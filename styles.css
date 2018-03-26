@@ -1,0 +1,118 @@
+/*change the default style of the badge to one that is a lot more subtle this 
+chnages all badged in the application*/
+
+.logo {
+    margin-top: -12px;
+}
+
+/*default badge*/
+.badge {
+    display: inline-block;
+    min-width: 10px;
+    padding: 3px 7px;
+    font-size: 16px;
+    font-weight: 300;
+    color: #000000;
+    line-height: 1;
+    vertical-align: middle;
+    white-space: nowrap;
+    text-align: center;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+}
+
+.badge-warning {
+    font-weight: normal;
+    color: #ffffff;
+    background-color: #d37272;
+
+}
+
+
+.panel-default {
+    border-color: #f5f5f5;
+}
+
+.panel-default>.panel-heading {
+    color: #333333;
+    background-color: #f5f5f5;
+    border-color: #f5f5f5;
+}
+
+.global-date-row {
+  display: inline-block;
+}
+
+/*add padding to list group item in ordert make the panels have more room within*/
+.list-group-item {
+    position: relative;
+    display: block;
+    padding: 15px 15px;
+    margin-bottom: -1px;
+    background-color: transparent;
+    border: 0px solid rgba(221, 221, 221, 0);
+}
+
+.well {
+    border-radius: 10px;
+}
+
+/*.date_btn {
+/*margin-top: 16px;
+  margin-left: 10px;*/
+  display: inline-block;
+  vertical-align: top;
+  border-radius: 5px;
+  color: #666;
+  background-image: none;
+  background-color: transparent;
+  border-color: #aaa;
+}*/
+
+/*.shiny-date-input.form-group.shiny-input-container.shiny-bound-input {
+    display: inline-block;
+    width: 150px;
+}
+*/
+
+@media (max-width: 464px) {
+    .logo-img {
+        display: none;
+    }
+    .logo {
+        margin-top: 0;
+    }
+    .gage_map {
+        display: none;
+    }
+}
+
+
+label {
+    font-weight: normal;
+}
+
+.gage_map {
+    width: 75%;
+}
+
+
+.home-metrics {
+    /*border-right: #dddddd .5px solid;*/
+    padding-right: 20px;
+}
+
+.home-plots {
+    padding-left: 20px;
+}
+
+/*improve the validation errors that shiny provides */
+.shiny-output-error-validation {
+    color: #3a3434;
+    font-weight: 500;
+}
+
+.about {
+    max-width: 50%;
+    margin: auto;
+}

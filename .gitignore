@@ -1,0 +1,6 @@
+config.yml
+_scratch/*
+packrat/*
+rsconnect/*
+.Rproj.user
+.httr-oauth
