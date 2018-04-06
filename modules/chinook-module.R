@@ -41,28 +41,13 @@ winter_run_server <- function(input, output, session, g_date) {
   })
   
   selected_redd_from_table <- reactive({
-    if (is.null(input$chinook_table_cell_clicked$row)) return(NULL)
-    
-    redd_id <- selected_redds()[input$chinook_table_cell_clicked$row, 'spawn_id']$spawn_id
-    selected_redds() %>% 
-      filter(spawn_id %in% redd_id)
+    if (is.null(input$chinook_table_rows_selected)) return(NULL)
+    idx <- redds_for_table()[input$chinook_table_rows_selected, ]$`Spawn ID`
+    selected_redds() %>% filter(spawn_id == idx) %>% 
+      arrange(spawn_location, temp_date)
   })
   
-  observeEvent(input$chinook_table_cell_clicked, {
-    
-    row_idx <- input$chinook_table_cell_clicked$row
-    if (is.null(selected_redd_rows$rows)) {
-      selected_redd_rows$rows <- row_idx
-    }
-    else if (!(row_idx %in% selected_redd_rows$rows)) {
-      selected_redd_rows$rows <- append(selected_redd_rows$rows, row_idx)
-    }
-    else if (row_idx %in% selected_redd_rows$rows) {
-      selected_redd_rows$rows <- selected_redd_rows$rows[-which(selected_redd_rows$rows == row_idx)]
-    }
-   
-    cat(nrow(selected_redd_from_table()))
-  })
+  
   
   selected_redds <- reactive({
     redd_data %>% 
@@ -101,14 +86,19 @@ winter_run_server <- function(input, output, session, g_date) {
       mutate(expired = as.integer(estimated_emergence < g_date()))
   })
   
-  output$chinook_table <- DT::renderDataTable({
+  redds_for_table <- reactive({
     selected_redds() %>% 
       distinct(spawn_id, .keep_all = TRUE) %>% 
-      select(`Spawn Date` = spawn_date, 
+      select(`Spawn ID` = spawn_id,
+        `Spawn Date` = spawn_date, 
              `Location` = spawn_location,
              `Total Redds` = spawn_total, 
              `Estimated Emergence` = estimated_emergence, 
-             Expired = expired) %>%
+             Expired = expired)
+  })
+  
+  output$chinook_table <- DT::renderDataTable({
+    redds_for_table() %>%
       DT::datatable(data=.,
                     extensions = c("Scroller"),
                     rownames = FALSE,
@@ -124,13 +114,27 @@ winter_run_server <- function(input, output, session, g_date) {
       target = 'row',
       backgroundColor = styleEqual(c(0, 1), c('white', '#cccccc'))
     ) 
-  })
+  }, server = FALSE)
   
   output$chinook_plot <- renderPlotly({
-    p <- NULL
+    validate(need(
+      !is.null(selected_redd_from_table()), "Select a redd to view its temperature outlook"
+    ))
+    
+    p <- plot_ly(data=selected_redd_from_table(), 
+                 x=~temp_date, y=~daily_temp, type='scatter', 
+                 color=~spawn_location,
+                 mode = 'lines') %>% 
+      add_markers(
+        data=distinct(selected_redd_from_table(), spawn_id, .keep_all = TRUE), 
+        x=~spawn_date, 
+        y=~daily_temp, 
+        showlegend = FALSE
+      )
     validate(need(
       !is.null(p), "Select a redd to view its temperature profile"
     ))
+    p
   })
   
 }

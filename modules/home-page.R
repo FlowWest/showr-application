@@ -1,8 +1,9 @@
-# data used in this page depend on the data:
-# res oprations (storage, curve)
-# outflow temp
-# flow
-# chinook
+# Author: Emanuel
+# Details:
+# This file defines both the UI and server for the home page of showr.
+# The datasets used here are the following:
+# - shasta_storage_data: has sensors 15 and 94, storage and con curve respectively
+# - temp_compliance_points_daily_mean: daily temp means for kwk, bsf, and ccr 
 
 
 homeUI <- function(id){
@@ -84,10 +85,11 @@ home_server <- function(input, output, session, g_date) {
   # Temperature Readings -------------------------------------------------------
   
   latest_temperature_reading <- function(location) {
-    temp_data_daily_mean %>% 
+    temp_compliance_points_daily_mean %>% 
       filter(location_id == location, datetime == g_date()) %>% 
       pull(parameter_value)
   }
+  
   latest_kwk_temperature <- reactive({latest_temperature_reading('kwk')})
   latest_ccr_temperature <- reactive({latest_temperature_reading('ccr')})
   latest_bsf_temperature <- reactive({latest_temperature_reading('bsf')})

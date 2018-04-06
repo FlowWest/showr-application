@@ -22,7 +22,7 @@ source("atu.R")
 # modules -----------------------------------------------------------------------
 source("modules/home-page.R")
 source("modules/temperature-page.R")
-source("modules/winter-run-chinook-page.R")
+source("modules/chinook-module.R")
 source("modules/flow-page.R")
 source("modules/about-page.R")
 
@@ -49,7 +49,8 @@ diversion_data <- read_csv("data/srsc_diversion_data.csv") %>%
 # UPDATE: shiny app just reads from a static site pre-populated with processed data 
 # TODO: do the same with the fish data in the application
 temp_data <- readr::read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_hourly_temps.csv")
-temp_data_daily_mean <- readr::read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_tempatures.csv")
+temp_compliance_points_daily_mean <- 
+  readr::read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_tempatures.csv")
 flow_data <- readr::read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_hourly_flows.csv")
 flow_data_daily_mean <- readr::read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_flow.csv")
 shasta_storage_data <- readr::read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_ops.csv")
@@ -111,6 +112,8 @@ redd_to_cdec_location$location <- redd_to_cdec_location$location %>%
   str_replace_all("Rd", "Road")
 
 
+# these are used for plot legends in order to show full names and 
+# have hovers show full names too.
 station_code_to_name_temps <- c(
   "kwk" = "Keswick",
   "ccr" = "Clear Creek",
@@ -141,3 +144,7 @@ textInputRow<-function (inputId, label, value = "")
 cold_water_pool_2018 <- 
   gs_url("https://docs.google.com/spreadsheets/d/1fkl4RTjOADGNjgUD56HLKMdC0xd1olaw91PFbKiNY3s/edit?usp=sharing") %>% 
   gs_read(ws = "2017")
+
+
+redd_cdec_lookup <- redd_to_cdec_location$gage_location
+names(redd_cdec_lookup) <- redd_to_cdec_location$location

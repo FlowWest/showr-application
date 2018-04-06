@@ -101,6 +101,13 @@ winter_run_server <- function(input, output, session, g_date) {
              counts > 0) # maybe move counts > 0 to sql query?
   })
   
+  selected_temp_data_with_temps <- reactive({
+    d1 <- selected_redd_data() %>% 
+      mutate(cdec_loc = redd_cdec_lookup[location])
+    
+    left_join(d1, ungroup(temp_daily))
+  })
+  
   redd_year_counts <- reactive({
     req(input$fish_location, input$fish_year)
     redd_data %>% 
@@ -222,6 +229,7 @@ winter_run_server <- function(input, output, session, g_date) {
       }
     )
   })
+  
   
   output$location_selected_print <- renderText({input$fish_location})
   
