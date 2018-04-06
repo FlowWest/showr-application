@@ -19,12 +19,17 @@ winter_run_UI <- function(id) {
       column(width = 12, class = "col-md-4", 
              DT::dataTableOutput(ns("chinook_table")), 
              leafletOutput(ns("chinook_map"))), 
-      column(width = 12, class = "col-md-8")
+      column(width = 12, class = "col-md-8", 
+             plotlyOutput(ns("chinook_plot")))
     )
   )
 }
 
 winter_run_server <- function(input, output, session, g_date) {
+  
+  selected_redd_rows <- reactiveValues(
+    rows = c(NULL)
+  )
   
   selected_temp_data <- reactive({
     temp_data %>% 
@@ -33,6 +38,30 @@ winter_run_server <- function(input, output, session, g_date) {
       summarise(
         daily_mean = mean(parameter_value, na.rm = TRUE)
       )
+  })
+  
+  selected_redd_from_table <- reactive({
+    if (is.null(input$chinook_table_cell_clicked$row)) return(NULL)
+    
+    redd_id <- selected_redds()[input$chinook_table_cell_clicked$row, 'spawn_id']$spawn_id
+    selected_redds() %>% 
+      filter(spawn_id %in% redd_id)
+  })
+  
+  observeEvent(input$chinook_table_cell_clicked, {
+    
+    row_idx <- input$chinook_table_cell_clicked$row
+    if (is.null(selected_redd_rows$rows)) {
+      selected_redd_rows$rows <- row_idx
+    }
+    else if (!(row_idx %in% selected_redd_rows$rows)) {
+      selected_redd_rows$rows <- append(selected_redd_rows$rows, row_idx)
+    }
+    else if (row_idx %in% selected_redd_rows$rows) {
+      selected_redd_rows$rows <- selected_redd_rows$rows[-which(selected_redd_rows$rows == row_idx)]
+    }
+   
+    cat(nrow(selected_redd_from_table()))
   })
   
   selected_redds <- reactive({
@@ -67,8 +96,9 @@ winter_run_server <- function(input, output, session, g_date) {
             pull(filter(selected_temp_data(), location_id == .$cdec_location, 
                         date >= .$spawn_date, date <= .$estimated_emergence), date)
           }
-        )
-      ) %>% ungroup()
+        ) 
+      ) %>% ungroup() %>% 
+      mutate(expired = as.integer(estimated_emergence < g_date()))
   })
   
   output$chinook_table <- DT::renderDataTable({
@@ -77,16 +107,30 @@ winter_run_server <- function(input, output, session, g_date) {
       select(`Spawn Date` = spawn_date, 
              `Location` = spawn_location,
              `Total Redds` = spawn_total, 
-             `Estimated Emergence` = estimated_emergence)
-    },
-    extensions = c("Scroller"),
-    rownames = FALSE,
-    options = list(
-      order = list(list(0, 'desc')), 
-      dom = 't',
-      deferRender = TRUE,
-      scrollY = 400,
-      scroller = TRUE
+             `Estimated Emergence` = estimated_emergence, 
+             Expired = expired) %>%
+      DT::datatable(data=.,
+                    extensions = c("Scroller"),
+                    rownames = FALSE,
+                    options = list(
+                      order = list(list(0, 'desc')), 
+                      dom = 't',
+                      deferRender = TRUE,
+                      scrollY = 400,
+                      scroller = TRUE
+                    )) %>% 
+    DT::formatStyle(
+      columns = "Expired",
+      target = 'row',
+      backgroundColor = styleEqual(c(0, 1), c('white', '#cccccc'))
+    ) 
+  })
+  
+  output$chinook_plot <- renderPlotly({
+    p <- NULL
+    validate(need(
+      !is.null(p), "Select a redd to view its temperature profile"
     ))
+  })
   
 }
