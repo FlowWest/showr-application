@@ -16,20 +16,16 @@ winter_run_UI <- function(id) {
                          choices = c("Test")))
     ),
     fluidRow(
-      column(width = 12, class = "col-md-4", 
+      column(width = 12, class = "col-md-5", 
              DT::dataTableOutput(ns("chinook_table")), 
              leafletOutput(ns("chinook_map"))), 
-      column(width = 12, class = "col-md-8", 
+      column(width = 12, class = "col-md-7", 
              plotlyOutput(ns("chinook_plot")))
     )
   )
 }
 
 winter_run_server <- function(input, output, session, g_date) {
-  
-  selected_redd_rows <- reactiveValues(
-    rows = c(NULL)
-  )
   
   selected_temp_data <- reactive({
     temp_data %>% 
@@ -39,15 +35,6 @@ winter_run_server <- function(input, output, session, g_date) {
         daily_mean = mean(parameter_value, na.rm = TRUE)
       )
   })
-  
-  selected_redd_from_table <- reactive({
-    if (is.null(input$chinook_table_rows_selected)) return(NULL)
-    idx <- redds_for_table()[input$chinook_table_rows_selected, ]$`Spawn ID`
-    selected_redds() %>% filter(spawn_id == idx) %>% 
-      arrange(spawn_location, temp_date)
-  })
-  
-  
   
   selected_redds <- reactive({
     redd_data %>% 
@@ -86,6 +73,22 @@ winter_run_server <- function(input, output, session, g_date) {
       mutate(expired = as.integer(estimated_emergence < g_date()))
   })
   
+  selected_redd_id_from_table <- reactive({
+    if (is.null(input$chinook_table_rows_selected)) return(NULL)
+    idx <- redds_for_table()[input$chinook_table_rows_selected, ]$`Spawn ID`
+    return(idx)
+  })
+  
+  
+  selected_redd_spawn <- reactive({
+    selected_redds() %>% 
+      filter(spawn_id %in% selected_redd_id_from_table(), 
+             spawn_date == temp_date) %>% 
+      select(spawn_id, spawn_date, daily_teamp, spawn_location)
+  })
+  selected_redd_emergence <- reactive({})
+  selected_redd_temps <- reactive({})
+  
   redds_for_table <- reactive({
     selected_redds() %>% 
       distinct(spawn_id, .keep_all = TRUE) %>% 
@@ -106,7 +109,7 @@ winter_run_server <- function(input, output, session, g_date) {
                       order = list(list(0, 'desc')), 
                       dom = 't',
                       deferRender = TRUE,
-                      scrollY = 400,
+                      scrollY = 300,
                       scroller = TRUE
                     )) %>% 
     DT::formatStyle(
@@ -123,18 +126,31 @@ winter_run_server <- function(input, output, session, g_date) {
     
     p <- plot_ly(data=selected_redd_from_table(), 
                  x=~temp_date, y=~daily_temp, type='scatter', 
-                 color=~spawn_location,
+                 color=~spawn_id,
                  mode = 'lines') %>% 
       add_markers(
         data=distinct(selected_redd_from_table(), spawn_id, .keep_all = TRUE), 
         x=~spawn_date, 
-        y=~daily_temp, 
+        y=~daily_temp,
+        text = ~paste0(
+          "Spawn Date: <b>", spawn_date, "</b><br>",
+          "Location: <b>", spawn_location,"</b><br>",
+          "Total Redds: <b>", spawn_total,"</b><br>",
+          "Esimated Emergence: <b>", estimated_emergence, "</b>"
+        ),
+        hoverinfo = "text",
+        color=~spawn_id,
         showlegend = FALSE
-      )
+      ) %>% 
+      add_lines(data=selected_redd_from_table(), 
+                x=~temp_date, 
+                y=56, 
+                line=list(dash='dash'))
+    
     validate(need(
       !is.null(p), "Select a redd to view its temperature profile"
     ))
-    p
+    p %>% layout(yaxis=list(domain=c(40,70)))
   })
   
 }
