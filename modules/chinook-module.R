@@ -84,10 +84,20 @@ winter_run_server <- function(input, output, session, g_date) {
     selected_redds() %>% 
       filter(spawn_id %in% selected_redd_id_from_table(), 
              spawn_date == temp_date) %>% 
-      select(spawn_id, spawn_date, daily_teamp, spawn_location)
+      select(spawn_id, spawn_date, spawn_total, daily_temp, spawn_location, 
+             estimated_emergence)
   })
-  selected_redd_emergence <- reactive({})
-  selected_redd_temps <- reactive({})
+  
+  selected_redd_emergence <- reactive({
+    selected_redds() %>% 
+      filter(spawn_id %in% selected_redd_id_from_table(), 
+             estimated_emergence == temp_date) %>% 
+      select(spawn_id, esimated_emergence, spawn_total, daily_temp, spawn_location)
+  })
+  selected_redd_temps <- reactive({
+    selected_redds() %>% 
+      filter(spawn_id %in% selected_redd_id_from_table())
+  })
   
   redds_for_table <- reactive({
     selected_redds() %>% 
@@ -121,31 +131,26 @@ winter_run_server <- function(input, output, session, g_date) {
   
   output$chinook_plot <- renderPlotly({
     validate(need(
-      !is.null(selected_redd_from_table()), "Select a redd to view its temperature outlook"
+      nrow(selected_redd_spawn()) > 0, "Select a redd to view its temperature outlook"
     ))
     
-    p <- plot_ly(data=selected_redd_from_table(), 
-                 x=~temp_date, y=~daily_temp, type='scatter', 
-                 color=~spawn_id,
-                 mode = 'lines') %>% 
-      add_markers(
-        data=distinct(selected_redd_from_table(), spawn_id, .keep_all = TRUE), 
-        x=~spawn_date, 
-        y=~daily_temp,
-        text = ~paste0(
-          "Spawn Date: <b>", spawn_date, "</b><br>",
-          "Location: <b>", spawn_location,"</b><br>",
-          "Total Redds: <b>", spawn_total,"</b><br>",
-          "Esimated Emergence: <b>", estimated_emergence, "</b>"
-        ),
-        hoverinfo = "text",
-        color=~spawn_id,
-        showlegend = FALSE
-      ) %>% 
-      add_lines(data=selected_redd_from_table(), 
+    p <- plot_ly() %>% 
+      add_markers(data=selected_redd_spawn(),
+                  x=~spawn_date, 
+                  y=~daily_temp, 
+                  color=~spawn_location, 
+                  showlegend = FALSE, 
+                  text = ~paste0(
+                    "Spawn Date: ", spawn_date, "<br>",
+                    "Location: ", spawn_location, "<br>",
+                    "Total: ", spawn_total, "<br>",
+                    "Estimated Emergence: ", estimated_emergence
+                  ), 
+                  hoverinfo = "text") %>% 
+      add_lines(data=selected_redd_temps(), 
                 x=~temp_date, 
-                y=56, 
-                line=list(dash='dash'))
+                y=~daily_temp, 
+                color=~spawn_location)
     
     validate(need(
       !is.null(p), "Select a redd to view its temperature profile"
