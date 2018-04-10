@@ -115,6 +115,7 @@ winter_run_server <- function(input, output, session, g_date) {
       DT::datatable(data=.,
                     extensions = c("Scroller"),
                     rownames = FALSE,
+                    selection = list(mode='single', selected = 1),
                     options = list(
                       order = list(list(0, 'desc')), 
                       dom = 't',
@@ -146,16 +147,25 @@ winter_run_server <- function(input, output, session, g_date) {
                     "Total: ", spawn_total, "<br>",
                     "Estimated Emergence: ", estimated_emergence
                   ), 
-                  hoverinfo = "text") %>% 
+                  hoverinfo = "text", 
+                  marker = list(color="black")) %>% 
       add_lines(data=selected_redd_temps(), 
                 x=~temp_date, 
                 y=~daily_temp, 
-                color=~spawn_location)
+                color=~spawn_location, 
+                line =list(color="#666666"))
     
     validate(need(
       !is.null(p), "Select a redd to view its temperature profile"
     ))
-    p %>% layout(yaxis=list(domain=c(40,70)))
+    p %>% layout(yaxis=list(title = "Daily Mean Temperature (F)",domain=c(40,70)),
+                 xaxis = list(title =""))
+  })
+  
+  output$chinook_map <- renderLeaflet({
+    leaflet() %>% 
+      addTiles() %>% 
+      addPolylines(data=redd_reach)
   })
   
 }
