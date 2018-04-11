@@ -1,15 +1,11 @@
 # Author: Emanuel
 # Details:
 # This file defines both the UI and server for the home page of showr.
-# The datasets used here are the following:
-# - shasta_storage_data: has sensors 15 and 94, storage and con curve respectively
-# - temp_compliance_points_daily_mean: daily temp means for kwk, bsf, and ccr 
-
 
 homeUI <- function(id){
   ns <- NS(id)
   tagList(
-           htmlTemplate("templates/home.html", 
+           htmlTemplate("templates/dashboard.html", 
                         shasta_storage_val = textOutput(ns("shasta_storage")), 
                         shasta_cons_curve_val = textOutput(ns("shasta_cons_curve")), 
                         shasta_percent_of_full_val = textOutput(ns("shasta_percent_of_full")),

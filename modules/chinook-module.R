@@ -20,7 +20,21 @@ winter_run_UI <- function(id) {
              DT::dataTableOutput(ns("chinook_table")), 
              leafletOutput(ns("chinook_map"))), 
       column(width = 12, class = "col-md-7", 
-             plotlyOutput(ns("chinook_plot")))
+             plotlyOutput(ns("chinook_plot")), 
+             column(width = 12, class = "col-md-6", 
+                    tags$div(class="panel panel-default", 
+                             tags$div(class="panel-heading", 
+                                      "Left Heading"), 
+                             tags$div(class = "panel-body", 
+                                      tags$div(
+                                        "Total Redds Counted:",
+                                        textOutput(ns("total_redds_metric"))
+                                      ), 
+                                      tags$p("row 2")))), 
+             column(width = 12, class = "col-md-6", 
+                    tags$div(class="panel panel-default", 
+                             tags$div(class="panel-heading", 
+                                      "Right Heading"))))
     )
   )
 }
@@ -108,6 +122,17 @@ winter_run_server <- function(input, output, session, g_date) {
              `Total Redds` = spawn_total, 
              `Estimated Emergence` = estimated_emergence, 
              Expired = expired)
+  })
+  
+  total_redds_observed_to_date <- reactive({
+    redds_for_table() %>% 
+      select(`Total Redds`) %>% 
+      pull() %>% 
+      sum()
+  })
+  
+  output$total_redds_metric <- renderText({
+    total_redds_observed_to_date()
   })
   
   output$chinook_table <- DT::renderDataTable({

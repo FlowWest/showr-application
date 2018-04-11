@@ -1,6 +1,4 @@
-# library imports -----------------------------------------------------------------
 library(shiny)
-#library(DBI)
 library(plotly)
 library(dplyr)
 library(lubridate)
@@ -15,6 +13,7 @@ library(forcats)
 library(readr)
 library(sparkline)
 library(shinyjs)
+library(measurements)
 
 # atu
 source("atu.R")
@@ -113,9 +112,6 @@ tcd_configs_data <- read_rds("data/tcd_configurations/tcd_configs_through_2017-0
 
 # temp locations metadata 
 cdec_temperature_locations <- read_rds("data/temperatures/cdec_temperature_locations.rds")
-
-# redd location to cdec location lookup table 
-redd_to_cdec_location <- read_rds("data/chinook/redd_location_to_cdec_location.rds")
 
 model_temps <- read_csv("https://s3-us-west-2.amazonaws.com/svproducers-data/cvtemp_data/2017-08-25_10%3A00%3A15_model_output.csv")
 model_temps$datetime <- as_date(model_temps$datetime)
