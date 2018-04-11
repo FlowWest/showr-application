@@ -1,6 +1,6 @@
 # library imports -----------------------------------------------------------------
 library(shiny)
-library(DBI)
+#library(DBI)
 library(plotly)
 library(dplyr)
 library(lubridate)
@@ -15,7 +15,7 @@ library(forcats)
 library(readr)
 library(sparkline)
 library(shinyjs)
-library(googlesheets)
+
 # atu
 source("atu.R")
 
@@ -26,47 +26,73 @@ source("modules/chinook-module.R")
 source("modules/flow-page.R")
 source("modules/about-page.R")
 
-db <- config::get("production")
+# load general object, documented in "data/make-general-objects.R"
+load("data/general-objects.RData")
 
-database_transaction <- function(q, ...) {
-  tmp_conn <- dbConnect(
-    drv = RPostgreSQL::PostgreSQL(), 
-    user = db$user, 
-    host = db$host,
-    password = db$password,
-    port = db$port,
-    dbname = db$dbname
-  )
-  on.exit(dbDisconnect(tmp_conn))
-  query <- sqlInterpolate(tmp_conn, q, ...)
-  dbGetQuery(tmp_conn, query)
-}
 
 diversion_data <- read_csv("data/srsc_diversion_data.csv") %>% 
   mutate(draft_date = mdy(draft_date))
 
 
-# UPDATE: shiny app just reads from a static site pre-populated with processed data 
-# TODO: do the same with the fish data in the application
-temp_data <- readr::read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_hourly_temps.csv")
-temp_compliance_points_daily_mean <- 
-  readr::read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_tempatures.csv")
-flow_data <- readr::read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_hourly_flows.csv")
-flow_data_daily_mean <- readr::read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_flow.csv")
-shasta_storage_data <- readr::read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_ops.csv")
+temp_data <- 
+  read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_hourly_temps.csv", 
+                             col_types = cols(
+                               datetime = col_datetime(format = ""),
+                               location_id = col_character(),
+                               parameter_id = col_integer(),
+                               parameter_value = col_double()
+                             ))
 
-redd_data <- readr::read_csv("https://s3-us-west-2.amazonaws.com/showr-data/cdfw/redds/aerial-survey-observations_no_error_codes.csv") %>% 
-  filter(race == "Winter")
+temp_compliance_points_daily_mean <- 
+  read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_tempatures.csv", 
+                  col_types = cols(
+                    datetime = col_date(format = ""),
+                    location_id = col_character(),
+                    parameter_id = col_integer(),
+                    parameter_value = col_double()
+                  ))
+
+flow_data <- 
+  read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_hourly_flows.csv",
+                             col_types = cols(
+                               location_id = col_character(),
+                               parameter_id = col_integer(),
+                               datetime = col_datetime(format = ""),
+                               parameter_value = col_integer()
+                             ))
+
+flow_data_daily_mean <- 
+  read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_flow.csv", 
+                                        col_types = cols(
+                                          datetime = col_date(format = ""),
+                                          location_id = col_character(),
+                                          parameter_id = col_integer(),
+                                          parameter_value = col_double()
+                                        ))
+
+shasta_storage_data <- 
+  read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_ops.csv", 
+                  col_types = cols(
+                    datetime = col_date(format = ""),
+                    location_id = col_character(),
+                    parameter_id = col_integer(),
+                    parameter_value = col_double()
+                  ))
+
+redd_data <- 
+  read_csv("https://s3-us-west-2.amazonaws.com/showr-data/cdfw/redds/aerial-survey-observations_no_error_codes.csv", 
+                  col_types = cols(
+                    date = col_date(format = ""),
+                    location = col_character(),
+                    race = col_character(),
+                    counts = col_double()
+                  )) %>% filter(race == "Winter")
+
 
 redd_locations <- distinct(redd_data, location) %>% pull(location)
 
+carcass_data <- read_rds("data/carcass_static_data.rds")
 
-# query for carcass data 
-carcass_data <- database_transaction(
-  "select * from carcass_counts 
-  where date_part('year', date) IN (2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017)
-  and total_count >= 0;"
-)
 # shape files for redd map 
 redd_reach <- readOGR("data/redd_reaches/redd_reach.shp", stringsAsFactors = FALSE)
 redd_reach <- spTransform(redd_reach, CRS("+proj=longlat +datum=WGS84 +no_defs"))
@@ -112,56 +138,16 @@ redd_to_cdec_location$location <- redd_to_cdec_location$location %>%
   str_replace_all("Rd", "Road")
 
 
-# these are used for plot legends in order to show full names and 
-# have hovers show full names too.
-station_code_to_name_temps <- c(
-  "kwk" = "Keswick",
-  "ccr" = "Clear Creek",
-  "bsf" = "Balls Ferry", 
-  "jlf" = "Jellys Ferry",
-  "bnd" = "Bend Bridge", 
-  "sha" = "Shasta"
-)
 
-station_code_to_name_flows <- c(
-  "kwk" = "Keswick Outflow",
-  "ccr" = "Clear Creek",
-  "bsf" = "Balls Ferry", 
-  "jlf" = "Jellys Ferry",
-  "bnd" = "Bend Bridge", 
-  "sha" = "Shasta Inflow", 
-  "wlk" = "Wilkins Slough"
-)
+# textInputRow<-function (inputId, label, value = "") 
+# {
+#   div(style="display:inline-block",
+#       tags$label(label, `for` = inputId), 
+#       tags$input(id = inputId, type = "text", value = value,class="input-small"))
+# }
+# 
+# cold_water_pool_2018 <- 
+#   gs_url("https://docs.google.com/spreadsheets/d/1fkl4RTjOADGNjgUD56HLKMdC0xd1olaw91PFbKiNY3s/edit?usp=sharing") %>% 
+#   gs_read(ws = "2017")
 
 
-textInputRow<-function (inputId, label, value = "") 
-{
-  div(style="display:inline-block",
-      tags$label(label, `for` = inputId), 
-      tags$input(id = inputId, type = "text", value = value,class="input-small"))
-}
-
-cold_water_pool_2018 <- 
-  gs_url("https://docs.google.com/spreadsheets/d/1fkl4RTjOADGNjgUD56HLKMdC0xd1olaw91PFbKiNY3s/edit?usp=sharing") %>% 
-  gs_read(ws = "2017")
-
-
-redd_cdec_lookup <- redd_to_cdec_location$gage_location
-names(redd_cdec_lookup) <- redd_to_cdec_location$location
-
-
-# redd reaches center coords 
-redd_reach_center_coords <- list(
-  "Keswick to ACID Dam" = c(40.597215, -122.439403), 
-  "ACID Dam to Highway 44 Bridge" = c(40.592037, -122.373396), 
-  "Highway 44 Bridge to Airport Road Bridge" = c(40.515936, -122.357771), 
-  "Airport Road Bridge to Balls Ferry Bridge" = c(40.462697, -122.251489),
-  "Balls Ferry Bridge to Battle Creek" = c(40.380764, -122.199044),
-  "Battle Creek to Jellys Ferry Bridge" = c(40.331602, -122.210969),
-  "Jellys Ferry Bridge to Bend Bridge" = c(40.317591, -122.173661),
-  "Bend Bridge to Red Bluff Diversion Dam" = c(40.203255, -122.218306),
-  "Red Bluff Diversion Dam to Tehama Bridge" = c(),
-  "Tehama Bridge to Woodson Bridge" = c(),
-  "Woodson Bridge to Hamilton City Bridge" = c(),
-  "Hamilton City Bridge to Old Ferry Bridge" = c()
-)
