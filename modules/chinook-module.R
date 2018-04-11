@@ -26,20 +26,26 @@ winter_run_UI <- function(id) {
                              tags$div(class="panel-heading", 
                                       "Left Heading"), 
                              tags$div(class = "panel-body", 
-                                      tags$div(
-                                        "Total Redds Counted:",
-                                        textOutput(ns("total_redds_metric"))
-                                      ), 
                                       tags$p("row 2")))), 
              column(width = 12, class = "col-md-6", 
                     tags$div(class="panel panel-default", 
                              tags$div(class="panel-heading", 
-                                      "Right Heading"))))
+                                      textOutput(ns("panel_year_heading"))),
+                             tags$div(class = "panel-body",
+                               "Total Redds Counted:",
+                               textOutput(ns("total_redds_metric"))
+                             )
+                             )))
     )
   )
 }
 
 winter_run_server <- function(input, output, session, g_date) {
+  
+  
+  output$panel_year_heading <- reactive({
+    paste(input$chinook_year_selected, "Year Summary")
+  })
   
   selected_temp_data <- reactive({
     temp_data %>% 
@@ -178,7 +184,10 @@ winter_run_server <- function(input, output, session, g_date) {
                 x=~temp_date, 
                 y=~daily_temp, 
                 color=~spawn_location, 
-                line =list(color="#666666"))
+                line =list(color="#666666")) %>% 
+      add_lines(x=~temp_date, 
+                y=56, 
+                line=list(dash = "dash", color="red"))
     
     validate(need(
       !is.null(p), "Select a redd to view its temperature profile"
