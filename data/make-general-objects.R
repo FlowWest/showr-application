@@ -62,12 +62,16 @@ redd_reach_center_coords <- list(
   "Hamilton City Bridge to Old Ferry Bridge" = c()
 )
 
+# redd locations, this is used for the selectInput
+redd_locations <- names(redd_cdec_lookup)
+
 
 save(
   redd_cdec_lookup, 
   station_code_to_name_flows, 
   station_code_to_name_temps, 
   redd_reach_center_coords,
+  redd_locations,
   file = "data/general-objects.RData"
 )
 
