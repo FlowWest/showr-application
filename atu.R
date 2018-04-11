@@ -1,9 +1,7 @@
 # functions for automating the calculations of atu's and redd emergence 
 
 get_gage_location <- function(redd_location) {
-  redd_to_cdec_location %>% 
-    filter(location == redd_location) %>% 
-    pull(gage_location)
+  as.character(redd_cdec_lookup[redd_location])
 }
 
 
