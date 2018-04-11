@@ -14,7 +14,7 @@ get_gage_location <- function(redd_location) {
 estimate_emergence <- function(spawn_date, redd_location) {
   # get the appropriate cdec/cvtemp location 
   gage <- get_gage_location(redd_location)
-  spawn_data <- as_date(spawn_date)
+  spawn_date <- as_date(spawn_date)
   
   # summarize hourly data to a daily mean
   atu <- 
@@ -25,10 +25,11 @@ estimate_emergence <- function(spawn_date, redd_location) {
     ungroup() %>%
     arrange(date) %>% 
     filter(date >= spawn_date) %>% 
-    mutate(atu = cumsum(daily_mean))
+    mutate(daily_mean_C = measurements::conv_unit(daily_mean, "F", "C"), 
+           atu = cumsum(daily_mean_C))
   
     
-  emergence <- atu %>% filter(atu >= 1724)
+  emergence <- atu %>% filter(atu >= 958)
   
   # if the 'emergence' dataframe is empty then we have not reached
   # the emergence value, and must proceed using modeled temp data.
@@ -37,13 +38,14 @@ estimate_emergence <- function(spawn_date, redd_location) {
     
     if (length(current_atu) == 0) current_atu <- 0 
     
-    thresh <- 1724 - current_atu # new thresh will be old thresh minus current atu
+    thresh <- 958 - current_atu # new thresh will be old thresh minus current atu
     
     model_estimated_emergence <- 
-      model_temps %>% filter(location_id == gage, datetime >= spawn_date) %>% 
-      mutate(atu = cumsum(temp_50)) %>%
-      filter(atu >= thresh) %>% 
+      model_temps %>%
       arrange(datetime) %>% 
+      filter(location_id == gage, datetime >= spawn_date) %>% 
+      mutate(atu = cumsum(temp_50)) %>%
+      filter(atu >= thresh) %>%
       head(1)
     
     # na indicates the model is unable to project that far in the future
