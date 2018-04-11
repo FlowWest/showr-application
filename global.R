@@ -148,3 +148,20 @@ cold_water_pool_2018 <-
 
 redd_cdec_lookup <- redd_to_cdec_location$gage_location
 names(redd_cdec_lookup) <- redd_to_cdec_location$location
+
+
+# redd reaches center coords 
+redd_reach_center_coords <- list(
+  "Keswick to ACID Dam" = c(40.597215, -122.439403), 
+  "ACID Dam to Highway 44 Bridge" = c(40.592037, -122.373396), 
+  "Highway 44 Bridge to Airport Road Bridge" = c(40.515936, -122.357771), 
+  "Airport Road Bridge to Balls Ferry Bridge" = c(40.462697, -122.251489),
+  "Balls Ferry Bridge to Battle Creek" = c(40.380764, -122.199044),
+  "Battle Creek to Jellys Ferry Bridge" = c(40.331602, -122.210969),
+  "Jellys Ferry Bridge to Bend Bridge" = c(40.317591, -122.173661),
+  "Bend Bridge to Red Bluff Diversion Dam" = c(40.203255, -122.218306),
+  "Red Bluff Diversion Dam to Tehama Bridge" = c(),
+  "Tehama Bridge to Woodson Bridge" = c(),
+  "Woodson Bridge to Hamilton City Bridge" = c(),
+  "Hamilton City Bridge to Old Ferry Bridge" = c()
+)

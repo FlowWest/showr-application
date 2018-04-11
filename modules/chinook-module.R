@@ -3,11 +3,11 @@ winter_run_UI <- function(id) {
   
   tagList(
     fluidRow(
-      column(width = 1, 
-             radioButtons(inputId = ns("fish_view"),
-                          label = "Select Dataset",
-                          choices = c("Aerial Redd",
-                                      "Carcass"))), 
+      # column(width = 1, 
+      #        radioButtons(inputId = ns("fish_view"),
+      #                     label = "Select Dataset",
+      #                     choices = c("Aerial Redd",
+      #                                 "Carcass"))), 
       column(width = 2, 
              selectInput(ns("chinook_year_selected"), label = "Select A Year", 
                          choices = 2010:2018, selected = 2017)), 
