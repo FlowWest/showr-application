@@ -10,6 +10,7 @@ library(shiny)
 shinyServer(function(input, output) {
   g_date <- callModule(global_date, 'app')
   
+  callModule(welcome_server, 'app')
   callModule(home_server, 'app', g_date)
   callModule(temp_page_server, 'app', g_date)
   callModule(winter_run_server, 'app', g_date)

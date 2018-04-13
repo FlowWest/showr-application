@@ -24,6 +24,7 @@ source("modules/temperature-page.R")
 source("modules/chinook-module.R")
 source("modules/flow-page.R")
 source("modules/about-page.R")
+source("modules/welcome.R")
 
 # load general object, documented in "data/make-general-objects.R"
 load("data/general-objects.RData")

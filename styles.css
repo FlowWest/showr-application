@@ -1,42 +1,78 @@
 /*change the default style of the badge to one that is a lot more subtle this 
 chnages all badged in the application*/
 
+/* welcome page */
+.welcome-page {
+ max-width: 1000px;
+ margin-left: auto;
+ margin-right: auto;
+}
+
+.welcome-banner {
+  overflow: visible;
+  height: 350px;
+}
+
+.welcome-banner > div.welcome-image {
+  background-image: url("shasta-backdrop.jpg") center no-repeat;
+  position: absolute;
+  margin-top: -25px;
+  left: 0;
+  z-index: -1;
+  width: 100%;
+  height: inherit;
+}
+
+.welcome-banner > div.welcome-heading {
+  background-color: rgba(0, 0, 0, 0.3);
+  width: 410px;
+  padding: 10px 20px 10px 20px;
+}
+
+.welcome-banner > div.welcome-heading > h2 {
+ font-weight: 400;
+ color: white;
+ margin-bottom: 0px;
+ padding-top: 0px
+}
+
+
 .logo {
-    margin-top: -12px;
+  margin-top: -12px;
 }
 
 /*default badge*/
 .badge {
-    display: inline-block;
-    min-width: 10px;
-    padding: 3px 7px;
-    font-size: 16px;
-    font-weight: 300;
-    color: #000000;
-    line-height: 1;
-    vertical-align: middle;
-    white-space: nowrap;
-    text-align: center;
-    background-color: #f1f1f1;
-    border-radius: 5px;
+  display: inline-block;
+  min-width: 10px;
+  padding: 3px 7px;
+  font-size: 16px;
+  font-weight: 300;
+  color: #000000;
+  line-height: 1;
+  vertical-align: middle;
+  white-space: nowrap;
+  text-align: center;
+  background-color: #f1f1f1;
+  border-radius: 5px;
 }
 
 .badge-warning {
-    font-weight: normal;
-    color: #ffffff;
-    background-color: #d37272;
+  font-weight: normal;
+  color: #ffffff;
+  background-color: #d37272;
 
 }
 
 
 .panel-default {
-    border-color: #f5f5f5;
+  border-color: #f5f5f5;
 }
 
 .panel-default>.panel-heading {
-    color: #333333;
-    background-color: #f5f5f5;
-    border-color: #f5f5f5;
+  color: #333333;
+  background-color: #f5f5f5;
+  border-color: #f5f5f5;
 }
 
 .global-date-row {
@@ -45,28 +81,28 @@ chnages all badged in the application*/
 
 /*add padding to list group item in ordert make the panels have more room within*/
 .list-group-item {
-    position: relative;
-    display: block;
-    padding: 15px 15px;
-    margin-bottom: -1px;
-    background-color: transparent;
-    border: 0px solid rgba(221, 221, 221, 0);
+  position: relative;
+  display: block;
+  padding: 15px 15px;
+  margin-bottom: -1px;
+  background-color: transparent;
+  border: 0px solid rgba(221, 221, 221, 0);
 }
 
 .well {
-    border-radius: 10px;
+  border-radius: 10px;
 }
 
 /*.date_btn {
 /*margin-top: 16px;
-  margin-left: 10px;*/
-  display: inline-block;
-  vertical-align: top;
-  border-radius: 5px;
-  color: #666;
-  background-image: none;
-  background-color: transparent;
-  border-color: #aaa;
+margin-left: 10px;*/
+display: inline-block;
+vertical-align: top;
+border-radius: 5px;
+color: #666;
+background-image: none;
+background-color: transparent;
+border-color: #aaa;
 }*/
 
 /*.shiny-date-input.form-group.shiny-input-container.shiny-bound-input {
@@ -76,43 +112,43 @@ chnages all badged in the application*/
 */
 
 @media (max-width: 464px) {
-    .logo-img {
-        display: none;
-    }
-    .logo {
-        margin-top: 0;
-    }
-    .gage_map {
-        display: none;
-    }
+  .logo-img {
+    display: none;
+  }
+  .logo {
+    margin-top: 0;
+  }
+  .gage_map {
+    display: none;
+  }
 }
 
 
 label {
-    font-weight: normal;
+  font-weight: normal;
 }
 
 .gage_map {
-    width: 75%;
+  width: 75%;
 }
 
 
 .home-metrics {
-    /*border-right: #dddddd .5px solid;*/
-    padding-right: 20px;
+  /*border-right: #dddddd .5px solid;*/
+  padding-right: 20px;
 }
 
 .home-plots {
-    padding-left: 20px;
+  padding-left: 20px;
 }
 
 /*improve the validation errors that shiny provides */
 .shiny-output-error-validation {
-    color: #3a3434;
-    font-weight: 500;
+  color: #3a3434;
+  font-weight: 500;
 }
 
 .about {
-    max-width: 50%;
-    margin: auto;
+  max-width: 50%;
+  margin: auto;
 }
