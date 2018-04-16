@@ -6,7 +6,6 @@ tagList(useShinyjs(),
            collapsible = TRUE, 
            inverse = FALSE,
            theme = shinythemes::shinytheme("cosmo"),
-           # shinythemes::themeSelector(),
            windowTitle = "SHO-WR App", 
            header = includeCSS("styles.css"),
            

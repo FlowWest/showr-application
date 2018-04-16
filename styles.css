@@ -36,6 +36,12 @@ chnages all badged in the application*/
  padding-top: 0px
 }
 
+.welcome-about-showr > h4 {
+  font-weight: 400;
+  text-align: center;
+  max-width: 500px;
+}
+
 
 .logo {
   margin-top: -12px;
