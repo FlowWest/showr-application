@@ -9,8 +9,8 @@ chnages all badged in the application*/
 }
 
 .welcome-banner {
-  overflow: visible;
-  height: 350px;
+  /* overflow: visible; */
+  height: 245px;
 }
 
 .welcome-banner > div.welcome-image {
@@ -36,10 +36,16 @@ chnages all badged in the application*/
  padding-top: 0px
 }
 
-.welcome-about-showr > h4 {
+.welcome-about-showr > h5 {
   font-weight: 400;
   text-align: center;
-  max-width: 500px;
+}
+
+.welcome-footer {
+  position:absolute;
+  bottom:0;
+  width: inherit;
+  text-align: center;
 }
 
 
