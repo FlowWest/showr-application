@@ -26,14 +26,14 @@ source("modules/flow-page.R")
 source("modules/about-page.R")
 source("modules/welcome.R")
 
-# load general object, documented in "data/make-general-objects.R"
+# load general objects, documented in "data/make-general-objects.R"
 load("data/general-objects.RData")
 
 
 diversion_data <- read_csv("data/flows/srsc_diversion_data.csv") %>% 
   mutate(draft_date = mdy(draft_date))
 
-
+# These data are all on a public S3 bucket 
 temp_data <- 
   read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_hourly_temps.csv", 
                              col_types = cols(

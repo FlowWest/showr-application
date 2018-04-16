@@ -66,6 +66,7 @@ redd_reach_center_coords <- list(
 redd_locations <- names(redd_cdec_lookup)
 
 
+# run this to make the .Rdata object file
 save(
   redd_cdec_lookup, 
   station_code_to_name_flows, 

@@ -14,7 +14,7 @@ chnages all badged in the application*/
 }
 
 .welcome-banner > div.welcome-image {
-  background-image: url("shasta-backdrop.jpg") center no-repeat;
+  background: url("sand-slough-dawn-banner-700px.jpg") center no-repeat;
   position: absolute;
   margin-top: -25px;
   left: 0;
