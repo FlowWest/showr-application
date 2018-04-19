@@ -4,6 +4,7 @@ temp_pageUI <- function(id) {
   tagList(
     fluidRow(
       column(width = 12, class = "col-md-4", 
+             style="display: inline-flex;",
                dateRangeInput(inputId = ns("temp_daterange"), 
                               label = "Select Date Range", 
                               min = "1999-01-01", 

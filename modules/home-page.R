@@ -267,9 +267,27 @@ home_server <- function(input, output, session, g_date) {
       config(displayModeBar = FALSE)
   })
   
+  observe({
+    
+  })
+  
   output$chinook_summary_plot <- renderPlotly({
-    validate(need(nrow(selected_chinook_data()) > 0, 
-                  "0 Counts of Redds to date this year"))
+    
+    # 
+    # validate(need(nrow(selected_chinook_data()) > 0, 
+    #               "0 Counts of Redds to date this year"))
+    
+    if (nrow(selected_chinook_data()) == 0) {
+      return(redd_data %>% 
+        group_by(month = factor(month.abb[as.integer(month(date))], levels=month.abb), 
+                 location) %>% 
+        summarise(
+          month_counts = sum(counts)
+        ) %>% 
+        plot_ly(x=~month, y=~month_counts, type='bar', color=~location) %>% 
+        layout(barmode='stack'))
+    }
+    
     selected_chinook_data() %>% 
       group_by(location, month = month(date)) %>% 
       summarise(

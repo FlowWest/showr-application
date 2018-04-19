@@ -131,3 +131,22 @@ current_water_year_types <-
 pretty_num <- function(num, places = 2) {
   format(round(num, places), big.mark = ',', drop = FALSE)
 }
+
+isothermal_data <- read_rds("data/operations/shasta_storage_temperature.rds")
+
+get_year_classification <- function(y) {
+  if (y != year(today())) {
+    historic_water_year_types %>% 
+      filter(year == y) %>% 
+      mutate(classification = wy_class_lookups[yr_type]) %>% 
+      pull(classification) %>% 
+      as.character()
+  } else {
+    current_water_year_types %>% 
+      filter(probability == 99) %>% 
+      arrange(desc(date)) %>% 
+      head(1) %>% 
+      pull(classification) %>% 
+      as.character()
+  }
+}

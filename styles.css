@@ -1,6 +1,12 @@
 /*change the default style of the badge to one that is a lot more subtle this 
 chnages all badged in the application*/
 
+
+/* a hack for now */
+#app-temp_daterange{
+  margin-right: 10px;
+}
+
 /* welcome page */
 .welcome-page {
  max-width: 1000px;
@@ -31,7 +37,7 @@ chnages all badged in the application*/
 
 .welcome-banner > div.welcome-heading {
   background-color: rgba(0, 0, 0, 0.3);
-  width: 440px;
+  width: 455px;
   padding: 10px 20px 10px 20px;
 }
 
