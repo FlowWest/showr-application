@@ -65,6 +65,31 @@ redd_reach_center_coords <- list(
 # redd locations, this is used for the selectInput
 redd_locations <- names(redd_cdec_lookup)
 
+# convert the one letter codes in cdec to human readable types
+wy_class_lookups <- c(
+  "C" = "critical", 
+  "D" = "dry",
+  "BN" = "below normal", 
+  "AN" = "above normal",
+  "W" = "wet"
+)
+
+get_year_classification <- function(y) {
+  if (y != year(today())) {
+    historic_water_year_types %>% 
+      filter(year == y) %>% 
+      mutate(classification = wy_class_lookups[yr_type]) %>% 
+      pull(classification) %>% 
+      as.character()
+  } else {
+    current_water_year_types %>% 
+      filter(probability == 99) %>% 
+      arrange(desc(date)) %>% 
+      head(1) %>% 
+      pull(classification) %>% 
+      as.character()
+  }
+}
 
 # run this to make the .Rdata object file
 save(
@@ -73,6 +98,8 @@ save(
   station_code_to_name_temps, 
   redd_reach_center_coords,
   redd_locations,
+  wy_class_lookups,
+  get_year_classification,
   file = "data/general-objects.RData"
 )
 

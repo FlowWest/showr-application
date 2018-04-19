@@ -1,4 +1,3 @@
-
 tagList(useShinyjs(),
         navbarPage(title=div(class="logo", tags$img(class="logo-img",
                               src="chinook (1).svg", width="140px"), 

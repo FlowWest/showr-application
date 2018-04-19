@@ -8,7 +8,7 @@ homeUI <- function(id){
            htmlTemplate("templates/dashboard.html", 
                         shasta_storage_val = textOutput(ns("shasta_storage")), 
                         shasta_cons_curve_val = textOutput(ns("shasta_cons_curve")), 
-                        shasta_percent_of_full_val = textOutput(ns("shasta_percent_of_full")),
+                        water_year_type_val = textOutput(ns("water_year_class")),
                         mean_daily_temp_kwk = uiOutput(ns("kwk_temp_span")), 
                         mean_daily_temp_ccr = uiOutput(ns("ccr_temp_span")),
                         mean_daily_temp_bsf = uiOutput(ns("bsf_temp_span")), 
@@ -72,10 +72,8 @@ home_server <- function(input, output, session, g_date) {
     paste(pretty_num(x/1000000), "MAF")
   })
   
-  output$shasta_percent_of_full <- renderText({
-    validate(need(length(selected_shasta_percent_of_full()) > 0, "No Data"))
-    x <- selected_shasta_percent_of_full()[1]
-    paste(pretty_num(x * 100), "%")
+  output$water_year_class <- renderText({
+    get_year_classification(year(g_date()))
   })
   
   # Temperature Readings -------------------------------------------------------

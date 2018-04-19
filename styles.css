@@ -23,9 +23,15 @@ chnages all badged in the application*/
   height: inherit;
 }
 
+@media (max-width: 420) {
+  .welcome-banner > div.welcome-image {
+    background: none;
+  }
+}
+
 .welcome-banner > div.welcome-heading {
   background-color: rgba(0, 0, 0, 0.3);
-  width: 410px;
+  width: 440px;
   padding: 10px 20px 10px 20px;
 }
 
@@ -36,10 +42,15 @@ chnages all badged in the application*/
  padding-top: 0px
 }
 
-.welcome-about-showr > h5 {
+.welcome-banner > div.welcome-heading > h4 {
   font-weight: 400;
+  color: white;
+ }
+
+.welcome-about-showr > h5 {
   text-align: center;
 }
+
 
 .welcome-footer {
   position:absolute;
@@ -105,9 +116,9 @@ chnages all badged in the application*/
   border-radius: 10px;
 }
 
-/*.date_btn {
-/*margin-top: 16px;
-margin-left: 10px;*/
+/* .date_btn {
+margin-top: 16px;
+margin-left: 10px;
 display: inline-block;
 vertical-align: top;
 border-radius: 5px;
@@ -115,7 +126,7 @@ color: #666;
 background-image: none;
 background-color: transparent;
 border-color: #aaa;
-}*/
+} */
 
 /*.shiny-date-input.form-group.shiny-input-container.shiny-bound-input {
     display: inline-block;
