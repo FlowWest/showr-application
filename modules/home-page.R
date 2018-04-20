@@ -40,6 +40,61 @@ home_server <- function(input, output, session, g_date) {
       pull(parameter_value)
   })
   
+  
+  # isothermal data for storage bin
+  isothermal_percent_metric <- reactive({
+    isothermal_data %>% 
+      filter(date <= g_date(), year(date) == year(g_date())) %>% 
+      arrange(desc(date)) %>% 
+      group_by(date) %>% 
+      mutate(total_storage = sum(volume_taf)) %>% 
+      ungroup() %>% 
+      mutate(proportion_of_total = volume_taf / total_storage) %>% 
+      filter(temp <= 50) %>% 
+      group_by(date) %>% 
+      summarise(
+        total_prop_below_50 = sum(proportion_of_total)
+      ) %>% 
+      arrange(desc(date)) %>% 
+      head(1)
+    
+  })
+  
+  iso_thermal_data_for_plot <- reactive({
+    t <- iso_color_coded %>%
+      group_by(date, temp_code) %>%
+      summarise(total_storage_in_bin = sum(volume_taf)) %>% ungroup() %>%
+      mutate(volume_af = total_storage_in_bin * 1000) %>%
+      arrange(date, temp_code) %>%
+      group_by(date) %>%
+      mutate(accum_volume = cumsum(volume_af)) %>% ungroup() %>% 
+      filter(year(date) == year(g_date()), date <= g_date())
+    
+    list(
+      "dark_blue" = t %>% 
+        filter(temp_code == "dark blue"),
+      
+      "blue" =  t %>% 
+        filter(temp_code == "blue"),
+      
+      "cyan" = t %>% 
+        filter(temp_code == "cyan"),
+      
+      "green" = t %>% 
+        filter(temp_code == "green"),
+      
+      "baige" =  t %>% 
+        filter(temp_code == "baige"),
+      
+      "orange" = t %>% 
+        filter(temp_code == "orange"),
+      
+      "red" = t %>% 
+        filter(temp_code == "red")
+    )
+  })
+  
+  
   selected_shasta_cons_curve <- reactive({
     if (g_date() == today(tzone = "America/Los_Angeles")) {
       shasta_storage_data %>% 
@@ -67,9 +122,10 @@ home_server <- function(input, output, session, g_date) {
   })
   
   output$shasta_cons_curve <- renderText({
-    validate(need(length(selected_shasta_cons_curve()) > 0, "No Data"))
-    x <- selected_shasta_cons_curve()[1]
-    paste(pretty_num(x/1000000), "MAF")
+    validate(need(nrow(isothermal_percent_metric()) > 0, "No Data"))
+    x <- isothermal_percent_metric()
+    
+    paste(pretty_num(x$total_prop_below_50*100), "%")
   })
   
   output$water_year_class <- renderText({
@@ -261,14 +317,94 @@ home_server <- function(input, output, session, g_date) {
                 hoverinfo = "text",
                 connectgaps = TRUE,
                 line = list(color = '#666', width = 3, dash = 'solid')) %>%
+      add_trace(data = iso_thermal_data_for_plot()$red, 
+                x=~date, y=~accum_volume, 
+                fillcolor = '#d64646', inherit = FALSE, 
+                type='scatter', mode = 'none', fill='tozeroy', 
+                legendgroup="Isothermals", 
+                name=">71", 
+                text = ~paste0(
+                  "Storage Temperature Above 70 <br>",
+                  date, "<br>",
+                  "Volume ", round(total_storage_in_bin, 0), " taf"
+                ), 
+                hoverinfo = "text") %>% 
+      add_trace(data = iso_thermal_data_for_plot()$orange, 
+                x=~date, y=~accum_volume, 
+                fillcolor = '#ed8e12', inherit = FALSE, 
+                type='scatter', mode = 'none', fill='tozeroy', 
+                legendgroup="Isothermals", 
+                name="67-70", 
+                text = ~paste0(
+                  "Storage Temperature Between 67 & 70 °F <br>",
+                  date, "<br>",
+                  "Volume ", round(total_storage_in_bin, 0), " taf"
+                ), 
+                hoverinfo = "text") %>% 
+      add_trace(data = iso_thermal_data_for_plot()$baige, 
+                x=~date, y=~accum_volume, 
+                fillcolor = '#d9e0a3', inherit = FALSE, 
+                type='scatter', mode = 'none', fill='tozeroy', 
+                legendgroup="Isothermals", 
+                name="61-66", 
+                text = ~paste0(
+                  "Storage Temperature Between 61 & 66 °F <br>",
+                  date, "<br>",
+                  "Volume ", round(total_storage_in_bin, 0), " taf"
+                ), 
+                hoverinfo = "text") %>% 
+      add_trace(data = iso_thermal_data_for_plot()$green, 
+                x=~date, y=~accum_volume, 
+                fillcolor = '#27824c', inherit = FALSE, 
+                type='scatter', mode = 'none', fill='tozeroy', 
+                legendgroup="Isothermals", 
+                name="57-60", 
+                text = ~paste0(
+                  "Storage Temperature Between 57 & 60 °F <br>",
+                  date, "<br>",
+                  "Volume ", round(total_storage_in_bin, 0), " taf"
+                ), 
+                hoverinfo = "text") %>%  
+      add_trace(data = iso_thermal_data_for_plot()$cyan, 
+                x=~date, y=~accum_volume, 
+                fillcolor = '#56bfbd', inherit = FALSE, 
+                type='scatter', mode = 'none', fill='tozeroy', 
+                legendgroup="Isothermals", 
+                name="53-56",
+                text = ~paste0(
+                  "Storage Temperature Between 53 & 56 °F <br>",
+                  date, "<br>",
+                  "Volume ", round(total_storage_in_bin, 0), " taf"
+                ), 
+                hoverinfo = "text") %>%  
+      add_trace(data = iso_thermal_data_for_plot()$blue, 
+                x=~date, y=~accum_volume, 
+                fillcolor = '#4C74C9', inherit = FALSE, 
+                type='scatter', mode = 'none', fill='tozeroy', 
+                legendgroup="Isothermals", 
+                name="49-52", 
+                text = ~paste0(
+                  "Storage Temperature Between 49 & 52 °F <br>",
+                  date, "<br>",
+                  "Volume ", round(total_storage_in_bin, 0), " taf"
+                ), 
+                hoverinfo = "text") %>%  
+      add_trace(data = iso_thermal_data_for_plot()$dark_blue, 
+                x=~date, y=~accum_volume, 
+                fillcolor = '#274a82', inherit = FALSE, 
+                type='scatter', mode = 'none', fill='tozeroy', 
+                legendgroup="Isothermals", 
+                name="<48", 
+                text = ~paste0(
+                  "Storage Temperature Below 48 <br>",
+                  date, "<br>",
+                  "Volume ", round(total_storage_in_bin, 0), " taf"
+                ), 
+                hoverinfo = "text") %>% 
       layout(xaxis = list(title = '', fixedrange = TRUE),
              yaxis = list(title = "storage (AF)"), 
              legend = list(orientation = 'h')) %>% 
       config(displayModeBar = FALSE)
-  })
-  
-  observe({
-    
   })
   
   output$chinook_summary_plot <- renderPlotly({

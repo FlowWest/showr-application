@@ -65,6 +65,14 @@ chnages all badged in the application*/
   text-align: center;
 }
 
+.welcome-getting-started {
+  text-align: center;
+}
+
+.welcome-last-year-summary {
+  text-align: left;
+}
+
 
 .logo {
   margin-top: -12px;
