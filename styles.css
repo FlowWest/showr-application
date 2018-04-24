@@ -57,6 +57,26 @@ chnages all badged in the application*/
   text-align: center;
 }
 
+.help-btn {
+  background-color: #3e3e3e00;
+  border: none;
+  color: black;
+  padding: 1px 1px 1px 1px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.help-btn:hover {
+    color: #ffffff;
+    background-color: #090909;
+    border-color: #040404;
+    background-color: #3e3e3e00;
+    border: none;
+    color: #1967be;
+    padding: 1px 1px 1px 1px;
+    font-size: 16px;
+    cursor: pointer;
+}
 
 .welcome-footer {
   position:absolute;
