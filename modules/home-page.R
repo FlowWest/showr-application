@@ -9,15 +9,31 @@ homeUI <- function(id){
                         shasta_storage_val = textOutput(ns("shasta_storage")), 
                         shasta_cons_curve_val = textOutput(ns("shasta_cons_curve")), 
                         water_year_type_val = textOutput(ns("water_year_class")),
+                        help_me_with_storage = actionButton(ns("help_me_with_storage"),
+                                                          label = NULL,
+                                                          class="help-btn pull-right",
+                                                          icon = icon("question-circle")),
                         mean_daily_temp_kwk = uiOutput(ns("kwk_temp_span")), 
                         mean_daily_temp_ccr = uiOutput(ns("ccr_temp_span")),
                         mean_daily_temp_bsf = uiOutput(ns("bsf_temp_span")), 
+                        help_me_with_temps = actionButton(ns("help_me_with_temps"),
+                                                                label = NULL,
+                                                                class="help-btn pull-right",
+                                                                icon = icon("question-circle")),
                         mean_daily_flow_kwk = textOutput(ns("kwk_flow")), 
                         mean_daily_flow_sha = textOutput(ns("sha_flow")), 
                         mean_daily_flow_wlk = textOutput(ns("wlk_flow")),
+                        help_me_with_flows = actionButton(ns("help_me_with_flows"),
+                                                          label = NULL,
+                                                          class="help-btn pull-right",
+                                                          icon = icon("question-circle")),
                         wr_presence = textOutput(ns("wr_chinook_presence")),
                         limiting_reach = textOutput(ns("redd_limiting_reach")), 
                         limiting_date = textOutput(ns("redd_limiting_date")),
+                        help_me_with_chinook_activity = actionButton(ns("help_me_with_chinook_activity"),
+                                                          label = NULL,
+                                                          class="help-btn pull-right",
+                                                          icon = icon("question-circle")),
                         shasta_elevation_plot = plotlyOutput(ns("elevation_plot"), height = '500px'),
                         chinook_summary_plot = plotlyOutput(ns("chinook_summary_plot"), height = '500px'),
                         date_button = dateInput(ns("global_date"), label = "Select Date", 
@@ -61,6 +77,21 @@ home_server <- function(input, output, session, g_date) {
   })
   
   iso_thermal_data_for_plot <- reactive({
+    
+    iso_color_coded <- isothermal_data %>% 
+      mutate(temp_code = case_when(
+        (temp <= 48) ~ "dark blue", 
+        (temp > 48 & temp <= 52) ~ "blue",
+        (temp > 52 & temp <= 56) ~ "cyan",
+        (temp > 56 & temp <= 60) ~ "green",
+        (temp > 60 & temp <= 66) ~ "baige",
+        (temp > 66 & temp <= 70) ~ "orange",
+        (temp > 70) ~ "red",
+        TRUE ~ as.character(NA)
+      ), 
+      temp_code = factor(temp_code, levels = c("dark blue", "blue", "cyan",
+                                               "green", "baige", "orange", 
+                                               "red")))
     t <- iso_color_coded %>%
       group_by(date, temp_code) %>%
       summarise(total_storage_in_bin = sum(volume_taf)) %>% ungroup() %>%
@@ -301,22 +332,15 @@ home_server <- function(input, output, session, g_date) {
   })
   
   output$elevation_plot <- renderPlotly({
-    selected_shasta_storage_data() %>% 
-      spread(parameter_id, parameter_value) %>% 
-      plot_ly(x = ~datetime, y=~`94`, name = "Flood Conservation Max Storage", type = 'scatter', 
-              mode = 'lines', text = ~paste("<b>",datetime, "</b>",
-                                            "<br>", 
-                                            "<b>",round(`94`/1000000, 3), "MAF</b>"),
-              hoverinfo = "text",
+    shasta_spread_data <- selected_shasta_storage_data() %>% 
+      spread(parameter_id, parameter_value) 
+    
+    plot_ly() %>% 
+    add_trace(data = shasta_spread_data, 
+              x=~datetime, y = ~`15`, name ="Reservoir Storage", fill = 'tozeroy',
+              fillcolor="#bcbcbc",
               connectgaps = TRUE,
-              line = list(color = '#990000', width = 2, dash = 'dash')) %>% 
-      add_trace(y = ~`15`, name ="Reservoir Storage", fill = 'tozeroy',
-                text = ~paste("<b>",datetime, "</b>",
-                              "<br>",
-                              "<b>",round(`15`/1000000, 3), "MAF</b>"),
-                hoverinfo = "text",
-                connectgaps = TRUE,
-                line = list(color = '#666', width = 3, dash = 'solid')) %>%
+              type='scatter', mode='none') %>%
       add_trace(data = iso_thermal_data_for_plot()$red, 
                 x=~date, y=~accum_volume, 
                 fillcolor = '#d64646', inherit = FALSE, 
@@ -401,9 +425,28 @@ home_server <- function(input, output, session, g_date) {
                   "Volume ", round(total_storage_in_bin, 0), " taf"
                 ), 
                 hoverinfo = "text") %>% 
+      add_lines(data=shasta_spread_data, 
+                x = ~datetime, y=~`94`, name = "Flood Conservation Max Storage", type = 'scatter', 
+                mode = 'lines', text = ~paste("<b>",datetime, "</b>",
+                                              "<br>", 
+                                              "<b>",round(`94`/1000000, 3), "MAF</b>"),
+                hoverinfo = "text",
+                connectgaps = TRUE,
+                line = list(color = '#990000', width = 2, dash = 'dash'), 
+                inherit = FALSE) %>%
+      add_lines(data=shasta_spread_data, 
+                x = ~datetime, y=~`15`, name ="Reservoir Storage",
+                text = ~paste("<b>",datetime, "</b>",
+                              "<br>",
+                              "<b>",round(`15`/1000000, 3), "MAF</b>"),
+                hoverinfo = "text",
+                connectgaps = TRUE,
+                line = list(color="black", width = 2), 
+                inherit = FALSE) %>%
       layout(xaxis = list(title = '', fixedrange = TRUE),
-             yaxis = list(title = "storage (AF)"), 
-             legend = list(orientation = 'h')) %>% 
+             yaxis = list(title = "storage (AF)") 
+             ,legend = list(orientation = 'h')
+             ) %>% 
       config(displayModeBar = FALSE)
   })
   
@@ -436,6 +479,95 @@ home_server <- function(input, output, session, g_date) {
              yaxis = list(tickmode = 'array', tickvals = 1:12, ticktext = month.abb),
              xaxis = list(title = '')) %>% 
       config(displayModeBar = FALSE)
+  })
+  
+  
+  observeEvent(input$help_me_with_temps, {
+    showModal(modalDialog(
+      title = "Outflow Temperatures",
+      tagList(
+        tags$h4("Keswick Temperature Compliance"), 
+        tags$p("Based on Action 1.2.4 Reclamation will manage Keswick Reservoir from", 
+               tags$b("May 15 through October"), "such that daily average temperatures 
+               do not exceed 56°F at compliance locations between", 
+               tags$b("Ballls Ferry and Bend Bridge")), 
+        tags$br(), 
+        tags$p("You can view a full temperature profile by clicking on the", tags$b("Temperature"), 
+               "tab above."), 
+        tags$hr(), 
+        tags$p("For more information you can view the report from the Sacramento Temperature 
+               Task Group", tags$a("here",
+                                   target="_blank",
+                                   href="http://deltacouncil.ca.gov/sites/default/files/2017/11/17%20%20SRTTG%202017%20Annual%20Report.pdf"))
+      ), 
+      easyClose = TRUE
+    ))
+  })
+  
+  observeEvent(input$help_me_with_flows, {
+    showModal(modalDialog(
+      title = "Outflow Temperatures",
+      tagList(
+        tags$h4("Keswick Temperature Compliance"), 
+        tags$p("Based on Action 1.2.4 Reclamation will manage Keswick Reservoir from", 
+               tags$b("May 15 through October"), "such that daily average temperatures 
+               do not exceed 56°F at compliance locations between", 
+               tags$b("Ballls Ferry and Bend Bridge")), 
+        tags$br(), 
+        tags$p("You can view a full temperature profile by clicking on the", tags$b("Temperature"), 
+               "tab above."), 
+        tags$hr(), 
+        tags$p("For more information you can view the report from the Sacramento Temperature 
+               Task Group", tags$a("here",
+                                   target="_blank",
+                                   href="http://deltacouncil.ca.gov/sites/default/files/2017/11/17%20%20SRTTG%202017%20Annual%20Report.pdf"))
+      ), 
+      easyClose = TRUE
+    ))
+  })
+  
+  observeEvent(input$help_me_with_chinook_activity, {
+    showModal(modalDialog(
+      title = "Outflow Temperatures",
+      tagList(
+        tags$h4("Keswick Temperature Compliance"), 
+        tags$p("Based on Action 1.2.4 Reclamation will manage Keswick Reservoir from", 
+               tags$b("May 15 through October"), "such that daily average temperatures 
+               do not exceed 56°F at compliance locations between", 
+               tags$b("Ballls Ferry and Bend Bridge")), 
+        tags$br(), 
+        tags$p("You can view a full temperature profile by clicking on the", tags$b("Temperature"), 
+               "tab above."), 
+        tags$hr(), 
+        tags$p("For more information you can view the report from the Sacramento Temperature 
+               Task Group", tags$a("here",
+                                   target="_blank",
+                                   href="http://deltacouncil.ca.gov/sites/default/files/2017/11/17%20%20SRTTG%202017%20Annual%20Report.pdf"))
+      ), 
+      easyClose = TRUE
+    ))
+  })
+  
+  observeEvent(input$help_me_with_storage, {
+    showModal(modalDialog(
+      title = "Outflow Temperatures",
+      tagList(
+        tags$h4("Keswick Temperature Compliance"), 
+        tags$p("Based on Action 1.2.4 Reclamation will manage Keswick Reservoir from", 
+               tags$b("May 15 through October"), "such that daily average temperatures 
+               do not exceed 56°F at compliance locations between", 
+               tags$b("Ballls Ferry and Bend Bridge")), 
+        tags$br(), 
+        tags$p("You can view a full temperature profile by clicking on the", tags$b("Temperature"), 
+               "tab above."), 
+        tags$hr(), 
+        tags$p("For more information you can view the report from the Sacramento Temperature 
+               Task Group", tags$a("here",
+                                   target="_blank",
+                                   href="http://deltacouncil.ca.gov/sites/default/files/2017/11/17%20%20SRTTG%202017%20Annual%20Report.pdf"))
+      ), 
+      easyClose = TRUE
+    ))
   })
 }
 

@@ -3,51 +3,59 @@ temp_pageUI <- function(id) {
   
   tagList(
     fluidRow(
-      column(width = 12, class = "col-md-4", 
-             style="display: inline-flex;",
-               dateRangeInput(inputId = ns("temp_daterange"), 
-                              label = "Select Date Range", 
-                              min = "1999-01-01", 
-                              start = paste0(year(today()), "-01-01"), 
-                              end = today()-1),
-               selectInput(inputId = ns("temp_add_year"), 
-                           label = "Add Year", 
-                           choices = c("None", 2010:2017), 
-                           width = "75px")
-      ), 
+      # context sidebar
       column(width = 12, class = "col-md-3", 
-             selectInput(inputId = ns("temp_gage_location"), 
-                         label = "Select Gage(s)", 
-                         choices = c("Keswick" = "kwk", 
-                                     "Sac. River Hwy 44" = "sac", 
-                                     "Clear Creek" = "ccr", 
-                                     "Balls Ferry" = "bsf", 
-                                     "Jellys Ferry" = "jlf", 
-                                     "Bend Bridge" = "bnd"), 
-                         multiple = TRUE, selected = c("kwk","ccr","bsf"))),
-      column(width = 12, class = "col-md-5", 
-             radioButtons(inputId = ns("temp_summary_choice"), 
-                          label = "Select Temperature Statistic", 
-                          choices = c("Daily Mean", "7DADM", "Daily Max")))), 
-    fluidRow(
-      column(width = 12,
-             class = "col-md-10",
-             tabsetPanel(
-               tabPanel(title = "Plot", plotlyOutput(ns("temperature_ts_plot"), height = "500px")), 
-               tabPanel(title = "Tabular", dataTableOutput(ns("temperature_tabular")))
-             )),
-      column(width = 2,
-             tags$img(class="gage_map", src="temp_sites.png"), 
-             tags$h6("Gray locations are below compliance point"))
-      ), 
-    fluidRow(
-      column(width = 12, 
-             tags$h5("Shaded area in the plot above indicates temperature target period"),
-             tags$h5("Data Source: hourly data from CDEC, updated to the application daily"), 
-             tags$h5("Temperature Statistics Definitions:"), 
-             tags$h5("-Daily Mean: Daily mean for temperatures observed in a given day"), 
-             tags$h5("-7DADM: 7 day average of daily maxes"), 
-             tags$h5("-Daily Max: the max observed temperature for a given day")))
+             tags$div(class = "temp-sidebar", 
+                      tags$h5("Shaded area in the plot above indicates temperature target period"),
+                               tags$h5("Data Source: hourly data from CDEC, updated to the application daily"),
+                               tags$h5("Temperature Statistics Definitions:"),
+                               tags$h5("-Daily Mean: Daily mean for temperatures observed in a given day"),
+                               tags$h5("-7DADM: 7 day average of daily maxes"),
+                               tags$h5("-Daily Max: the max observed temperature for a given day"), 
+                      downloadButton(ns("download_temp_data")))),
+      # main interface
+      column(width = 12, class = "col-md-9",
+             fluidRow(
+               # temp controls
+               column(width = 12, class = "col-md-3",
+                      style="display: inline-flex;",
+                      dateRangeInput(inputId = ns("temp_daterange"),
+                                     label = "Select Date Range",
+                                     min = "1999-01-01",
+                                     start = paste0(year(today()), "-01-01"),
+                                     end = today()-1)),
+               column(width = 12, class = "col-md-2",
+                      selectInput(inputId = ns("temp_add_year"),
+                                  label = "Add Year",
+                                  choices = c("None", 2010:2017),
+                                  width = "75px")
+               ),
+               column(width = 12, class = "col-md-3",
+                      selectInput(inputId = ns("temp_gage_location"),
+                                  label = "Select Gage(s)",
+                                  choices = c("Keswick" = "kwk",
+                                              "Sac. River Hwy 44" = "sac",
+                                              "Clear Creek" = "ccr",
+                                              "Balls Ferry" = "bsf",
+                                              "Jellys Ferry" = "jlf",
+                                              "Bend Bridge" = "bnd"),
+                                  multiple = TRUE, selected = c("kwk","ccr","bsf"))),
+               column(width = 12, class = "col-md-3",
+                      radioButtons(inputId = ns("temp_summary_choice"),
+                                   label = "Select Temperature Statistic",
+                                   choices = c("Daily Mean", "7DADM", "Daily Max")))
+             ), 
+             fluidRow(
+               # temp plot
+               column(width = 12, class = "col-md-9", 
+                      plotlyOutput(ns("temperature_ts_plot"), height = "500px")),
+               # temp schematic
+               column(width = 12, class = "col-md-3", 
+                      tags$img(class="gage_map", src="temp_sites.png"), 
+                      tags$h6("Gray locations are below compliance point"))
+             ))
+    )
+
   )
 } 
 
