@@ -50,7 +50,7 @@ chnages all badged in the application*/
 .welcome-banner > div.welcome-heading > h4 {
   font-weight: 400;
   color: white;
- }
+}
 
 .welcome-about-showr > h3 {
   margin-bottom: 40px;
@@ -73,6 +73,13 @@ chnages all badged in the application*/
   color: #3F3F3F;
   background-color: #D6E8F7;
   border-top: 2px solid transparent;
+  padding-left: 15px;
+  padding-bottom: 35px;
+}
+
+.home-page-summary-content {
+  width: 90%;
+  margin: auto;
 }
 
 .home-about {
@@ -94,10 +101,15 @@ chnages all badged in the application*/
 }
 
 .intro-divider {
-    height: 6px;
-    background: transparent linear-gradient(to right, #3476a8 0%, #d4be85 100%) repeat scroll 0% 0%;
-    margin-top: 30px;
-    margin-bottom: 30px;
+  height: 6px;
+  background: transparent linear-gradient(to right, #3476a8 0%, #d4be85 100%) repeat scroll 0% 0%;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.summary-value {
+  text-align: right;
+  width: 100px;
 }
 
 .help-btn {
@@ -110,15 +122,15 @@ chnages all badged in the application*/
 }
 
 .help-btn:hover, .help-btn:active {
-    color: #ffffff;
-    background-color: #090909;
-    border-color: #040404;
-    background-color: #3e3e3e00;
-    border: none;
-    color: #1967be;
-    padding: 1px 1px 1px 1px;
-    font-size: 16px;
-    cursor: pointer;
+  color: #ffffff;
+  background-color: #090909;
+  border-color: #040404;
+  background-color: #3e3e3e00;
+  border: none;
+  color: #1967be;
+  padding: 1px 1px 1px 1px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 .welcome-footer {
