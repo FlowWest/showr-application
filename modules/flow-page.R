@@ -1,56 +1,66 @@
 flow_UI <- function(id) {
   ns <- NS(id) 
   
+  
   tagList(
     fluidRow(
-      column(width = 4, 
-             dateRangeInput(inputId = ns("flow_daterange"), 
-                            label = "Select a Date Range", 
-                            min = "1999-01-01", 
-                            start = paste0(year(today()), "-01-01"), 
-                            end = today(tzone = "America/Los_Angeles")-1), 
-             selectInput(ns("flow_add_year"), label = NULL, choices = c("None", 2010:2017), 
-                         width = "75px")), 
-      column(width = 4, 
-             selectInput(inputId = ns("flow_station_select"), 
-                         label = "Select Stations",
-                         choices = c("Shasta (Natural Flow)" = "sha", 
-                                     "Keswick" = "kwk", 
-                                     "Bend Bridge" = "bnd", 
-                                     "Wilkins Slough" = "wlk"),
-                         multiple = TRUE,
-                         selected = c("sha", "kwk"), width = "400px"), 
-             checkboxInput(ns("show_diversions"), label = "Show diversion"))
-    ), 
-    fluidRow(
-      column(width = 12, 
-             class = "col-md-9",
-             tabsetPanel(
-               tabPanel(title = "Plot", 
-                        plotlyOutput(ns("flow_plot"))), 
-               tabPanel(title = "Tabular", 
-                        dataTableOutput(ns("flow_tabular")))
-             )), 
-      column(width = 12, 
-             class = "col-md-3", 
-             uiOutput(ns("table_title")),
-             tags$table(class="table",tags$tbody(
-               tags$tr(tags$td("McCloud"), 
-                       tags$td(textOutput(ns("mccloud_summmary_flow"))),
-                       tags$td(sparklineOutput(ns("mccloud_spark")), tags$h6("past 30 days"))), 
-               tags$tr(tags$td("Sac River at Delta"),
-                       tags$td(textOutput(ns("delta_summary_flow"))),
-                       tags$td(sparklineOutput(ns("sac_river_spark")), tags$h6("past 30 days")))
-             )))
-    ), 
-    fluidRow(
-      column(width = 12, 
-             tags$h6("Data source: data obtained from CDEC and USGS(NWIS)"), 
-             tags$h6("Latest TCD configurations transcribed from", 
-                     tags$a(target="_blank",
-                            "CVO TCD Configurations", 
-                            href="https://www.usbr.gov/mp/cvo/vungvari/ShastaTCD2017.pdf")),
-             tags$h6("Update schedule: data is updated on daily basis with both hourly and daily data"))
+      # flow context sidebar
+      column(width = 12, class = "col-md-3", 
+             tags$div(class = "flow-sidebar", 
+                      tags$h2("Flow"),
+                      tags$hr(),
+                      tags$p(
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ac scelerisque quam. Fusce eget risus eros. Cras elementum nulla velit, in lacinia mauris euismod ut. Praesent ut semper nunc. Cras porttitor elit sem, id molestie purus fringilla nec. Aliquam vehicula lacinia aliquam. Curabitur et leo elit. Sed egestas massa sit amet turpis faucibus blandit. Curabitur vel efficitur tellus, accumsan dapibus diam. Vivamus tincidunt leo vel placerat facilisis. Duis id augue ac dui posuere hendrerit."
+                      ),
+                      tags$h3("Download Data in View"),
+                      downloadButton(ns("download_flow_data")), 
+                      tags$h5("Data source: data obtained from CDEC and USGS(NWIS)"), 
+                               tags$h5("Latest TCD configurations transcribed from",
+                                       tags$a(target="_blank",
+                                              "CVO TCD Configurations",
+                                              href="https://www.usbr.gov/mp/cvo/vungvari/ShastaTCD2017.pdf")),
+                               tags$h5("Update schedule: data is updated on daily basis with both hourly and daily data"))),
+      # main interface
+      column(width = 12, class = "col-md-9",
+             # controls
+             fluidRow( 
+                      column(width = 12, class = "col-md-3", 
+                             dateRangeInput(inputId = ns("flow_daterange"), 
+                                            label = "Select a Date Range", 
+                                            min = "1999-01-01", 
+                                            start = paste0(year(today()), "-01-01"), 
+                                            end = today(tzone = "America/Los_Angeles")-1)), 
+                      column(width = 12, class = "col-md-2", 
+                             selectInput(ns("flow_add_year"), label = NULL, choices = c("None", 2010:2017), 
+                                         width = "75px")), 
+                      column(width = 12, class = "col-md-3", 
+                             selectInput(inputId = ns("flow_station_select"), 
+                                         label = "Select Stations",
+                                         choices = c("Shasta (Natural Flow)" = "sha", 
+                                                     "Keswick" = "kwk", 
+                                                     "Bend Bridge" = "bnd", 
+                                                     "Wilkins Slough" = "wlk"),
+                                         multiple = TRUE,
+                                         selected = c("sha", "kwk"), width = "400px")), 
+                      column(width = 12, class = "col-md-3", 
+                             checkboxInput(ns("show_diversions"), label = "Show diversion"))
+                      ), 
+             
+             fluidRow(
+               # plot
+               column(width = 12, class = "col-md-9", 
+                      plotlyOutput(ns("flow_plot"))), 
+               column(width = 12, 
+                      class = "col-md-3", 
+                      uiOutput(ns("table_title")),
+                      tags$table(class="table",tags$tbody(
+                        tags$tr(tags$td("McCloud"), 
+                                tags$td(textOutput(ns("mccloud_summmary_flow"))),
+                                tags$td(sparklineOutput(ns("mccloud_spark")), tags$h6("past 30 days"))), 
+                        tags$tr(tags$td("Sac River at Delta"),
+                                tags$td(textOutput(ns("delta_summary_flow"))),
+                                tags$td(sparklineOutput(ns("sac_river_spark")), tags$h6("past 30 days")))
+                      )))))
     )
   )
 }

@@ -6,13 +6,20 @@ temp_pageUI <- function(id) {
       # context sidebar
       column(width = 12, class = "col-md-3", 
              tags$div(class = "temp-sidebar", 
+                      tags$h2("Temperature Compliance"),
+                      tags$hr(),
+                      tags$p(
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ac scelerisque quam. Fusce eget risus eros. Cras elementum nulla velit, in lacinia mauris euismod ut. Praesent ut semper nunc. Cras porttitor elit sem, id molestie purus fringilla nec. Aliquam vehicula lacinia aliquam. Curabitur et leo elit. Sed egestas massa sit amet turpis faucibus blandit. Curabitur vel efficitur tellus, accumsan dapibus diam. Vivamus tincidunt leo vel placerat facilisis. Duis id augue ac dui posuere hendrerit."
+                      ),
+                      tags$h3("Download Data in View"),
+                      downloadButton(ns("download_temp_data")),
                       tags$h5("Shaded area in the plot above indicates temperature target period"),
                                tags$h5("Data Source: hourly data from CDEC, updated to the application daily"),
                                tags$h5("Temperature Statistics Definitions:"),
                                tags$h5("-Daily Mean: Daily mean for temperatures observed in a given day"),
                                tags$h5("-7DADM: 7 day average of daily maxes"),
-                               tags$h5("-Daily Max: the max observed temperature for a given day"), 
-                      downloadButton(ns("download_temp_data")))),
+                               tags$h5("-Daily Max: the max observed temperature for a given day") 
+                      )),
       # main interface
       column(width = 12, class = "col-md-9",
              fluidRow(
