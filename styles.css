@@ -16,7 +16,7 @@ chnages all badged in the application*/
 
 .welcome-banner {
   /* overflow: visible; */
-  height: 245px;
+  height: 325px;
 }
 
 .welcome-banner > div.welcome-image {
@@ -69,7 +69,7 @@ chnages all badged in the application*/
 
 .home-page-summary {
   float: left;
-  width: 33%;
+  width: 40%;
   color: #3F3F3F;
   background-color: #D6E8F7;
   border-top: 2px solid transparent;
@@ -77,12 +77,21 @@ chnages all badged in the application*/
 
 .home-about {
   float: right;
-  width: 64%;
+  width: 55%;
   color: #3F3F3F;
   background-color: #F2F2F2;
   border-top: 2px solid transparent;
 }
 
+.home-about > h2 {
+  padding-left: 15px;
+}
+
+.home-about > p {
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-bottom: 15px;
+}
 
 .intro-divider {
     height: 6px;
