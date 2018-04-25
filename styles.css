@@ -56,14 +56,39 @@ chnages all badged in the application*/
   margin-bottom: 40px;
 }
 
+.welcome-page-content {
+  width: 60%;
+  margin: auto;
+}
+
+.home-page-cards {
+  height: 130px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.home-page-summary {
+  float: left;
+  width: 33%;
+  color: #3F3F3F;
+  background-color: #D6E8F7;
+  border-top: 2px solid transparent;
+}
+
+.home-about {
+  float: right;
+  width: 64%;
+  color: #3F3F3F;
+  background-color: #F2F2F2;
+  border-top: 2px solid transparent;
+}
+
 
 .intro-divider {
     height: 6px;
     background: transparent linear-gradient(to right, #3476a8 0%, #d4be85 100%) repeat scroll 0% 0%;
-    width: 64%;
-    margin-top: 20px;
-    margin-bottom: 20px;
-    margin: auto;
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
 
 .help-btn {
