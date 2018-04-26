@@ -2,7 +2,7 @@
 # Details:
 # This file defines both the UI and server for the home page of showr.
 
-homeUI <- function(id){
+dashboardUI <- function(id){
   ns <- NS(id)
   tagList(
            htmlTemplate("templates/dashboard.html", 
@@ -43,8 +43,9 @@ homeUI <- function(id){
 }
 
 
-home_server <- function(input, output, session, g_date) {
+dashboard_server <- function(input, output, session, g_date) {
   ns <- session$ns
+  
   
   home_year <- reactive({ lubridate::year(g_date()) })
 
@@ -558,7 +559,8 @@ home_server <- function(input, output, session, g_date) {
                do not exceed 56°F at compliance locations between", 
                tags$b("Ballls Ferry and Bend Bridge")), 
         tags$br(), 
-        tags$p("You can view a full temperature profile by clicking on the", tags$b("Temperature"), 
+        tags$p("You can view a full temperature profile by clicking on the", 
+               actionLink(ns("link_to_the_temp_from_home"), label="Temperature"), 
                "tab above."), 
         tags$hr(), 
         tags$p("For more information you can view the report from the Sacramento Temperature 

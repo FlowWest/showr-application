@@ -19,7 +19,7 @@ library(measurements)
 source("atu.R")
 
 # modules -----------------------------------------------------------------------
-source("modules/home-page.R")
+source("modules/dashboard-page.R")
 source("modules/temperature-page.R")
 source("modules/chinook-module.R")
 source("modules/flow-page.R")
