@@ -3,6 +3,7 @@ about_UI <- function(id) {
   
   tagList(
     fluidRow(
+
       column(width = 12, 
              tags$div(
                class="about",
@@ -29,5 +30,6 @@ about_UI <- function(id) {
 } 
 
 about_server <- function(input, output, session) {
-  #
+  
+  
 }  

@@ -14,6 +14,7 @@ library(readr)
 library(sparkline)
 library(shinyjs)
 library(measurements)
+library(purrr)
 
 # atu
 source("atu.R")
@@ -21,7 +22,7 @@ source("atu.R")
 # modules -----------------------------------------------------------------------
 source("modules/dashboard-page.R")
 source("modules/temperature-page.R")
-source("modules/chinook-module.R")
+source("modules/winter-run-chinook-page.R")
 source("modules/flow-page.R")
 source("modules/about-page.R")
 source("modules/welcome.R")
@@ -150,3 +151,25 @@ get_year_classification <- function(y) {
       as.character()
   }
 }
+
+# for winter run emergence
+daily_temps <- temp_data %>% 
+  group_by(cdec_gage = location_id, date = as_date(datetime)) %>% 
+  summarise(
+    daily_mean = mean(parameter_value, na.rm = TRUE)
+  ) %>% ungroup()
+
+### NO TEMPERATURE DATA BEFORE 2010!!!!
+rd <- redd_data %>%
+  filter(counts > 0, year(date) >= 2010) %>% 
+  rowwise() %>% 
+  do(
+    tibble(
+      date = seq(.$date, estimate_emergence(.$date, .$location) -1, by="day"), 
+      location = .$location, 
+      counts = .$counts
+    )
+  ) %>% ungroup() %>% 
+  mutate(cdec_gage = redd_cdec_lookup[location], 
+         location = factor(location, levels = unique(redd_data$location))) %>%
+  left_join(daily_temps)

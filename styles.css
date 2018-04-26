@@ -264,3 +264,10 @@ label {
   max-width: 50%;
   margin: auto;
 }
+
+.shiny-output-error-no-redds-alert {
+  font-size: 20px;
+  padding-top: 20px;
+  padding-left: 20px
+  
+}
