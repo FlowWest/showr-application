@@ -30,8 +30,9 @@ winter_run_UI <- function(id) {
              fluidRow(
                # plot
                column(width = 12, class="col-md-9", 
-                      plotlyOutput(ns("winter_run_plot"))), 
+                      plotlyOutput(ns("winter_run_plot"), height = "500px")), 
                column(width = 12, class = "col-md-3", 
+                      tags$h3('Number of Redds'),
                       tableOutput(ns("wr_table"))))
       )
     )
@@ -45,12 +46,15 @@ winter_run_server <- function(input, output, session, g_date) {
   # not working correctly
   output$wr_table <- renderTable(
     rd %>% 
-      filter(year(date) == input$wr_select_year) %>% 
-      group_by(redd_id) %>% 
+      filter(year(date) == input$wr_select_year, counts > 0) %>% 
       mutate(temp_exceed = daily_mean > 56) %>% 
-      summarise(`Total` = n(), `Temperature Threatened` = sum(temp_exceed)) %>% 
+      group_by(redd_id) %>% 
+      summarise(Total = max(counts), `Temperature Threatened` = max(temp_exceed) * max(counts)) %>% 
       ungroup() %>% 
-      summarise(`Total` = n(), `Temperature Threatened` = sum(`Temperature Threatened`)))
+      summarise(Total = as.integer(sum(Total)), 
+                `Temperature Threatened` = as.integer(sum(`Temperature Threatened`, na.rm = TRUE))))
+  
+
   
   rd_yr <- reactive({
     if (input$wr_show_temp_danger) {
