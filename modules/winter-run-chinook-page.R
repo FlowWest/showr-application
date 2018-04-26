@@ -40,6 +40,17 @@ winter_run_UI <- function(id) {
 
 # TODO pick either switch or ifelse from now on
 winter_run_server <- function(input, output, session, g_date) {
+
+
+  # not working correctly
+  output$wr_table <- renderTable(
+    rd %>% 
+      filter(year(date) == input$wr_select_year) %>% 
+      group_by(redd_id) %>% 
+      mutate(temp_exceed = daily_mean > 56) %>% 
+      summarise(`Total` = n(), `Temperature Threatened` = sum(temp_exceed)) %>% 
+      ungroup() %>% 
+      summarise(`Total` = n(), `Temperature Threatened` = sum(`Temperature Threatened`)))
   
   rd_yr <- reactive({
     if (input$wr_show_temp_danger) {

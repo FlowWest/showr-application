@@ -162,12 +162,14 @@ daily_temps <- temp_data %>%
 ### NO TEMPERATURE DATA BEFORE 2010!!!!
 rd <- redd_data %>%
   filter(counts > 0, year(date) >= 2010) %>% 
+  mutate(redd_id = row_number(date)) %>% 
   rowwise() %>% 
   do(
     tibble(
       date = seq(.$date, estimate_emergence(.$date, .$location) -1, by="day"), 
       location = .$location, 
-      counts = .$counts
+      counts = .$counts,
+      redd_id = .$redd_id
     )
   ) %>% ungroup() %>% 
   mutate(cdec_gage = redd_cdec_lookup[location], 
