@@ -78,7 +78,7 @@ winter_run_server <- function(input, output, session, g_date) {
       nrow(rd_yr()) > 0, "No redds at risk."
     ))
     
-    rd_yr() %>% 
+    rd_yr() %>%    
       plot_ly(x = ~date, y = ~total, color = ~location, type='bar') %>% 
       layout(legend = list(orientation = 'h'), showlegend = TRUE, 
              xaxis = list(title = ""), yaxis = list(title = 'total redds'))
