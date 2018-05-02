@@ -122,9 +122,11 @@ model_temps$datetime <- as_date(model_temps$datetime)
 wr_presence_data <- read_csv("data/chinook/wr_chinook_presence.csv")
 
 # water year index classifications
+
 historic_water_year_types <- 
   readr::read_rds("data/operations/historical-water-year-index.rds") %>% 
-  tibble::add_row(year =2017, yr_type="W") 
+  tibble::add_row(year =2017, yr_type="W")
+
 current_water_year_types <- 
   readr::read_rds("data/operations/2018-04-17-water-year-index.rds")
 
