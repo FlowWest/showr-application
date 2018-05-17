@@ -80,14 +80,19 @@ shasta_storage_data <-
                     parameter_value = col_double()
                   ))
 
+# redd_data <- 
+#   read_csv("https://s3-us-west-2.amazonaws.com/showr-data/cdfw/redds/aerial-survey-observations_no_error_codes.csv", 
+#                   col_types = cols(
+#                     date = col_date(format = ""),
+#                     location = col_character(),
+#                     race = col_character(),
+#                     counts = col_double()
+#                   )) %>% filter(race == "Winter")
+
 redd_data <- 
-  read_csv("https://s3-us-west-2.amazonaws.com/showr-data/cdfw/redds/aerial-survey-observations_no_error_codes.csv", 
-                  col_types = cols(
-                    date = col_date(format = ""),
-                    location = col_character(),
-                    race = col_character(),
-                    counts = col_double()
-                  )) %>% filter(race == "Winter")
+  read_rds("data/chinook/aerial-survey-observations_no_error_codes.rds") %>% 
+  filter(race == "Winter")
+
 
 carcass_data <- read_rds("data/chinook/carcass_static_data.rds")
 

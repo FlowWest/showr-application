@@ -5,41 +5,41 @@
 dashboardUI <- function(id){
   ns <- NS(id)
   tagList(
-           htmlTemplate("templates/dashboard.html", 
-                        shasta_storage_val = textOutput(ns("shasta_storage")), 
-                        shasta_cons_curve_val = textOutput(ns("shasta_cons_curve")), 
-                        water_year_type_val = textOutput(ns("water_year_class")),
-                        help_me_with_storage = actionButton(ns("help_me_with_storage"),
-                                                          label = NULL,
-                                                          class="help-btn pull-right",
-                                                          icon = icon("question-circle")),
-                        mean_daily_temp_kwk = uiOutput(ns("kwk_temp_span")), 
-                        mean_daily_temp_ccr = uiOutput(ns("ccr_temp_span")),
-                        mean_daily_temp_bsf = uiOutput(ns("bsf_temp_span")), 
-                        help_me_with_temps = actionButton(ns("help_me_with_temps"),
-                                                                label = NULL,
-                                                                class="help-btn pull-right",
-                                                                icon = icon("question-circle")),
-                        mean_daily_flow_kwk = textOutput(ns("kwk_flow")), 
-                        mean_daily_flow_sha = textOutput(ns("sha_flow")), 
-                        mean_daily_flow_wlk = textOutput(ns("wlk_flow")),
-                        help_me_with_flows = actionButton(ns("help_me_with_flows"),
-                                                          label = NULL,
-                                                          class="help-btn pull-right",
-                                                          icon = icon("question-circle")),
-                        wr_presence = textOutput(ns("wr_chinook_presence")),
-                        limiting_reach = textOutput(ns("redd_limiting_reach")), 
-                        limiting_date = textOutput(ns("redd_limiting_date")),
-                        help_me_with_chinook_activity = actionButton(ns("help_me_with_chinook_activity"),
-                                                          label = NULL,
-                                                          class="help-btn pull-right",
-                                                          icon = icon("question-circle")),
-                        shasta_elevation_plot = plotlyOutput(ns("elevation_plot"), height = '500px'),
-                        chinook_summary_plot = plotlyOutput(ns("chinook_summary_plot"), height = '500px'),
-                        date_button = dateInput(ns("global_date"), label = "Select Date", 
-                                    min = "2010-01-01", max = (today(tzone = "America/Los_Angeles")), value = (today(tzone = "America/Los_Angeles")), 
-                                    width = "150px")
-                        ))
+    htmlTemplate("templates/dashboard.html", 
+                 shasta_storage_val = textOutput(ns("shasta_storage")), 
+                 shasta_cons_curve_val = textOutput(ns("shasta_cons_curve")), 
+                 water_year_type_val = textOutput(ns("water_year_class")),
+                 help_me_with_storage = actionButton(ns("help_me_with_storage"),
+                                                     label = NULL,
+                                                     class="help-btn pull-right",
+                                                     icon = icon("question-circle")),
+                 mean_daily_temp_kwk = uiOutput(ns("kwk_temp_span")), 
+                 mean_daily_temp_ccr = uiOutput(ns("ccr_temp_span")),
+                 mean_daily_temp_bsf = uiOutput(ns("bsf_temp_span")), 
+                 help_me_with_temps = actionButton(ns("help_me_with_temps"),
+                                                   label = NULL,
+                                                   class="help-btn pull-right",
+                                                   icon = icon("question-circle")),
+                 mean_daily_flow_kwk = textOutput(ns("kwk_flow")), 
+                 mean_daily_flow_sha = textOutput(ns("sha_flow")), 
+                 mean_daily_flow_wlk = textOutput(ns("wlk_flow")),
+                 help_me_with_flows = actionButton(ns("help_me_with_flows"),
+                                                   label = NULL,
+                                                   class="help-btn pull-right",
+                                                   icon = icon("question-circle")),
+                 wr_presence = textOutput(ns("wr_chinook_presence")),
+                 limiting_reach = textOutput(ns("redd_limiting_reach")), 
+                 limiting_date = textOutput(ns("redd_limiting_date")),
+                 help_me_with_chinook_activity = actionButton(ns("help_me_with_chinook_activity"),
+                                                              label = NULL,
+                                                              class="help-btn pull-right",
+                                                              icon = icon("question-circle")),
+                 shasta_elevation_plot = plotlyOutput(ns("elevation_plot"), height = '500px'),
+                 chinook_summary_plot = plotlyOutput(ns("chinook_summary_plot"), height = '500px'),
+                 date_button = dateInput(ns("global_date"), label = "Select Date", 
+                                         min = "2010-01-01", max = (today(tzone = "America/Los_Angeles")), value = (today(tzone = "America/Los_Angeles")), 
+                                         width = "150px")
+    ))
 }
 
 
@@ -48,7 +48,7 @@ dashboard_server <- function(input, output, session, g_date) {
   
   
   home_year <- reactive({ lubridate::year(g_date()) })
-
+  
   # Reservoir Metrics ----------------------------------------------------------
   selected_shasta_storage <- reactive({
     
@@ -211,7 +211,7 @@ dashboard_server <- function(input, output, session, g_date) {
   
   output$kwk_temp <- renderText({
     validate(need(length(latest_kwk_temperature()) > 0, "No Data"))
-
+    
     paste(latest_kwk_temperature(), "°F")
   })
   
@@ -281,7 +281,7 @@ dashboard_server <- function(input, output, session, g_date) {
   
   selected_redds_with_emergence <- reactive({
     validate(need(nrow(selected_recent_redd_observations()) > 0, 
-                   "Preseason"))
+                  "Preseason"))
     d <- selected_recent_redd_observations()$date
     l <- selected_recent_redd_observations()$location
     
@@ -337,11 +337,11 @@ dashboard_server <- function(input, output, session, g_date) {
       spread(parameter_id, parameter_value) 
     
     plot_ly() %>% 
-    add_trace(data = shasta_spread_data, 
-              x=~datetime, y = ~`15`, name ="Reservoir Storage", fill = 'tozeroy',
-              fillcolor="#bcbcbc",
-              connectgaps = TRUE,
-              type='scatter', mode='none') %>%
+      add_trace(data = shasta_spread_data, 
+                x=~datetime, y = ~`15`, name ="Reservoir Storage", fill = 'tozeroy',
+                fillcolor="#bcbcbc",
+                connectgaps = TRUE,
+                type='scatter', mode='none') %>%
       add_trace(data = iso_thermal_data_for_plot()$red, 
                 x=~date, y=~accum_volume, 
                 fillcolor = '#d64646', inherit = FALSE, 
@@ -447,7 +447,7 @@ dashboard_server <- function(input, output, session, g_date) {
       layout(xaxis = list(title = '', fixedrange = TRUE),
              yaxis = list(title = "storage (AF)") 
              ,legend = list(orientation = 'h')
-             ) %>% 
+      ) %>% 
       config(displayModeBar = FALSE)
   })
   
@@ -459,13 +459,13 @@ dashboard_server <- function(input, output, session, g_date) {
     
     if (nrow(selected_chinook_data()) == 0) {
       return(redd_data %>% 
-        group_by(month = factor(month.abb[as.integer(month(date))], levels=month.abb), 
-                 location) %>% 
-        summarise(
-          month_counts = sum(counts)
-        ) %>% 
-        plot_ly(x=~month, y=~month_counts, type='bar', color=~location) %>% 
-        layout(barmode='stack'))
+               group_by(month = factor(month.abb[as.integer(month(date))], levels=month.abb), 
+                        location) %>% 
+               summarise(
+                 month_counts = sum(counts)
+               ) %>% 
+               plot_ly(x=~month, y=~month_counts, type='bar', color=~location) %>% 
+               layout(barmode='stack'))
     }
     
     selected_chinook_data() %>% 
@@ -509,19 +509,15 @@ dashboard_server <- function(input, output, session, g_date) {
     showModal(modalDialog(
       title = "Outflow Temperatures",
       tagList(
-        tags$h4("Keswick Temperature Compliance"), 
-        tags$p("Based on Action 1.2.4 Reclamation will manage Keswick Reservoir from", 
-               tags$b("May 15 through October"), "such that daily average temperatures 
-               do not exceed 56°F at compliance locations between", 
-               tags$b("Ballls Ferry and Bend Bridge")), 
-        tags$br(), 
-        tags$p("You can view a full temperature profile by clicking on the", tags$b("Temperature"), 
-               "tab above."), 
-        tags$hr(), 
-        tags$p("For more information you can view the report from the Sacramento Temperature 
-               Task Group", tags$a("here",
-                                   target="_blank",
-                                   href="http://deltacouncil.ca.gov/sites/default/files/2017/11/17%20%20SRTTG%202017%20Annual%20Report.pdf"))
+        tags$p(tags$b("Shasta Reservoir"), "reports full natural flow, that is,
+natural water production of a river basin, unaltered by upstream diversions, 
+               storage, or by export or import of water to or from other watersheds"),
+        tags$hr(),
+        tags$p(tags$b("Keswick"), "reports flow from KWK a gauge downstream of Keswick Dam.
+               Full hydrograph is available in the", tags$b("Flow Page.")),
+        tags$hr(),
+        tags$p(tags$b("Wilkins Slough"), "reports flow using CDEC gauge WLK, 
+Full hydrograph is available in the", tags$b("Flow Page."))
       ), 
       easyClose = TRUE
     ))
@@ -529,21 +525,15 @@ dashboard_server <- function(input, output, session, g_date) {
   
   observeEvent(input$help_me_with_chinook_activity, {
     showModal(modalDialog(
-      title = "Outflow Temperatures",
+      title = "Chinook Activity",
       tagList(
-        tags$h4("Keswick Temperature Compliance"), 
-        tags$p("Based on Action 1.2.4 Reclamation will manage Keswick Reservoir from", 
-               tags$b("May 15 through October"), "such that daily average temperatures 
-               do not exceed 56°F at compliance locations between", 
-               tags$b("Ballls Ferry and Bend Bridge")), 
-        tags$br(), 
-        tags$p("You can view a full temperature profile by clicking on the", tags$b("Temperature"), 
-               "tab above."), 
-        tags$hr(), 
-        tags$p("For more information you can view the report from the Sacramento Temperature 
-               Task Group", tags$a("here",
-                                   target="_blank",
-                                   href="http://deltacouncil.ca.gov/sites/default/files/2017/11/17%20%20SRTTG%202017%20Annual%20Report.pdf"))
+        tags$p(tags$b("Life Stage"), "reports the life stage of Winter Run Chinook based
+               on the current date."), 
+        tags$hr(),
+        tags$p(tags$b("Furthest Redd"), "the most downstream reach with an active redd."),
+        tags$hr(),
+        tags$p(tags$b("Estimated Emergence"), "reports the number of days remaining until
+               it is expected for the redd to emerge.")
       ), 
       easyClose = TRUE
     ))
@@ -551,22 +541,17 @@ dashboard_server <- function(input, output, session, g_date) {
   
   observeEvent(input$help_me_with_storage, {
     showModal(modalDialog(
-      title = "Outflow Temperatures",
+      title = "Shasta Dam Operation",
       tagList(
-        tags$h4("Keswick Temperature Compliance"), 
-        tags$p("Based on Action 1.2.4 Reclamation will manage Keswick Reservoir from", 
-               tags$b("May 15 through October"), "such that daily average temperatures 
-               do not exceed 56°F at compliance locations between", 
-               tags$b("Ballls Ferry and Bend Bridge")), 
-        tags$br(), 
-        tags$p("You can view a full temperature profile by clicking on the", 
-               actionLink(ns("link_to_the_temp_from_home"), label="Temperature"), 
-               "tab above."), 
-        tags$hr(), 
-        tags$p("For more information you can view the report from the Sacramento Temperature 
-               Task Group", tags$a("here",
-                                   target="_blank",
-                                   href="http://deltacouncil.ca.gov/sites/default/files/2017/11/17%20%20SRTTG%202017%20Annual%20Report.pdf"))
+        tags$p(tags$b("Storage"), "is reported from daily storage data from CDEC. It is 
+               displayed in in Million Acre Feet. The plot to the right also reports this value."),
+        tags$hr(),
+        tags$p(tags$b("Storage below 50°F"), "reports the percent of total storage that is below 50°F."),
+        tags$hr(),
+        tags$p(tags$b("Water Year Classification"), "reports the water year type as classified through
+               the water year index calculation, more information ", 
+               tags$a("here", target="_blank", 
+                      href="http://cdec.water.ca.gov/cgi-progs/iodir/WSIHIST"))
       ), 
       easyClose = TRUE
     ))
