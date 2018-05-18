@@ -22,7 +22,7 @@ welcome_server <- function(input, output, session) {
   total_redds_summary <- reactive({
     redd_data %>% 
       filter(year(date) == as.numeric(input$welcome_summary_year_select)) %>% 
-      pull(counts) %>% sum()
+      pull(counts) %>% sum(na.rm = TRUE)
   })
   
   eos_summary <- reactive({

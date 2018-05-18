@@ -9,10 +9,12 @@ temp_pageUI <- function(id) {
                       tags$h2("Temperature Compliance"),
                       tags$hr(),
                       tags$p(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ac scelerisque quam. Fusce eget risus eros. Cras elementum nulla velit, in lacinia mauris euismod ut. Praesent ut semper nunc. Cras porttitor elit sem, id molestie purus fringilla nec. Aliquam vehicula lacinia aliquam. Curabitur et leo elit. Sed egestas massa sit amet turpis faucibus blandit. Curabitur vel efficitur tellus, accumsan dapibus diam. Vivamus tincidunt leo vel placerat facilisis. Duis id augue ac dui posuere hendrerit."
+                        "Sacramento River water temperatures downstream of Keswick dam are controlled by the temperature of flows released from Shasta Dam and ambient air temperature. Water temperature typically increases with distance downstream of Keswick Dam. Between May 15 and October 31, flow management from Shasta Dam attempts to prevent daily average temperatures from exceeding 56°F at compliance locations between Balls Ferry and Bend Bridge. Compliance with this temperature threshold is intended to maintain suitable conditions for Winter Run Chinook Salmon spawning, egg incubation, emergence, and rearing."
                       ),
-                      tags$h3("Download Data in View"),
-                      downloadButton(ns("download_temp_data")),
+                      tags$hr(),
+                      tags$h4("Download Data in View"),
+                      downloadButton(ns("download_temp_data"), class = "btn-sm"),
+                      tags$hr(),
                       tags$h5("Shaded area in the plot above indicates temperature target period"),
                                tags$h5("Data Source: hourly data from CDEC, updated to the application daily"),
                                tags$h5("Temperature Statistics Definitions:"),
@@ -33,9 +35,9 @@ temp_pageUI <- function(id) {
                                      end = today()-1)),
                column(width = 12, class = "col-md-2",
                       selectInput(inputId = ns("temp_add_year"),
-                                  label = "Add Year",
+                                  label = "Add Previous Year",
                                   choices = c("None", 2010:2017),
-                                  width = "75px")
+                                  width = "140px")
                ),
                column(width = 12, class = "col-md-3",
                       selectInput(inputId = ns("temp_gage_location"),
@@ -228,7 +230,7 @@ temp_page_server <- function(input, output, session, g_date) {
       need(input$flow_daterange[1] < input$flow_daterange[2], "Selected dates returned no data")
     )
     
-    cat(unlist(make_compliance_rect()))
+    # cat(unlist(make_compliance_rect()))
     
     switch (input$temp_summary_choice,
             "Daily Mean" = {
@@ -338,4 +340,43 @@ temp_page_server <- function(input, output, session, g_date) {
             } 
     )
   }, style = "bootstrap")
+  
+  output$download_temp_data <- downloadHandler(
+    filename = function() {
+      switch (input$temp_summary_choice,
+              "Daily Mean" = "showr_temperature_daily_mean.csv", 
+              "7DADM" = "showr_temperature_7dadm.csv", 
+              "Daily Max" = "showr_temperature_daily_max.csv")
+    },
+    content = function(file) {
+      switch (input$temp_summary_choice,
+        "Daily Mean" = write.csv(selected_daily_means(), file, row.names = FALSE),
+        "7DADM" = write.csv(selected_7dadm(), file, row.names = FALSE),
+        "Daily Max" = write.csv(selected_daily_max(), file, row.names = FALSE)
+      )
+    }
+  )
+  
+  
+  
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -10,41 +10,44 @@ flow_UI <- function(id) {
                       tags$h2("Flow"),
                       tags$hr(),
                       tags$p(
-                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam ac scelerisque quam. Fusce eget risus eros. Cras elementum nulla velit, in lacinia mauris euismod ut. Praesent ut semper nunc. Cras porttitor elit sem, id molestie purus fringilla nec. Aliquam vehicula lacinia aliquam. Curabitur et leo elit. Sed egestas massa sit amet turpis faucibus blandit. Curabitur vel efficitur tellus, accumsan dapibus diam. Vivamus tincidunt leo vel placerat facilisis. Duis id augue ac dui posuere hendrerit."
+                        "Shasta Dam and its downstream re-regulating Keswick Dam are managed in part to optimize use of cold water for Winter Run Chinook salmon. Cold water management is guided by State Water Resource Control Board (SWRCB) Water Rights Order (WR) 90-5 and Reasonable and Prudent Alternatives (RPA) specified in the 2009 Biological Opinion on the long term operations of the Central Valley Project and State Water Project. Specifically, Reclamation manages outflows from Shasta and Keswick from May 15 through October 31 to prevent daily average temperatures from exceeding 56°F at compliance locations between Balls Ferry and Bend Bridge. "
                       ),
-                      tags$h3("Download Data in View"),
-                      downloadButton(ns("download_flow_data")), 
+                      tags$hr(),
+                      tags$h4("Download Data in View"),
+                      downloadButton(ns("download_flow_data"), class="btn-sm"), 
+                      tags$hr(),
                       tags$h5("Data source: data obtained from CDEC and USGS(NWIS)"), 
-                               tags$h5("Latest TCD configurations transcribed from",
-                                       tags$a(target="_blank",
-                                              "CVO TCD Configurations",
-                                              href="https://www.usbr.gov/mp/cvo/vungvari/ShastaTCD2017.pdf")),
-                               tags$h5("Update schedule: data is updated on daily basis with both hourly and daily data"))),
+                      tags$h5("Latest TCD configurations transcribed from",
+                              tags$a(target="_blank",
+                                     "CVO TCD Configurations",
+                                     href="https://www.usbr.gov/mp/cvo/vungvari/ShastaTCD2017.pdf")),
+                      tags$h5("Update schedule: data is updated on daily basis with both hourly and daily data"), 
+                      tags$h5("Diversions for 2017 and 2018 are estimated values from 2010-2016"))),
       # main interface
       column(width = 12, class = "col-md-9",
              # controls
              fluidRow( 
-                      column(width = 12, class = "col-md-3", 
-                             dateRangeInput(inputId = ns("flow_daterange"), 
-                                            label = "Select a Date Range", 
-                                            min = "1999-01-01", 
-                                            start = paste0(year(today()), "-01-01"), 
-                                            end = today(tzone = "America/Los_Angeles")-1)), 
-                      column(width = 12, class = "col-md-2", 
-                             selectInput(ns("flow_add_year"), label = NULL, choices = c("None", 2010:2017), 
-                                         width = "75px")), 
-                      column(width = 12, class = "col-md-3", 
-                             selectInput(inputId = ns("flow_station_select"), 
-                                         label = "Select Stations",
-                                         choices = c("Shasta (Natural Flow)" = "sha", 
-                                                     "Keswick" = "kwk", 
-                                                     "Bend Bridge" = "bnd", 
-                                                     "Wilkins Slough" = "wlk"),
-                                         multiple = TRUE,
-                                         selected = c("sha", "kwk"), width = "400px")), 
-                      column(width = 12, class = "col-md-3", 
-                             checkboxInput(ns("show_diversions"), label = "Show diversion"))
-                      ), 
+               column(width = 12, class = "col-md-3", 
+                      dateRangeInput(inputId = ns("flow_daterange"), 
+                                     label = "Select a Date Range", 
+                                     min = "1999-01-01", 
+                                     start = paste0(year(today()), "-01-01"), 
+                                     end = today(tzone = "America/Los_Angeles")-1)), 
+               column(width = 12, class = "col-md-2", 
+                      selectInput(ns("flow_add_year"), label = "Add Previous Year", choices = c("None", 2010:2017), 
+                                  width = "140px")), 
+               column(width = 12, class = "col-md-3", 
+                      selectInput(inputId = ns("flow_station_select"), 
+                                  label = "Select Stations",
+                                  choices = c("Shasta (Natural Flow)" = "sha", 
+                                              "Keswick" = "kwk", 
+                                              "Bend Bridge" = "bnd", 
+                                              "Wilkins Slough" = "wlk"),
+                                  multiple = TRUE,
+                                  selected = c("sha", "kwk"), width = "400px")), 
+               column(width = 12, class = "col-md-3", 
+                      checkboxInput(ns("show_diversions"), label = "Show diversion"))
+             ), 
              
              fluidRow(
                # plot
@@ -67,6 +70,39 @@ flow_UI <- function(id) {
 
 flow_server <- function(input, output, session, g_date) {
   ns <- session$ns
+  
+  
+  diversion_data_for_plot <- reactive({
+    d <- diversion_data %>% 
+      filter(year(draft_date) == year(g_date()))
+    
+    if (nrow(d) == 0) {
+      d <- make_estimated_diversion(as.character(year(g_date())))
+    }
+    
+    d
+    
+  })
+  
+  # show_diversion_notification <- reactive({
+  #   if (input$show_diversions && sum(year(input$flow_daterange) %in% 2017:2018) != 0)
+  #     return(TRUE)
+  #   else
+  #     return(FALSE)
+  # })
+  # 
+  # observeEvent(show_diversion_notification(), {
+  #   show_em <- show_diversion_notification()
+  #   
+  #   if (show_em)
+  #     showNotification(paste("Diversions for 2017 and 2018 are estimated from historical values"), duration = 0)
+  #   else
+  #     removeNotification()
+  #     
+  # })
+  # 
+  # 
+  # 
   observeEvent(g_date(), 
                updateDateRangeInput(session = session, 
                                     inputId = "flow_daterange", 
@@ -116,7 +152,7 @@ flow_server <- function(input, output, session, g_date) {
     #   )
     
     data.frame() # hacks
-
+    
     
   })
   
@@ -134,7 +170,7 @@ flow_server <- function(input, output, session, g_date) {
       summarise(
         daily_flow = round(mean(parameter_value, na.rm = TRUE), 0)
       )
-      
+    
     year(this_flow_data$date) <- year(input$flow_daterange[1])
     return(this_flow_data)
   })
@@ -289,4 +325,18 @@ flow_server <- function(input, output, session, g_date) {
   output$flow_tabular <- renderDataTable({
     selected_flow_data()
   })
+  
+  output$download_flow_data <- downloadHandler(
+    filename = function() {
+      "showr_flow_data.csv"
+    },
+    content = function(file) {
+      write.csv(selected_flow_data(), file, row.names = FALSE)
+    }
+  )
+  
+  
+  
+  
+  
 }

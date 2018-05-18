@@ -13,7 +13,7 @@ tagList(useShinyjs(),
            tabPanel("Home", welcome_UI('app')),
            tabPanel("Dashboard", dashboardUI('app')),
            tabPanel("Temperature", temp_pageUI('app')),
-           tabPanel("Flow", flow_UI('app')), 
+           tabPanel("Flow", flow_UI('app')),
            tabPanel("Winter Run Chinook", winter_run_UI('app')), 
            tabPanel("About", about_UI('app'))
 ))

@@ -31,8 +31,9 @@ source("modules/welcome.R")
 load("data/general-objects.RData")
 
 
-diversion_data <- read_csv("data/flows/srsc_diversion_data.csv") %>% 
-  mutate(draft_date = mdy(draft_date))
+# diversion_data <- read_csv("data/flows/srsc_diversion_data.csv") %>% 
+#   mutate(draft_date = mdy(draft_date))
+diversion_data <- read_rds("data/flows/diversion_data_with_estimates.rds")
 
 # These data are all on a public S3 bucket 
 temp_data <- 
@@ -182,3 +183,18 @@ rd <- redd_data %>%
   mutate(cdec_gage = redd_cdec_lookup[location], 
          location = factor(location, levels = unique(redd_data$location))) %>%
   left_join(daily_temps)
+
+
+
+make_estimated_diversion <- function(year) {
+  diversion_data %>% 
+    group_by(month = month(draft_date), 
+             day = day(draft_date)) %>% 
+    summarise(
+      min = min(actual_upstream, na.rm = TRUE),
+      max = max(actual_upstream, na.rm = TRUE),
+      mean = mean(actual_upstream, na.rm = TRUE)
+    ) %>% 
+    mutate(
+      fake_date = ymd(paste0(year, "/", month, "/", day))
+    ) }

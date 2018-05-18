@@ -62,18 +62,13 @@ dashboard_server <- function(input, output, session, g_date) {
   isothermal_percent_metric <- reactive({
     isothermal_data %>% 
       filter(date <= g_date(), year(date) == year(g_date())) %>% 
-      arrange(desc(date)) %>% 
-      group_by(date) %>% 
-      mutate(total_storage = sum(volume_taf)) %>% 
-      ungroup() %>% 
-      mutate(proportion_of_total = volume_taf / total_storage) %>% 
       filter(temp <= 50) %>% 
       group_by(date) %>% 
       summarise(
-        total_prop_below_50 = sum(proportion_of_total)
-      ) %>% 
-      arrange(desc(date)) %>% 
-      head(1)
+        total_volume_below_50 = sum(volume_taf)
+      ) %>% ungroup() %>% 
+      arrange(desc(date)) %>% head(1)
+    
     
   })
   
@@ -157,7 +152,7 @@ dashboard_server <- function(input, output, session, g_date) {
     validate(need(nrow(isothermal_percent_metric()) > 0, "No Data"))
     x <- isothermal_percent_metric()
     
-    paste(pretty_num(x$total_prop_below_50*100), "%")
+    paste(pretty_num((x$total_volume_below_50*1000)/1e6), " MAF")
   })
   
   output$water_year_class <- renderText({
@@ -485,13 +480,12 @@ dashboard_server <- function(input, output, session, g_date) {
   
   observeEvent(input$help_me_with_temps, {
     showModal(modalDialog(
-      title = "Outflow Temperatures",
+      title = "River Temperatures",
       tagList(
         tags$h4("Keswick Temperature Compliance"), 
-        tags$p("Based on Action 1.2.4 Reclamation will manage Keswick Reservoir from", 
-               tags$b("May 15 through October"), "such that daily average temperatures 
-               do not exceed 56°F at compliance locations between", 
-               tags$b("Ballls Ferry and Bend Bridge")), 
+        tags$p("Sacramento River water temperatures downstream of Keswick dam are controlled by the temperature of flows released from Shasta Dam and ambient air temperature. Water temperature typically increases with distance downstream of Keswick Dam. Between May 15 and October 31, flow management from Shasta Dam attempts to prevent daily average temperatures from exceeding 56°F at compliance locations between Balls Ferry and Bend Bridge.
+Temperatures shaded red indicate non-compliance with Winter Run temperature management requirements.
+You can view a full temperature profile by clicking on the Temperature tab above."), 
         tags$br(), 
         tags$p("You can view a full temperature profile by clicking on the", tags$b("Temperature"), 
                "tab above."), 
