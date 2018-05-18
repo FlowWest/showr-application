@@ -81,6 +81,7 @@ shasta_storage_data <-
                     parameter_value = col_double()
                   ))
 
+# This dataset is small enough and is static enough to live on the app.
 # redd_data <- 
 #   read_csv("https://s3-us-west-2.amazonaws.com/showr-data/cdfw/redds/aerial-survey-observations_no_error_codes.csv", 
 #                   col_types = cols(

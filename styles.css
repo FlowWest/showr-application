@@ -77,6 +77,41 @@ chnages all badged in the application*/
   padding-bottom: 35px;
 }
 
+.home-page-learn-more {
+  float: right;
+  width: 60%;
+  color: #3F3F3F;
+  background-color: #D6E8F7;
+  border-top: 2px solid transparent;
+  padding-left: 15px;
+  padding-bottom: 35px;
+}
+
+.home-page-learn-more > a span { 
+  position:absolute; 
+  width:100%;
+  height:100%;
+  top:0;
+  left: 0;
+
+  /* edit: added z-index */
+  z-index: 1;
+
+  /* edit: fixes overlap error in IE7/8, 
+     make sure you have an empty gif */
+  background-image: url('empty.gif');
+}
+
+.home-page-learn-more:hover {
+  background-color: #0A0;  
+}
+
+
+.home-page-learn-more:hover {
+  background-color: #515863
+  color: white;
+}
+
 .home-page-summary-content {
   width: 90%;
   margin: auto;
@@ -270,4 +305,8 @@ label {
   padding-top: 20px;
   padding-left: 20px
   
+}
+
+.summary-value {
+  padding: 5px;
 }
