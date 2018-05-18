@@ -18,13 +18,3 @@ tagList(useShinyjs(),
            tabPanel("About", about_UI('app'))
 ))
 
-
-
-
-
-
-
-
-
-
-

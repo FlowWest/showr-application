@@ -35,14 +35,12 @@ welcome_server <- function(input, output, session) {
   })
   
   days_out_of_compliance <- reactive({
-    temp_compliance_points_daily_mean %>% 
-      filter(location_id == "bsf", parameter_value > 56) %>% 
-      group_by(year = year(datetime)) %>% 
-      summarise(
-        total_days = n_distinct(datetime)
-      ) %>% 
-      filter(year == as.numeric(input$welcome_summary_year_select)) %>% 
-      pull(total_days)
+    temp_compliance_points_daily_mean %>%
+      filter(
+             datetime >= as_date(paste0(input$welcome_summary_year_select, "-05-15")),
+             datetime <= as_date(paste0(input$welcome_summary_year_select, "-10-31")), 
+             location_id == "bsf", parameter_value > 56) %>% 
+      nrow()
   })
   
   # metrics output
