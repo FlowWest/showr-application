@@ -501,17 +501,15 @@ You can view a full temperature profile by clicking on the Temperature tab above
   
   observeEvent(input$help_me_with_flows, {
     showModal(modalDialog(
-      title = "Outflow Temperatures",
+      title = "Flows",
       tagList(
-        tags$p(tags$b("Shasta Reservoir"), "reports full natural flow, that is,
-natural water production of a river basin, unaltered by upstream diversions, 
-               storage, or by export or import of water to or from other watersheds"),
+        tags$p(tags$b("Shasta Reservoir"), "reports the full natural Sacramento River flow into Shasta Reservoir, as recorded by the SHA gauge upstream of Shasta Reservoir."),
         tags$hr(),
-        tags$p(tags$b("Keswick"), "reports flow from KWK a gauge downstream of Keswick Dam.
-               Full hydrograph is available in the", tags$b("Flow Page.")),
+        tags$p(tags$b("Keswick"), "reports Sacramento River flow, as recorded at the KWK gauge downstream of Keswick Dam."),
         tags$hr(),
-        tags$p(tags$b("Wilkins Slough"), "reports flow using CDEC gauge WLK, 
-Full hydrograph is available in the", tags$b("Flow Page."))
+        tags$p(tags$b("Wilkins Slough"), "reports flow using CDEC gauge WLK"), 
+        tags$hr(),
+        tags$p("You can view detailed flow hydrographs for these and other Sacramento River flow gages by clicking on the", tags$b("Flow tab"), "above.")
       ), 
       easyClose = TRUE
     ))
@@ -521,13 +519,13 @@ Full hydrograph is available in the", tags$b("Flow Page."))
     showModal(modalDialog(
       title = "Chinook Activity",
       tagList(
-        tags$p(tags$b("Life Stage"), "reports the life stage of Winter Run Chinook based
-               on the current date."), 
+        tags$p(tags$b("Life Stage"), "reports the Winter Run Chinook salmon life stages expected to be present on the selected date based on historical data on Winter Run migration, spawning, emergence, and rearing."), 
         tags$hr(),
-        tags$p(tags$b("Furthest Redd"), "the most downstream reach with an active redd."),
+        tags$p(tags$b("Furthest Redd"), "lists the river reach farthest downstream of Shasta Dam with Winter Run redd(s) containing eggs or juvenile Winter Run that have not yet emerged."),
         tags$hr(),
-        tags$p(tags$b("Estimated Emergence"), "reports the number of days remaining until
-               it is expected for the redd to emerge.")
+        tags$p(tags$b("Estimated Emergence"), "reports the number of days remaining until all juvenile Winter Run have emerged from the current most downstream redd."),
+        tags$hr(),
+        tags$p("You can view detailed on current and historical Winter Run Chinook Salmon activity by clicking on the Winter Run Chinook tab above.")
       ), 
       easyClose = TRUE
     ))
@@ -537,14 +535,12 @@ Full hydrograph is available in the", tags$b("Flow Page."))
     showModal(modalDialog(
       title = "Shasta Dam Operation",
       tagList(
-        tags$p(tags$b("Storage"), "is reported from daily storage data from CDEC. It is 
-               displayed in in Million Acre Feet. The plot to the right also reports this value."),
+        tags$p(tags$b("Storage"), "is monitored by Reclamation and recorded by CDEC (SHA). Storage is displayed in in Million Acre Feet (MAF). The plot to the right provides a time series of Shasta storage values."),
         tags$hr(),
-        tags$p(tags$b("Storage below 50°F"), "reports the percent of total storage that is below 50°F."),
+        tags$p(tags$b("Storage below 50°F"), "reports the total volume of storage in Shasta below 50°F."),
         tags$hr(),
-        tags$p(tags$b("Water Year Classification"), "reports the water year type as classified through
-               the water year index calculation, more information ", 
-               tags$a("here", target="_blank", 
+        tags$p(tags$b("Water Year Classification"), "reports the water year type according to the", 
+               tags$a("Sacramento River Index", target="_blank", 
                       href="http://cdec.water.ca.gov/cgi-progs/iodir/WSIHIST"))
       ), 
       easyClose = TRUE

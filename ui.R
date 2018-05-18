@@ -7,7 +7,7 @@ tagList(useShinyjs(),
            theme = shinythemes::shinytheme("cosmo"),
            windowTitle = "Shasta Operation Winter Run", 
            header = includeCSS("styles.css"),
-           id = "main_nav",
+           id = "showrapp",
 
            # refacor the names of UI functions
            tabPanel("Home", welcome_UI('app')),

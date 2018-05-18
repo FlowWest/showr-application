@@ -7,7 +7,9 @@ welcome_UI <- function(id) {
                                                   selected = 2017), 
                summary_water_year_type = textOutput(ns("summary_water_year_type_value")),
                summary_total_winter_redds = textOutput(ns("summary_total_winter_redds_value")),
-               summary_eos = textOutput(ns("summary_eos_value"))
+               summary_eos = textOutput(ns("summary_eos_value")),
+               summary_out_of_compliance = textOutput(ns("summary_out_of_compliance_value")), 
+               action_link_to_about_page = actionLink(ns("goto_about_page"), label="Learn more about SHOWR")
   )
 }
 
@@ -32,9 +34,24 @@ welcome_server <- function(input, output, session) {
       pull(parameter_value)/1000 
   })
   
+  days_out_of_compliance <- reactive({
+    temp_compliance_points_daily_mean %>% 
+      filter(location_id == "bsf", parameter_value > 56) %>% 
+      group_by(year = year(datetime)) %>% 
+      summarise(
+        total_days = n_distinct(datetime)
+      ) %>% 
+      filter(year == as.numeric(input$welcome_summary_year_select)) %>% 
+      pull(total_days)
+  })
+  
   # metrics output
   output$summary_water_year_type_value <- renderText({
     water_year_classification_summary()
+  })
+  
+  output$summary_out_of_compliance_value <- renderText({
+    days_out_of_compliance()
   })
   
   output$summary_total_winter_redds_value <- renderText({
@@ -45,9 +62,7 @@ welcome_server <- function(input, output, session) {
    paste(round(eos_summary(), digits = 0), "taf")
   })
   
-  observeEvent(input$dog_link, {
-    updateNavbarPage(session, 
-                     inputId = "main_nav", 
-                     selected = "About")
+  observeEvent(input$goto_about_page, {
+    updateNavbarPage(session = session, inputId = "showrapp", selected = "About")
   })
 }
