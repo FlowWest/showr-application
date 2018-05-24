@@ -35,6 +35,10 @@ dashboardUI <- function(id){
                                                               class="help-btn pull-right",
                                                               icon = icon("question-circle")),
                  shasta_elevation_plot = plotlyOutput(ns("elevation_plot"), height = '500px'),
+                 chinook_plot_selector = radioButtons(ns("chinook_plot_choice"), 
+                                                      label = NULL, 
+                                                      choices = c("Current", "Historical"), 
+                                                      selected = "Current", inline = TRUE),
                  chinook_summary_plot = plotlyOutput(ns("chinook_summary_plot"), height = '500px'),
                  date_button = dateInput(ns("global_date"), label = "Select Date", 
                                          min = "2010-01-01", max = (today(tzone = "America/Los_Angeles")), value = (today(tzone = "America/Los_Angeles")), 
@@ -448,19 +452,33 @@ dashboard_server <- function(input, output, session, g_date) {
   
   output$chinook_summary_plot <- renderPlotly({
     
-    # 
-    # validate(need(nrow(selected_chinook_data()) > 0, 
-    #               "0 Counts of Redds to date this year"))
+    # the plot shown here depends on whether there are active redds
+    # in the system or not. If not show total observation of redds
+    # by reach in all years, otherwise show plot
     
     if (nrow(selected_chinook_data()) == 0) {
-      return(redd_data %>% 
-               group_by(month = factor(month.abb[as.integer(month(date))], levels=month.abb), 
-                        location) %>% 
-               summarise(
-                 month_counts = sum(counts)
-               ) %>% 
-               plot_ly(x=~month, y=~month_counts, type='bar', color=~location) %>% 
-               layout(barmode='stack'))
+      return(
+        redd_data %>% 
+          mutate(total_count = sum(counts, na.rm = TRUE)) %>% 
+          group_by(month = month(date), location) %>% 
+          summarise(
+            proportion_in_month = sum(counts, na.rm = TRUE) / max(total_count)
+          ) %>% 
+          ungroup() %>% 
+          group_by(month, location) %>% 
+          summarise(
+            prop_of_location_in_month = sum(proportion_in_month) * 100
+          ) %>% ungroup() %>% 
+          filter(prop_of_location_in_month > 0) %>% 
+          mutate(month = factor(month.abb[month], levels = month.abb)) %>% 
+          plot_ly(x=~month, y=~prop_of_location_in_month, color=~location, 
+                  type='bar', 
+                  text = ~paste0(location, "<br>", 
+                                 round(prop_of_location_in_month), "%"), 
+                  hoverinfo = "text") %>% 
+          layout(barmode='stack', 
+                 yaxis = list(title = "Percent of Mapped Redds"))
+      )
     }
     
     selected_chinook_data() %>% 
