@@ -35,10 +35,6 @@ dashboardUI <- function(id){
                                                               class="help-btn pull-right",
                                                               icon = icon("question-circle")),
                  shasta_elevation_plot = plotlyOutput(ns("elevation_plot"), height = '500px'),
-                 chinook_plot_selector = radioButtons(ns("chinook_plot_choice"), 
-                                                      label = NULL, 
-                                                      choices = c("Current", "Historical"), 
-                                                      selected = "Current", inline = TRUE),
                  chinook_summary_plot = plotlyOutput(ns("chinook_summary_plot"), height = '500px'),
                  date_button = dateInput(ns("global_date"), label = "Select Date", 
                                          min = "2010-01-01", max = (today(tzone = "America/Los_Angeles")), value = (today(tzone = "America/Los_Angeles")), 
@@ -321,6 +317,19 @@ dashboard_server <- function(input, output, session, g_date) {
   
   # Visualizations -------------------------------------------------------------
   
+  observeEvent(input$dashboard_plot_tabs, {
+    x <- input$dashboard_plot_tabs
+    if (x == "1a") return(NULL)
+    else if (x == "2a") {
+      if (nrow(selected_chinook_data()) == 0) {
+        showNotification("You are viewing historical observations for Redds.
+                         There are currently no observations this year.")
+      } else {
+        return(NULL)
+      }
+    }
+  })
+  
   selected_shasta_storage_data <- reactive({
     shasta_storage_data %>% 
       filter(year(datetime) == year(g_date()), datetime <= g_date())
@@ -459,7 +468,8 @@ dashboard_server <- function(input, output, session, g_date) {
     if (nrow(selected_chinook_data()) == 0) {
       return(
         redd_data %>% 
-          mutate(total_count = sum(counts, na.rm = TRUE)) %>% 
+          mutate(total_count = sum(counts, na.rm = TRUE), 
+                 location = factor(location, levels = redd_locations)) %>% 
           group_by(month = month(date), location) %>% 
           summarise(
             proportion_in_month = sum(counts, na.rm = TRUE) / max(total_count)
@@ -475,9 +485,12 @@ dashboard_server <- function(input, output, session, g_date) {
                   type='bar', 
                   text = ~paste0(location, "<br>", 
                                  round(prop_of_location_in_month), "%"), 
-                  hoverinfo = "text") %>% 
+                  hoverinfo = "text", 
+                  colors = "Dark2") %>% 
           layout(barmode='stack', 
-                 yaxis = list(title = "Percent of Mapped Redds"))
+                 yaxis = list(title = "Percent of Mapped Redds"), 
+                 xaxis = list(title = ""), 
+                 title = "Historic Proportions of Winter Run Redds")
       )
     }
     
@@ -495,16 +508,25 @@ dashboard_server <- function(input, output, session, g_date) {
       config(displayModeBar = FALSE)
   })
   
-  
   observeEvent(input$help_me_with_temps, {
     showModal(modalDialog(
       title = "River Temperatures",
       tagList(
-        tags$h4("Keswick Temperature Compliance"), 
-        tags$p("Sacramento River water temperatures downstream of Keswick dam are controlled by the temperature of flows released from Shasta Dam and ambient air temperature. Water temperature typically increases with distance downstream of Keswick Dam. Between May 15 and October 31, flow management from Shasta Dam attempts to prevent daily average temperatures from exceeding 56°F at compliance locations between Balls Ferry and Bend Bridge.
-Temperatures shaded red indicate non-compliance with Winter Run temperature management requirements.
-You can view a full temperature profile by clicking on the Temperature tab above."), 
-        tags$br(), 
+        tags$p("The Long Term Operations Biological Opinion requires Reclamation to manage flows from Shasta and Keswick between May 15 and October 31 such that daily average temperatures do not exceed 56°F at compliance locations between Balls Ferry and Bend Bridge."),
+        tags$p("Keswick (",
+               tags$a("KWK", href="http://cdec.water.ca.gov/dynamicapp/QueryF?s=kwk", target="_blank"),
+               ") is Sacramento River water temperature at the outflow from", tags$a("Keswick Dam", href="https://en.wikipedia.org/wiki/Clear_Creek_(Sacramento_River_tributary)", target="_blank"), "."), 
+        tags$br(),
+        tags$p("Clear Creek (",
+               tags$a("CCR", href="http://cdec.water.ca.gov/dynamicapp/QueryF?s=ccr", target="_blank"),
+               ") is Sacramento River water temperature at the first major tributary to the Sacramento River downstream of Shasta Dam."),
+        tags$br(),
+        tags$p("Balls Ferry (",
+               tags$a("KWK", href="http://cdec.water.ca.gov/dynamicapp/QueryF?s=bsf", target="_blank"),
+               ") is Sacramento River water temperature at the most downstream compliance point location."),
+        tags$br(),
+        tags$p("Temperatures shaded red indicate non-compliance with Winter Run temperature management requirements."),
+        tags$br(),
         tags$p("You can view a full temperature profile by clicking on the", tags$b("Temperature"), 
                "tab above."), 
         tags$hr(), 
@@ -521,9 +543,13 @@ You can view a full temperature profile by clicking on the Temperature tab above
     showModal(modalDialog(
       title = "Flows",
       tagList(
-        tags$p(tags$b("Shasta Reservoir"), "reports the full natural Sacramento River flow into Shasta Reservoir, as recorded by the SHA gauge upstream of Shasta Reservoir."),
+        tags$p(tags$b("Shasta Reservoir"), "reports the full natural Sacramento River flow into Shasta Reservoir, as recorded by the", 
+               tags$a("SHA", href="https://cdec.water.ca.gov/dynamicapp/QueryF?s=SHA", target="_blank"), 
+               "gauge upstream of Shasta Reservoir."),
         tags$hr(),
-        tags$p(tags$b("Keswick"), "reports Sacramento River flow, as recorded at the KWK gauge downstream of Keswick Dam."),
+        tags$p(tags$b("Keswick"), "reports Sacramento River flow, as recorded at the",
+               tags$a("KWK", href="https://cdec.water.ca.gov/dynamicapp/QueryF?s=kwk", target="_blank"),
+               "gauge downstream of Keswick Dam."),
         tags$hr(),
         tags$p(tags$b("Wilkins Slough"), "reports flow using CDEC gauge WLK"), 
         tags$hr(),
@@ -553,7 +579,7 @@ You can view a full temperature profile by clicking on the Temperature tab above
     showModal(modalDialog(
       title = "Shasta Dam Operation",
       tagList(
-        tags$p(tags$b("Storage"), "is monitored by Reclamation and recorded by CDEC (SHA). Storage is displayed in in Million Acre Feet (MAF). The plot to the right provides a time series of Shasta storage values."),
+        tags$p(tags$b("Storage"), "is monitored by Reclamation and recorded by CDEC (", tags$a("SHA", href="http://cdec.water.ca.gov/dynamicapp/QueryF?s=SHA", target="_blank"),"). Storage is displayed in in Million Acre Feet (MAF). The plot to the right provides a time series of Shasta storage values."),
         tags$hr(),
         tags$p(tags$b("Storage below 50°F"), "reports the total volume of storage in Shasta below 50°F."),
         tags$hr(),

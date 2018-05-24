@@ -9,11 +9,20 @@ temp_pageUI <- function(id) {
                       tags$h2("Temperature Compliance"),
                       tags$hr(),
                       tags$p(
-                        "Sacramento River water temperatures downstream of Keswick dam are controlled by the temperature of flows released from Shasta Dam and ambient air temperature. Water temperature typically increases with distance downstream of Keswick Dam. Between May 15 and October 31, flow management from Shasta Dam attempts to prevent daily average temperatures from exceeding 56°F at compliance locations between Balls Ferry and Bend Bridge. Compliance with this temperature threshold is intended to maintain suitable conditions for Winter Run Chinook Salmon spawning, egg incubation, emergence, and rearing."
+                        "Shasta Dam and its downstream re-regulating Keswick Dam are managed in part to optimize use of cold water for Winter Run Chinook salmon. Cold water management is guided by State Water Resource Control Board (SWRCB) Water Rights Order (WR) 90-5 and Reasonable and Prudent Alternatives (RPA) specified in the 2009 Biological Opinion on the long term operations of the Central Valley Project and State Water Project. Sacramento River water temperatures downstream of Keswick dam are controlled by the temperature of flows released from Shasta Dam and ambient air temperature. Water temperature typically increases with distance downstream of Keswick Dam. Between May 15 and October 31, flow management from Shasta Dam attempts to prevent daily average temperatures from exceeding 56°F at compliance locations between Balls Ferry and Bend Bridge to maintain suitable conditions for Winter Run Chinook Salmon spawning, egg incubation, emergence, and rearing."
                       ),
                       tags$hr(),
+                      tags$div(
                       tags$h4("Download Data in View"),
                       downloadButton(ns("download_temp_data"), class = "btn-sm"),
+                      tags$br(),
+                      tags$br(),
+                      tags$div(class = "input-group",
+                        tags$span(class = "input-group-btn", 
+                                  tags$button(class="btn btn-default btn-sm", 
+                                              type="button", "Generate URL")), 
+                        tags$input(type="text", class="form-control input-sm")
+                      )),
                       tags$hr(),
                       tags$h5("Shaded area in the plot above indicates temperature target period"),
                                tags$h5("Data Source: hourly data from CDEC, updated to the application daily"),
