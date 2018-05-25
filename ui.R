@@ -1,4 +1,4 @@
-tagList(useShinyjs(),
+function(request) {tagList(useShinyjs(),
         navbarPage(title=div(class="logo", tags$img(class="logo-img",
                               src="chinook (1).svg", width="140px"), 
                      "SHOWR"), 
@@ -18,3 +18,4 @@ tagList(useShinyjs(),
            tabPanel("About", about_UI('app'))
 ))
 
+}

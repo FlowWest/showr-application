@@ -9,71 +9,78 @@ temp_pageUI <- function(id) {
                       tags$h2("Temperature Compliance"),
                       tags$hr(),
                       tags$p(
-                        "Shasta Dam and its downstream re-regulating Keswick Dam are managed in part to optimize use of cold water for Winter Run Chinook salmon. Cold water management is guided by State Water Resource Control Board (SWRCB) Water Rights Order (WR) 90-5 and Reasonable and Prudent Alternatives (RPA) specified in the 2009 Biological Opinion on the long term operations of the Central Valley Project and State Water Project. Sacramento River water temperatures downstream of Keswick dam are controlled by the temperature of flows released from Shasta Dam and ambient air temperature. Water temperature typically increases with distance downstream of Keswick Dam. Between May 15 and October 31, flow management from Shasta Dam attempts to prevent daily average temperatures from exceeding 56°F at compliance locations between Balls Ferry and Bend Bridge to maintain suitable conditions for Winter Run Chinook Salmon spawning, egg incubation, emergence, and rearing."
+                        tags$a("Shasta Dam", href="https://www.usbr.gov/projects/index.php?id=241", target = "_blank"), 
+                        "and its downstream re-regulating", 
+                        tags$a("Keswick Dam", href="https://www.usbr.gov/projects/index.php?id=185", target = "_blank"),  
+                        "are managed in part to optimize use of cold water for Winter Run Chinook salmon. Cold water management is guided by State Water Resource Control Board (SWRCB)",
+                        tags$a("Water Rights Order (WR) 90-5", href="https://www.waterboards.ca.gov/waterrights/board_decisions/adopted_orders/orders/1990/wro90-05.pdf", target = "_blank"),
+                        "and Reasonable and Prudent Alternatives (RPA) specified in the", 
+                        tags$a("2009 Biological Opinion", href="http://www.westcoast.fisheries.noaa.gov/central_valley/water_operations/ocap.html", target = "_blank")
+                        ,"on the long term operations of the Central Valley Project and State Water Project. Sacramento River water temperatures downstream of Keswick dam are controlled by the temperature of flows released from Shasta Dam and ambient air temperature. Water temperature typically increases with distance downstream of Keswick Dam. Between May 15 and October 31, flow management from Shasta Dam attempts to prevent daily average temperatures from exceeding 56°F at compliance locations between Balls Ferry and Bend Bridge to maintain suitable conditions for Winter Run Chinook Salmon spawning, egg incubation, emergence, and rearing."
                       ),
                       tags$hr(),
-                      tags$div(
                       tags$h4("Download Data in View"),
                       downloadButton(ns("download_temp_data"), class = "btn-sm"),
                       tags$br(),
                       tags$br(),
-                      tags$div(class = "input-group",
-                        tags$span(class = "input-group-btn", 
-                                  tags$button(class="btn btn-default btn-sm", 
-                                              type="button", "Generate URL")), 
-                        tags$input(type="text", class="form-control input-sm")
-                      )),
-                      tags$hr(),
-                      tags$h5("Shaded area in the plot above indicates temperature target period"),
-                               tags$h5("Data Source: hourly data from CDEC, updated to the application daily"),
-                               tags$h5("Temperature Statistics Definitions:"),
-                               tags$h5("-Daily Mean: Daily mean for temperatures observed in a given day"),
-                               tags$h5("-7DADM: 7 day average of daily maxes"),
-                               tags$h5("-Daily Max: the max observed temperature for a given day") 
-                      )),
-      # main interface
-      column(width = 12, class = "col-md-9",
-             fluidRow(
-               # temp controls
-               column(width = 12, class = "col-md-3",
-                      style="display: inline-flex;",
-                      dateRangeInput(inputId = ns("temp_daterange"),
-                                     label = "Select Date Range",
-                                     min = "1999-01-01",
-                                     start = paste0(year(today()), "-01-01"),
-                                     end = today()-1)),
-               column(width = 12, class = "col-md-2",
-                      selectInput(inputId = ns("temp_add_year"),
-                                  label = "Add Previous Year",
-                                  choices = c("None", 2010:2017),
-                                  width = "140px")
-               ),
-               column(width = 12, class = "col-md-3",
-                      selectInput(inputId = ns("temp_gage_location"),
-                                  label = "Select Gage(s)",
-                                  choices = c("Keswick" = "kwk",
-                                              "Sac. River Hwy 44" = "sac",
-                                              "Clear Creek" = "ccr",
-                                              "Balls Ferry" = "bsf",
-                                              "Jellys Ferry" = "jlf",
-                                              "Bend Bridge" = "bnd"),
-                                  multiple = TRUE, selected = c("kwk","ccr","bsf"))),
-               column(width = 12, class = "col-md-3",
-                      radioButtons(inputId = ns("temp_summary_choice"),
-                                   label = "Select Temperature Statistic",
-                                   choices = c("Daily Mean", "7DADM", "Daily Max")))
-             ), 
-             fluidRow(
-               # temp plot
-               column(width = 12, class = "col-md-9", 
-                      plotlyOutput(ns("temperature_ts_plot"), height = "500px")),
-               # temp schematic
-               column(width = 12, class = "col-md-3", 
-                      tags$img(class="gage_map", src="temp_sites.png"), 
-                      tags$h6("Gray locations are below compliance point"))
-             ))
-    )
-
+                      bookmarkButton(),
+                      # tags$div(class = "input-group",
+                      #          tags$span(class = "input-group-btn", 
+                      #                    tags$button(class="btn btn-default btn-sm", 
+                      #                                type="button", "Generate URL")), 
+                      #          tags$input(type="text", class="form-control input-sm")
+                      # ),
+             tags$hr(),
+             tags$h5("Shaded area in the plot above indicates temperature target period"),
+             tags$h5("Data Source: hourly data from CDEC, updated to the application daily"),
+             tags$h5("Temperature Statistics Definitions:"),
+             tags$h5("-Daily Mean: Daily mean for temperatures observed in a given day"),
+             tags$h5("-7DADM: 7 day average of daily maxes"),
+             tags$h5("-Daily Max: the max observed temperature for a given day") 
+      )),
+    # main interface
+    column(width = 12, class = "col-md-9",
+           fluidRow(
+             # temp controls
+             column(width = 12, class = "col-md-3",
+                    style="display: inline-flex;",
+                    dateRangeInput(inputId = ns("temp_daterange"),
+                                   label = "Select Date Range",
+                                   min = "1999-01-01",
+                                   start = paste0(year(today()), "-01-01"),
+                                   end = today()-1)),
+             column(width = 12, class = "col-md-2",
+                    selectInput(inputId = ns("temp_add_year"),
+                                label = "Add Previous Year",
+                                choices = c("None", 2010:2017),
+                                width = "140px")
+             ),
+             column(width = 12, class = "col-md-3",
+                    selectInput(inputId = ns("temp_gage_location"),
+                                label = "Select Gage(s)",
+                                choices = c("Keswick" = "kwk",
+                                            "Sac. River Hwy 44" = "sac",
+                                            "Clear Creek" = "ccr",
+                                            "Balls Ferry" = "bsf",
+                                            "Jellys Ferry" = "jlf",
+                                            "Bend Bridge" = "bnd"),
+                                multiple = TRUE, selected = c("kwk","ccr","bsf"))),
+             column(width = 12, class = "col-md-3",
+                    radioButtons(inputId = ns("temp_summary_choice"),
+                                 label = "Select Temperature Statistic",
+                                 choices = c("Daily Mean", "7DADM", "Daily Max")))
+           ), 
+           fluidRow(
+             # temp plot
+             column(width = 12, class = "col-md-9", 
+                    plotlyOutput(ns("temperature_ts_plot"), height = "500px")),
+             # temp schematic
+             column(width = 12, class = "col-md-3", 
+                    tags$img(class="gage_map", src="temp_sites.png"), 
+                    tags$h6("Gray locations are below compliance point"))
+           ))
+  )
+  
   )
 } 
 
@@ -161,10 +168,10 @@ temp_page_server <- function(input, output, session, g_date) {
       return(NULL)
     }
     
-    })
+  })
   
   
-
+  
   span_multiple_years <- reactive({
     year(input$temp_daterange[1]) != year(input$temp_daterange[2])
   })
@@ -230,7 +237,7 @@ temp_page_server <- function(input, output, session, g_date) {
     this_temp_data <- selected_add_year_data_max() %>% 
       group_by(location_id) %>% 
       mutate(seven_dadm = round(rollmean(summary_value, k = 7, fill = NA), 2))
-
+    
     return(this_temp_data)
   })
   
@@ -359,9 +366,9 @@ temp_page_server <- function(input, output, session, g_date) {
     },
     content = function(file) {
       switch (input$temp_summary_choice,
-        "Daily Mean" = write.csv(selected_daily_means(), file, row.names = FALSE),
-        "7DADM" = write.csv(selected_7dadm(), file, row.names = FALSE),
-        "Daily Max" = write.csv(selected_daily_max(), file, row.names = FALSE)
+              "Daily Mean" = write.csv(selected_daily_means(), file, row.names = FALSE),
+              "7DADM" = write.csv(selected_7dadm(), file, row.names = FALSE),
+              "Daily Max" = write.csv(selected_daily_max(), file, row.names = FALSE)
       )
     }
   )

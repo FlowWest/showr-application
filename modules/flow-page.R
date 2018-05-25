@@ -10,7 +10,23 @@ flow_UI <- function(id) {
                       tags$h2("Flow"),
                       tags$hr(),
                       tags$p(
-                        "Shasta Dam and its downstream re-regulating Keswick Dam are managed in part to optimize use of cold water for Winter Run Chinook salmon. Cold water management is guided by State Water Resource Control Board (SWRCB) Water Rights Order (WR) 90-5 and Reasonable and Prudent Alternatives (RPA) specified in the 2009 Biological Opinion on the long term operations of the Central Valley Project and State Water Project. Specifically, Reclamation manages outflows from Shasta and Keswick from May 15 through October 31 to prevent daily average temperatures from exceeding 56°F at compliance locations between Balls Ferry and Bend Bridge. Estimated diversions are based on 6 (2010-2016) years of diversion data compiled by MBK Engineers for the Sacramento River Settlement Contractors and are total diversions between Keswick and Wilkins Slough."
+                        tags$p(
+                          tags$a("Shasta Dam", href="https://www.usbr.gov/projects/index.php?id=241", target="_blank"),
+                          "and its downstream re-regulating",
+                          tags$a("Keswick Dam", href="https://www.usbr.gov/projects/index.php?id=185", target="_blank"), 
+                          "are managed in part to optimize use of cold water for Winter Run Chinook salmon. 
+  Cold water management is guided by State Water Resource Control Board",
+                          tags$a("(SWRCB) Water Rights Order (WR) 90-5", href="https://www.waterboards.ca.gov/waterrights/board_decisions/adopted_orders/orders/1990/wro90-05.pdf", target="_blank"),
+                          "and Reasonable and Prudent Alternatives (RPA) 
+  specified in the", tags$a("2009 Biological Opinion", href="http://www.westcoast.fisheries.noaa.gov/central_valley/water_operations/ocap.html", target="_blank"), 
+                          "on the long term operations of the Central 
+  Valley Project and State Water Project. Sacramento River flow downstream of 
+  Keswick dam influences both water temperature and extent of Winter Run spawning and 
+  rearing habitat. Shasta inflow is monitored by Reclamation and Keswick outflow is 
+  monitored by USGS and Reclamation. Estimated diversions are based on 7 years of 
+  diversion data compiled by MBK Engineers for the Sacramento River Settlement Contractors 
+  and are total diversions between Keswick and Wilkins Slough. "
+                        )
                       ),
                       tags$hr(),
                       tags$h4("Download Data in View"),

@@ -16,6 +16,8 @@ library(shinyjs)
 library(measurements)
 library(purrr)
 
+enableBookmarking(store = "url")
+
 # atu
 source("atu.R")
 
