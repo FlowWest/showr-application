@@ -20,67 +20,61 @@ temp_pageUI <- function(id) {
                       ),
                       tags$hr(),
                       tags$h4("Download Data in View"),
-                      downloadButton(ns("download_temp_data"), class = "btn-sm"),
+                      downloadButton(ns("download_temp_data")),
                       tags$br(),
                       tags$br(),
-                      bookmarkButton(),
-                      # tags$div(class = "input-group",
-                      #          tags$span(class = "input-group-btn", 
-                      #                    tags$button(class="btn btn-default btn-sm", 
-                      #                                type="button", "Generate URL")), 
-                      #          tags$input(type="text", class="form-control input-sm")
-                      # ),
-             tags$hr(),
-             tags$h5("Shaded area in the plot above indicates temperature target period"),
-             tags$h5("Data Source: hourly data from CDEC, updated to the application daily"),
-             tags$h5("Temperature Statistics Definitions:"),
-             tags$h5("-Daily Mean: Daily mean for temperatures observed in a given day"),
-             tags$h5("-7DADM: 7 day average of daily maxes"),
-             tags$h5("-Daily Max: the max observed temperature for a given day") 
-      )),
-    # main interface
-    column(width = 12, class = "col-md-9",
-           fluidRow(
-             # temp controls
-             column(width = 12, class = "col-md-3",
-                    style="display: inline-flex;",
-                    dateRangeInput(inputId = ns("temp_daterange"),
-                                   label = "Select Date Range",
-                                   min = "1999-01-01",
-                                   start = paste0(year(today()), "-01-01"),
-                                   end = today()-1)),
-             column(width = 12, class = "col-md-2",
-                    selectInput(inputId = ns("temp_add_year"),
-                                label = "Add Previous Year",
-                                choices = c("None", 2010:2017),
-                                width = "140px")
-             ),
-             column(width = 12, class = "col-md-3",
-                    selectInput(inputId = ns("temp_gage_location"),
-                                label = "Select Gage(s)",
-                                choices = c("Keswick" = "kwk",
-                                            "Sac. River Hwy 44" = "sac",
-                                            "Clear Creek" = "ccr",
-                                            "Balls Ferry" = "bsf",
-                                            "Jellys Ferry" = "jlf",
-                                            "Bend Bridge" = "bnd"),
-                                multiple = TRUE, selected = c("kwk","ccr","bsf"))),
-             column(width = 12, class = "col-md-3",
-                    radioButtons(inputId = ns("temp_summary_choice"),
-                                 label = "Select Temperature Statistic",
-                                 choices = c("Daily Mean", "7DADM", "Daily Max")))
-           ), 
-           fluidRow(
-             # temp plot
-             column(width = 12, class = "col-md-9", 
-                    plotlyOutput(ns("temperature_ts_plot"), height = "500px")),
-             # temp schematic
-             column(width = 12, class = "col-md-3", 
-                    tags$img(class="gage_map", src="temp_sites.png"), 
-                    tags$h6("Gray locations are below compliance point"))
-           ))
-  )
-  
+                      bookmarkButton(label = "Share this page", id = ns("temp_page_bookmark")),
+                      tags$hr(),
+                      tags$h5("Shaded area in the plot above indicates temperature target period"),
+                      tags$h5("Data Source: hourly data from CDEC, updated to the application daily"),
+                      tags$h5("Temperature Statistics Definitions:"),
+                      tags$h5("-Daily Mean: Daily mean for temperatures observed in a given day"),
+                      tags$h5("-7DADM: 7 day average of daily maxes"),
+                      tags$h5("-Daily Max: the max observed temperature for a given day") 
+             )),
+      # main interface
+      column(width = 12, class = "col-md-9",
+             fluidRow(
+               # temp controls
+               column(width = 12, class = "col-md-3",
+                      style="display: inline-flex;",
+                      dateRangeInput(inputId = ns("temp_daterange"),
+                                     label = "Select Date Range",
+                                     min = "1999-01-01",
+                                     start = paste0(year(today()), "-01-01"),
+                                     end = today()-1)),
+               column(width = 12, class = "col-md-2",
+                      selectInput(inputId = ns("temp_add_year"),
+                                  label = "Add Previous Year",
+                                  choices = c("None", 2010:2017),
+                                  width = "140px")
+               ),
+               column(width = 12, class = "col-md-3",
+                      selectInput(inputId = ns("temp_gage_location"),
+                                  label = "Select Gage(s)",
+                                  choices = c("Keswick" = "kwk",
+                                              "Sac. River Hwy 44" = "sac",
+                                              "Clear Creek" = "ccr",
+                                              "Balls Ferry" = "bsf",
+                                              "Jellys Ferry" = "jlf",
+                                              "Bend Bridge" = "bnd"),
+                                  multiple = TRUE, selected = c("kwk","ccr","bsf"))),
+               column(width = 12, class = "col-md-3",
+                      radioButtons(inputId = ns("temp_summary_choice"),
+                                   label = "Select Temperature Statistic",
+                                   choices = c("Daily Mean", "7DADM", "Daily Max")))
+             ), 
+             fluidRow(
+               # temp plot
+               column(width = 12, class = "col-md-9", 
+                      plotlyOutput(ns("temperature_ts_plot"), height = "500px")),
+               # temp schematic
+               column(width = 12, class = "col-md-3", 
+                      tags$img(class="gage_map", src="temp_sites.png"), 
+                      tags$h6("Gray locations are below compliance point"))
+             ))
+    )
+    
   )
 } 
 
@@ -88,13 +82,14 @@ temp_page_server <- function(input, output, session, g_date) {
   
   ns <- session$ns
   
+  
   # upadte the daterange input depending on the home page date
-  observeEvent(g_date(), {
-    updateDateRangeInput(session = session, 
-                         inputId = "temp_daterange", 
-                         start = paste0(year(g_date()), "-01-01"), 
-                         end = g_date() - 1)
-  })
+  # observeEvent(g_date(), {
+  #   updateDateRangeInput(session = session, 
+  #                        inputId = "temp_daterange", 
+  #                        start = paste0(year(g_date()), "-01-01"), 
+  #                        end = g_date() - 1)
+  # })
   
   # compute temperature statistics here
   selected_temp_summary <- function(summary_f) {
@@ -372,6 +367,20 @@ temp_page_server <- function(input, output, session, g_date) {
       )
     }
   )
+  
+  # Bookmarking this page ----------
+  setBookmarkExclude(c("flow_page_bookmark", "temp_page_bookmark"))
+  
+  observeEvent(input$temp_page_bookmark, {
+    session$doBookmark()
+  })
+  
+  onBookmark(function(state) {
+    state$values$temp_daterange_hash <- digest::digest(input$temp_daterange, "md5")
+    state$values$temp_add_year_hash <- digest::digest(input$temp_add_year, "md5")
+    state$values$temp_gage_location_hash <- digest::digest(input$temp_gage_location, "md5")
+  })
+  
   
   
   

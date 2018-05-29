@@ -30,7 +30,9 @@ flow_UI <- function(id) {
                       ),
                       tags$hr(),
                       tags$h4("Download Data in View"),
-                      downloadButton(ns("download_flow_data"), class="btn-sm"), 
+                      downloadButton(ns("download_flow_data")),
+                      tags$br(), tags$br(),
+                      bookmarkButton(label = "Share this page", id = ns("flow_page_bookmark")),
                       tags$hr(),
                       tags$h5("Data source: data obtained from CDEC and USGS(NWIS)"), 
                       tags$h5("Latest TCD configurations transcribed from",
@@ -351,7 +353,16 @@ flow_server <- function(input, output, session, g_date) {
     }
   )
   
+  setBookmarkExclude(c("flow_page_bookmark", "temp_page_bookmark"))
   
+  observeEvent(input$flow_page_bookmark, {
+    session$doBookmark()
+  })
+  
+  
+  onBookmark(function(state) {
+    state$values$flow_daterange_hash <- digest::digest(input$flow_daterange, "md5")
+  })
   
   
   
