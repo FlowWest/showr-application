@@ -35,6 +35,7 @@ estimate_emergence <- function(spawn_date, redd_location) {
   # the emergence value, and must proceed using modeled temp data.
   if (nrow(emergence) == 0) {
     current_atu <- atu %>% tail(1) %>% pull(atu) # store latest accumulated value
+    current_date <- atu %>% tail(1) %>% pull(date)
     
     if (length(current_atu) == 0) current_atu <- 0 
     
@@ -43,8 +44,9 @@ estimate_emergence <- function(spawn_date, redd_location) {
     model_estimated_emergence <- 
       model_temps %>%
       arrange(datetime) %>% 
-      filter(location_id == gage, datetime >= spawn_date) %>% 
-      mutate(atu = cumsum(temp_50)) %>%
+      filter(location_id == gage, datetime > current_date) %>% 
+      mutate(daily_mean_C = measurements::conv_unit(temp_50, "F", "C"), 
+             atu = cumsum(daily_mean_C)) %>%
       filter(atu >= thresh) %>%
       head(1)
     

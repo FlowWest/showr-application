@@ -13,8 +13,11 @@ winter_run_UI <- function(id) {
                         tags$a("Winter Run Chinook", href="https://www.wildlife.ca.gov/Conservation/Fishes/Chinook-Salmon/Winter-run", target="_blank"),
                         "Salmon were listed as endangered under the California Endangered Species Act (CESA) and threatened under the Federal Endangered Species Act in 1989. Winter Run migrate between November and early August, and spawn in the upper mainstem Sacramento River from mid-April through August. Peak spawning typically occurs in June and July. The plot to the right shows the number and location (by river reach) of Winter Run redds mapped in the Upper Sacramento River. You can select “Show At Risk Redds” to view the redds potentially impacted by water temperatures exceeding the 56F compliance threshold."
                       ),
-                      tags$h3("Download Data in View"),
+                      tags$h4("Download Data in View"),
                       downloadButton(ns("download_wr_data")),
+                      tags$br(),
+                      tags$br(),
+                      bookmarkButton(id=ns("chinook_bookmark")),
                       tags$h5("Note: the final aerial redd survey was conducted on 08/16/2017"),
                       tags$h5("Data source: CDFW provided through calfish.org"), 
                       tags$h5("Update schedule: data is updated by CDFW on a weekly basis") 
@@ -25,7 +28,7 @@ winter_run_UI <- function(id) {
                # Controls
                column(width = 12, class="col-md-2", 
                       selectInput(ns("wr_select_year"), label = "Select a Year", 
-                                  choices = 2010:2017, selected = 2017)),
+                                  choices = 2010:2018, selected = 2018)),
                column(width = 12, class="col-md-3", 
                       checkboxInput(ns("wr_show_temp_danger"), 
                                     label = "Show At Risk Redds"))),
@@ -85,5 +88,17 @@ winter_run_server <- function(input, output, session, g_date) {
       layout(legend = list(orientation = 'h'), showlegend = TRUE, 
              xaxis = list(title = ""), yaxis = list(title = 'total redds'))
   })
+  
+  # Bookmarking this page ----------
+  setBookmarkExclude(c("flow_page_bookmark", "temp_page_bookmark", "chinook_bookmark"))
+  
+  observeEvent(input$chinook_bookmark, {
+    session$doBookmark()
+  })
+  
+  onBookmark(function(state) {
+    state$values$wr_year_hash <- digest::digest(input$wr_select_year, "md5")
+  })
+  
   
 }

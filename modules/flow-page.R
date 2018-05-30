@@ -102,25 +102,6 @@ flow_server <- function(input, output, session, g_date) {
     
   })
   
-  # show_diversion_notification <- reactive({
-  #   if (input$show_diversions && sum(year(input$flow_daterange) %in% 2017:2018) != 0)
-  #     return(TRUE)
-  #   else
-  #     return(FALSE)
-  # })
-  # 
-  # observeEvent(show_diversion_notification(), {
-  #   show_em <- show_diversion_notification()
-  #   
-  #   if (show_em)
-  #     showNotification(paste("Diversions for 2017 and 2018 are estimated from historical values"), duration = 0)
-  #   else
-  #     removeNotification()
-  #     
-  # })
-  # 
-  # 
-  # 
   observeEvent(g_date(), 
                updateDateRangeInput(session = session, 
                                     inputId = "flow_daterange", 
@@ -363,7 +344,5 @@ flow_server <- function(input, output, session, g_date) {
   onBookmark(function(state) {
     state$values$flow_daterange_hash <- digest::digest(input$flow_daterange, "md5")
   })
-  
-  
   
 }

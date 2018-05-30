@@ -94,7 +94,7 @@ shasta_storage_data <-
 #                   )) %>% filter(race == "Winter")
 
 redd_data <- 
-  read_rds("data/chinook/aerial-survey-observations_no_error_codes.rds") %>% 
+  read_rds("data/chinook/chinook-data-tests/aerial-survey-observations_no_error_codes.rds") %>% 
   filter(race == "Winter") 
 # %>% 
 #   mutate(location = factor(location, levels = redd_locations))
@@ -126,7 +126,9 @@ tcd_configs_data <- read_rds("data/tcd_configurations/tcd_configs_through_2017-0
 # temp locations metadata 
 cdec_temperature_locations <- read_rds("data/temperatures/cdec_temperature_locations.rds")
 
-model_temps <- read_csv("https://s3-us-west-2.amazonaws.com/svproducers-data/cvtemp_data/2017-08-25_10%3A00%3A15_model_output.csv")
+model_temps <- read_csv("data/temperatures/cvtemp/sim_run_20150529.csv") %>% 
+  filter(model_type == "usbr_no_w2", 
+         scenario_name == "may_23_2018_input_90_output_90_50l3mto")
 model_temps$datetime <- as_date(model_temps$datetime)
 
 # winter run presence 

@@ -386,22 +386,3 @@ temp_page_server <- function(input, output, session, g_date) {
   
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
