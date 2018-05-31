@@ -61,6 +61,6 @@ welcome_server <- function(input, output, session) {
   })
   
   observeEvent(input$goto_about_page, {
-    updateNavbarPage(session = session, inputId = "showrapp", selected = "About")
+    updateTabsetPanel(session = session, inputId = "showrapp", selected = "about_tab")
   })
 }

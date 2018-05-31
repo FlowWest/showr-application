@@ -67,6 +67,14 @@ chnages all badged in the application*/
   margin-bottom: 10px;
 }
 
+.home-page-summary-content {
+    font-size: 17px;
+}
+
+.home-page-learn-more {
+    font-size: 17px
+}
+
 .home-page-summary {
   float: left;
   width: 40%;
@@ -284,4 +292,8 @@ label {
 
 .summary-value {
   padding: 5px;
+}
+
+.subpage-buttons {
+    width: 127px;
 }

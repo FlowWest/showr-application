@@ -565,10 +565,15 @@ dashboard_server <- function(input, output, session, g_date) {
       tagList(
         tags$p(tags$b("Life Stage"), "reports the Winter Run Chinook salmon life stages expected to be present on the selected date based on historical data on Winter Run migration, spawning, emergence, and rearing."), 
         tags$hr(),
-        tags$p(tags$b("Furthest Redd"), "lists the river reach farthest downstream of Shasta Dam with Winter Run redd(s) containing eggs or juvenile Winter Run that have not yet emerged."),
+        tags$p(tags$b("Furthest Redd"), "lists the river reach farthest downstream 
+               of Shasta Dam with Winter Run redd(s) containing eggs or 
+               juvenile Winter Run that have not yet emerged."),
         tags$hr(),
         tags$p(tags$b("Estimated Emergence"), "reports the number of days remaining until all juvenile Winter Run have emerged from the current most downstream redd."),
         tags$hr(),
+        tags$p("Emergence is estimated using Accumulated Temperature Units, and either known river
+               temperatures or modeled temperatures from", 
+               tags$a(href="https://oceanview.pfeg.noaa.gov/CVTEMP/", "CVTemp")),
         tags$p("You can view detailed on current and historical Winter Run Chinook Salmon activity by clicking on the Winter Run Chinook tab above.")
       ), 
       easyClose = TRUE

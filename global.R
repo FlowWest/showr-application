@@ -15,6 +15,7 @@ library(sparkline)
 library(shinyjs)
 library(measurements)
 library(purrr)
+library(shinytoastr)
 
 enableBookmarking(store = "url")
 

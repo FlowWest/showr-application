@@ -14,10 +14,11 @@ winter_run_UI <- function(id) {
                         "Salmon were listed as endangered under the California Endangered Species Act (CESA) and threatened under the Federal Endangered Species Act in 1989. Winter Run migrate between November and early August, and spawn in the upper mainstem Sacramento River from mid-April through August. Peak spawning typically occurs in June and July. The plot to the right shows the number and location (by river reach) of Winter Run redds mapped in the Upper Sacramento River. You can select “Show At Risk Redds” to view the redds potentially impacted by water temperatures exceeding the 56F compliance threshold."
                       ),
                       tags$h4("Download Data in View"),
-                      downloadButton(ns("download_wr_data")),
+                      downloadButton(ns("download_wr_data"), class="subpage-buttons"),
                       tags$br(),
                       tags$br(),
-                      bookmarkButton(id=ns("chinook_bookmark")),
+                      bookmarkButton(id=ns("chinook_bookmark"), "Share page", 
+                                     class="subpage-buttons"),
                       tags$h5("Note: the final aerial redd survey was conducted on 08/16/2017"),
                       tags$h5("Data source: CDFW provided through calfish.org"), 
                       tags$h5("Update schedule: data is updated by CDFW on a weekly basis") 
@@ -46,7 +47,6 @@ winter_run_UI <- function(id) {
 
 # TODO pick either switch or ifelse from now on
 winter_run_server <- function(input, output, session, g_date) {
-
 
   # not working correctly
   output$wr_table <- renderTable(
@@ -84,7 +84,11 @@ winter_run_server <- function(input, output, session, g_date) {
     ))
     
     rd_yr() %>%    
-      plot_ly(x = ~date, y = ~total, color = ~location, type='bar') %>% 
+      plot_ly(x = ~date, y = ~total, color = ~location, type='bar', 
+              text = ~paste0(date, "<br>", 
+                             location, "<br>", 
+                             total), 
+              hoverinfo = "text") %>% 
       layout(legend = list(orientation = 'h'), showlegend = TRUE, 
              xaxis = list(title = ""), yaxis = list(title = 'total redds'))
   })
@@ -100,5 +104,20 @@ winter_run_server <- function(input, output, session, g_date) {
     state$values$wr_year_hash <- digest::digest(input$wr_select_year, "md5")
   })
   
+
+  # observeEvent(input$wr_select_year, {
+  #   val <- input$wr_select_year
+  #   if (val == "2018" && (input$showrapp == "winter_run_tab")) {
+  #     toastr_info(
+  #       paste0("Using USBR W2 Model to estimate temperatures past ",
+  #              format(today(), "%b"), " ", format(today(), "%d"))
+  #     )
+  #   } else {
+  #     return()
+  #   }
+  # })
   
+  
+  
+   
 }
