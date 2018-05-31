@@ -64,7 +64,8 @@ flow_UI <- function(id) {
                                   multiple = TRUE,
                                   selected = c("sha", "kwk"), width = "400px")), 
                column(width = 12, class = "col-md-3", 
-                      checkboxInput(ns("show_diversions"), label = "Show diversion"))
+                      shinyWidgets::materialSwitch(ns("show_diversions"), 
+                                                   label = "Show diversion"))
              ), 
              
              fluidRow(
