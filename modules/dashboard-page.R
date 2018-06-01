@@ -574,7 +574,7 @@ dashboard_server <- function(input, output, session, g_date) {
         tags$p("Emergence is estimated using Accumulated Temperature Units, and either known river
                temperatures or modeled temperatures from", 
                tags$a(href="https://oceanview.pfeg.noaa.gov/CVTEMP/", "CVTemp")),
-        tags$p("You can view detailed on current and historical Winter Run Chinook Salmon activity by clicking on the Winter Run Chinook tab above.")
+        tags$p("You can view detailes on current and historical Winter Run Chinook Salmon activity by clicking on the Winter Run Chinook tab above.")
       ), 
       easyClose = TRUE
     ))

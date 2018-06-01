@@ -20,69 +20,72 @@ flow_UI <- function(id) {
                           "and Reasonable and Prudent Alternatives (RPA) 
   specified in the", tags$a("2009 Biological Opinion", href="http://www.westcoast.fisheries.noaa.gov/central_valley/water_operations/ocap.html", target="_blank"), 
                           "on the long term operations of the Central 
-  Valley Project and State Water Project. Sacramento River flow downstream of 
+  Valley Project and State Water Project."), tags$p("Sacramento River flow downstream of 
   Keswick dam influences both water temperature and extent of Winter Run spawning and 
   rearing habitat. Shasta inflow is monitored by Reclamation and Keswick outflow is 
   monitored by USGS and Reclamation. Estimated diversions are based on 7 years of 
   diversion data compiled by MBK Engineers for the Sacramento River Settlement Contractors 
-  and are total diversions between Keswick and Wilkins Slough. "
-                        )
-                      ),
-                      tags$hr(),
-                      tags$h4("Download Data in View"),
-                      downloadButton(ns("download_flow_data"),class="subpage-buttons"),
-                      tags$br(), tags$br(),
-                      bookmarkButton(label = "Share page", id = ns("flow_page_bookmark"), class="subpage-buttons"),
-                      tags$hr(),
-                      tags$h5("Data source: data obtained from CDEC and USGS(NWIS)"), 
-                      tags$h5("Latest TCD configurations transcribed from",
-                              tags$a(target="_blank",
-                                     "CVO TCD Configurations",
-                                     href="https://www.usbr.gov/mp/cvo/vungvari/ShastaTCD2017.pdf")),
-                      tags$h5("Update schedule: data is updated on daily basis with both hourly and daily data"), 
-                      tags$h5("Diversions for 2017 and 2018 are estimated values from 2010-2016"))),
-      # main interface
-      column(width = 12, class = "col-md-9",
-             # controls
-             fluidRow( 
-               column(width = 12, class = "col-md-3", 
-                      dateRangeInput(inputId = ns("flow_daterange"), 
-                                     label = "Select a Date Range", 
-                                     min = "1999-01-01", 
-                                     start = paste0(year(today()), "-01-01"), 
-                                     end = today(tzone = "America/Los_Angeles")-1)), 
-               column(width = 12, class = "col-md-2", 
-                      selectInput(ns("flow_add_year"), label = "Add Previous Year", choices = c("None", 2010:2017), 
-                                  width = "140px")), 
-               column(width = 12, class = "col-md-3", 
-                      selectInput(inputId = ns("flow_station_select"), 
-                                  label = "Select Stations",
-                                  choices = c("Shasta (Natural Flow)" = "sha", 
-                                              "Keswick" = "kwk", 
-                                              "Bend Bridge" = "bnd", 
-                                              "Wilkins Slough" = "wlk"),
-                                  multiple = TRUE,
-                                  selected = c("sha", "kwk"), width = "400px")), 
-               column(width = 12, class = "col-md-3", 
-                      shinyWidgets::materialSwitch(ns("show_diversions"), 
-                                                   label = "Show diversion"))
-             ), 
-             
-             fluidRow(
-               # plot
-               column(width = 12, class = "col-md-9", 
-                      plotlyOutput(ns("flow_plot"))), 
-               column(width = 12, 
-                      class = "col-md-3", 
-                      uiOutput(ns("table_title")),
-                      tags$table(class="table",tags$tbody(
-                        tags$tr(tags$td("McCloud"), 
-                                tags$td(textOutput(ns("mccloud_summmary_flow"))),
-                                tags$td(sparklineOutput(ns("mccloud_spark")), tags$h6("past 30 days"))), 
-                        tags$tr(tags$td("Sac River at Delta"),
-                                tags$td(textOutput(ns("delta_summary_flow"))),
-                                tags$td(sparklineOutput(ns("sac_river_spark")), tags$h6("past 30 days")))
-                      )))))
+  and are total diversions between Keswick and Wilkins Slough."
+  )),
+  tags$hr(),
+  tags$h4("Download Data in View"),
+  downloadButton(ns("download_flow_data"),class="subpage-buttons"),
+  tags$br(), tags$br(),
+  bookmarkButton(label = "Share page", id = ns("flow_page_bookmark"), class="subpage-buttons"),
+  tags$hr(),
+  tags$h5("Data source: data obtained from CDEC and USGS(NWIS)"), 
+  tags$h5("Latest TCD configurations transcribed from",
+          tags$a(target="_blank",
+                 "CVO TCD Configurations",
+                 href="https://www.usbr.gov/mp/cvo/vungvari/ShastaTCD2017.pdf")),
+  tags$h5("Update schedule: data is updated on daily basis with both hourly and daily data"), 
+  tags$h5("Diversions for 2017 and 2018 are estimated values from 2010-2016"))),
+  # main interface
+  column(width = 12, class = "col-md-9",
+         # controls
+         fluidRow( 
+           column(width = 12, class = "col-md-3", 
+                  dateRangeInput(inputId = ns("flow_daterange"), 
+                                 label = "Select a Date Range", 
+                                 min = "1999-01-01", 
+                                 start = paste0(year(today()), "-01-01"), 
+                                 end = today(tzone = "America/Los_Angeles")-1)), 
+           column(width = 12, class = "col-md-2", 
+                  selectInput(ns("flow_add_year"), label = "Add Previous Year", choices = c("None", 2010:2017), 
+                              width = "140px")), 
+           column(width = 12, class = "col-md-3", 
+                  selectInput(inputId = ns("flow_station_select"), 
+                              label = "Select Stations",
+                              choices = c("Shasta (Natural Flow)" = "sha", 
+                                          "Keswick" = "kwk", 
+                                          "Bend Bridge" = "bnd", 
+                                          "Wilkins Slough" = "wlk"),
+                              multiple = TRUE,
+                              selected = c("sha", "kwk"), width = "400px")), 
+           column(width = 12, class = "col-md-3", 
+                  shinyWidgets::materialSwitch(ns("show_diversions"), 
+                                               label = "Show diversion", 
+                                               right = TRUE), 
+                  shinyWidgets::materialSwitch(ns("show_tcd_configs"), 
+                                               label = "Show TCD Configs", 
+                                               right = TRUE))
+         ), 
+         
+         fluidRow(
+           # plot
+           column(width = 12, class = "col-md-9", 
+                  plotlyOutput(ns("flow_plot"))), 
+           column(width = 12, 
+                  class = "col-md-3", 
+                  uiOutput(ns("table_title")),
+                  tags$table(class="table",tags$tbody(
+                    tags$tr(tags$td("McCloud"), 
+                            tags$td(textOutput(ns("mccloud_summmary_flow"))),
+                            tags$td(sparklineOutput(ns("mccloud_spark")), tags$h6("past 30 days"))), 
+                    tags$tr(tags$td("Sac River at Delta"),
+                            tags$td(textOutput(ns("delta_summary_flow"))),
+                            tags$td(sparklineOutput(ns("sac_river_spark")), tags$h6("past 30 days")))
+                  )))))
     )
   )
 }

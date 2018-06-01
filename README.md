@@ -52,16 +52,7 @@ TODO
 
 # TODO 
 
-[x] change the boxes font size to 17px 
-
-[] change the color of the right box 
-
 [] change the height of the right box to match left
 
-[X] remove all of the sub text stuff at the bottom
-
-[] break up the context text into two paragraphs
-
-[X] try and make the button the same size downlod and share this page
 
 

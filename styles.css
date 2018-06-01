@@ -9,9 +9,9 @@ chnages all badged in the application*/
 
 /* welcome page */
 .welcome-page {
- max-width: 1000px;
- margin-left: auto;
- margin-right: auto;
+   max-width: 1000px;
+   margin-left: auto;
+   margin-right: auto;
 }
 
 .welcome-banner {
@@ -32,7 +32,7 @@ chnages all badged in the application*/
 @media (max-width: 420) {
   .welcome-banner > div.welcome-image {
     background: none;
-  }
+}
 }
 
 .welcome-banner > div.welcome-heading {
@@ -42,9 +42,9 @@ chnages all badged in the application*/
 }
 
 .welcome-banner > div.welcome-heading > h1 {
- color: white;
- margin-bottom: 0px;
- padding-top: 0px
+   color: white;
+   margin-bottom: 0px;
+   padding-top: 0px
 }
 
 .welcome-banner > div.welcome-heading > h4 {
@@ -61,10 +61,10 @@ chnages all badged in the application*/
   margin: auto;
 }
 
+
 .home-page-cards {
-  height: 130px;
-  margin-top: 10px;
-  margin-bottom: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .home-page-summary-content {
@@ -78,6 +78,7 @@ chnages all badged in the application*/
 .home-page-summary {
   float: left;
   width: 40%;
+  height: 300px;
   color: #ffffff;
   background-color: #436972;
   border-top: 2px solid transparent;
@@ -88,8 +89,9 @@ chnages all badged in the application*/
 .home-page-learn-more {
   float: right;
   width: 55%;
+  height: 300px;
   color: #3F3F3F;
-  background-color: #e9d399;
+  background-color: #ffedcd;
   border-top: 2px solid transparent;
   padding-left: 15px;
   padding-bottom: 35px;
@@ -244,13 +246,13 @@ border-color: #aaa;
 @media (max-width: 464px) {
   .logo-img {
     display: none;
-  }
-  .logo {
+}
+.logo {
     margin-top: 0;
-  }
-  .gage_map {
+}
+.gage_map {
     display: none;
-  }
+}
 }
 
 
