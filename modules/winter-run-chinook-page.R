@@ -47,6 +47,16 @@ winter_run_UI <- function(id) {
 
 # TODO pick either switch or ifelse from now on
 winter_run_server <- function(input, output, session, g_date) {
+  
+  output$download_wr_data <- downloadHandler(
+    filename = function() {
+      "showr-aerial-redd-survey.csv"
+    },
+    content = function(file){
+      write.csv(redd_data, file, row.names = FALSE)
+      
+    }
+  )
 
   # not working correctly
   output$wr_table <- renderTable(

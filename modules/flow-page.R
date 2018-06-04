@@ -65,10 +65,12 @@ flow_UI <- function(id) {
            column(width = 12, class = "col-md-3", 
                   shinyWidgets::materialSwitch(ns("show_diversions"), 
                                                label = "Show diversion", 
-                                               right = TRUE), 
-                  shinyWidgets::materialSwitch(ns("show_tcd_configs"), 
-                                               label = "Show TCD Configs", 
-                                               right = TRUE))
+                                               right = TRUE)
+                  # , 
+                  # shinyWidgets::materialSwitch(ns("show_tcd_configs"), 
+                  #                              label = "Show TCD Configs", 
+                  #                              right = TRUE)
+                  )
          ), 
          
          fluidRow(

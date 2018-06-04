@@ -149,7 +149,7 @@ pretty_num <- function(num, places = 2) {
   format(round(num, places), big.mark = ',', drop = FALSE)
 }
 
-isothermal_data <- read_rds("data/operations/shasta_storage_temperature-2018-06-01.rds")
+isothermal_data <- read_rds("data/operations/shasta_storage_temperature.rds")
 
 get_year_classification <- function(y) {
   if (y != year(today())) {
