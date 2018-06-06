@@ -95,7 +95,7 @@ shasta_storage_data <-
 #                   )) %>% filter(race == "Winter")
 
 redd_data <- 
-  read_rds("data/chinook/chinook-data-tests/aerial-survey-observations_no_error_codes.rds") %>% 
+  read_rds("data/chinook/aerial-survey-observations_no_error_codes.rds") %>% 
   filter(race == "Winter") 
 # %>% 
 #   mutate(location = factor(location, levels = redd_locations))
