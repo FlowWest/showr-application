@@ -86,7 +86,10 @@ flow_UI <- function(id) {
                             tags$td(sparklineOutput(ns("mccloud_spark")), tags$h6("past 30 days"))), 
                     tags$tr(tags$td("Sac River at Delta"),
                             tags$td(textOutput(ns("delta_summary_flow"))),
-                            tags$td(sparklineOutput(ns("sac_river_spark")), tags$h6("past 30 days")))
+                            tags$td(sparklineOutput(ns("sac_river_spark")), tags$h6("past 30 days"))),
+                    tags$tr(tags$td("Pitt River"),
+                            tags$td(textOutput(ns("pitt_summary_flow"))),
+                            tags$td(sparklineOutput(ns("pitt_river_spark")), tags$h6("past 30 days")))
                   )))))
     )
   )
@@ -131,7 +134,7 @@ flow_server <- function(input, output, session, g_date) {
   selected_flow_data_sparklines <- reactive({
     flow_data %>% 
       filter(
-        location_id %in% c("mss", "dlt"),
+        location_id %in% c("mss", "dlt", "pmn"),
         datetime >= input$flow_daterange[1], 
         datetime <= input$flow_daterange[2], 
         parameter_value > 0) %>% 
@@ -312,12 +315,27 @@ flow_server <- function(input, output, session, g_date) {
     paste(x, "cfs")
   })
   
+  output$pitt_summary_flow <- renderText({
+    x <- selected_flow_data_sparklines() %>% 
+      filter(location_id == "pmn", date == input$flow_daterange[2]) %>% 
+      pull(daily_flow)
+    paste(x, "cfs")
+  })
+  
   output$mccloud_spark <- sparkline::renderSparkline({
     selected_flow_data_sparklines() %>% 
       filter(location_id == "mss", date >= (input$flow_daterange[2]-30)) %>% 
       pull(daily_flow) %>% 
       sparkline()
   })
+  
+  output$pitt_river_spark <- sparkline::renderSparkline({
+    selected_flow_data_sparklines() %>% 
+      filter(location_id == "pmn", date >= (input$flow_daterange[2]-30)) %>% 
+      pull(daily_flow) %>% 
+      sparkline()
+  })
+  
   
   output$sac_river_spark <- sparkline::renderSparkline({
     selected_flow_data_sparklines() %>% 
