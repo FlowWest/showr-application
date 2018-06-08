@@ -100,7 +100,8 @@ winter_run_server <- function(input, output, session, g_date) {
                              total), 
               hoverinfo = "text") %>% 
       layout(legend = list(orientation = 'h'), showlegend = TRUE, 
-             xaxis = list(title = ""), yaxis = list(title = 'total redds'))
+             xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
+             barmode='stack')
   })
   
   # Bookmarking this page ----------

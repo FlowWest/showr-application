@@ -41,48 +41,48 @@ diversion_data <- read_rds("data/flows/diversion_data_with_estimates.rds")
 # These data are all on a public S3 bucket 
 temp_data <- 
   read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_hourly_temps.csv", 
-                             col_types = cols(
-                               datetime = col_datetime(format = ""),
-                               location_id = col_character(),
-                               parameter_id = col_integer(),
-                               parameter_value = col_double()
-                             ))
+           col_types = cols(
+             datetime = col_datetime(format = ""),
+             location_id = col_character(),
+             parameter_id = col_integer(),
+             parameter_value = col_double()
+           ))
 
 temp_compliance_points_daily_mean <- 
   read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_tempatures.csv", 
-                  col_types = cols(
-                    datetime = col_date(format = ""),
-                    location_id = col_character(),
-                    parameter_id = col_integer(),
-                    parameter_value = col_double()
-                  ))
+           col_types = cols(
+             datetime = col_date(format = ""),
+             location_id = col_character(),
+             parameter_id = col_integer(),
+             parameter_value = col_double()
+           ))
 
 flow_data <- 
   read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_hourly_flows.csv",
-                             col_types = cols(
-                               location_id = col_character(),
-                               parameter_id = col_integer(),
-                               datetime = col_datetime(format = ""),
-                               parameter_value = col_integer()
-                             ))
+           col_types = cols(
+             location_id = col_character(),
+             parameter_id = col_integer(),
+             datetime = col_datetime(format = ""),
+             parameter_value = col_integer()
+           ))
 
 flow_data_daily_mean <- 
   read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_flow.csv", 
-                                        col_types = cols(
-                                          datetime = col_date(format = ""),
-                                          location_id = col_character(),
-                                          parameter_id = col_integer(),
-                                          parameter_value = col_double()
-                                        ))
+           col_types = cols(
+             datetime = col_date(format = ""),
+             location_id = col_character(),
+             parameter_id = col_integer(),
+             parameter_value = col_double()
+           ))
 
 shasta_storage_data <- 
   read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_ops.csv", 
-                  col_types = cols(
-                    datetime = col_date(format = ""),
-                    location_id = col_character(),
-                    parameter_id = col_integer(),
-                    parameter_value = col_double()
-                  ))
+           col_types = cols(
+             datetime = col_date(format = ""),
+             location_id = col_character(),
+             parameter_id = col_integer(),
+             parameter_value = col_double()
+           ))
 
 # This dataset is small enough and is static enough to live on the app.
 # redd_data <- 
