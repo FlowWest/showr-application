@@ -64,7 +64,10 @@ temp_pageUI <- function(id) {
                column(width = 12, class = "col-md-3",
                       radioButtons(inputId = ns("temp_summary_choice"),
                                    label = "Select Temperature Statistic",
-                                   choices = c("Daily Mean", "7DADM", "Daily Max")))
+                                   choices = c("Daily Mean", "7DADM", "Daily Max")), 
+                      shinyWidgets::materialSwitch(ns("show_air_temp"), 
+                                                   label = "Show Redding Air Temp", 
+                                                   right = TRUE))
              ), 
              fluidRow(
                # temp plot
@@ -92,6 +95,13 @@ temp_page_server <- function(input, output, session, g_date) {
   #                        start = paste0(year(g_date()), "-01-01"), 
   #                        end = g_date() - 1)
   # })
+  
+  
+  selected_air_temp <- reactive({
+    redd_air_temp %>% 
+      filter(date >= input$temp_daterange[1], 
+             date <= input$temp_daterange[2])
+  })
   
   # compute temperature statistics here
   selected_temp_summary <- function(summary_f) {
@@ -245,7 +255,7 @@ temp_page_server <- function(input, output, session, g_date) {
     
     # cat(unlist(make_compliance_rect()))
     
-    switch (input$temp_summary_choice,
+    p <- switch (input$temp_summary_choice,
             "Daily Mean" = {
               validate(need(nrow(selected_daily_means()) > 0,
                             "Selected date range and or station combination returned no data"))
@@ -270,12 +280,8 @@ temp_page_server <- function(input, output, session, g_date) {
                             line=list(dash="dot", width = 2, showlegend = FALSE))
               }
               
-              base_plot %>% 
-                layout(xaxis = list(title=""), 
-                       yaxis = list(title = "Temperature (F)", range = c(40, 65)), 
-                       shapes = make_compliance_rect(), 
-                       legend = list(orientation = 'h')) %>%
-                config(displayModeBar = FALSE)
+              base_plot
+
               
             }, 
             "7DADM" = {
@@ -300,12 +306,8 @@ temp_page_server <- function(input, output, session, g_date) {
                             line=list(dash="dot", width = 2))
               }
               
-              base_plot %>% 
-                layout(xaxis = list(title=""), 
-                       yaxis = list(title = "Temperature (F)", range = c(40, 65)), 
-                       shapes = make_compliance_rect(), 
-                       legend = list(orientation = 'h')) %>%
-                config(displayModeBar = FALSE)
+              base_plot
+
             },
             "Daily Max" = {
               validate(need(nrow(selected_daily_max()) > 0,
@@ -329,15 +331,34 @@ temp_page_server <- function(input, output, session, g_date) {
                             hoverinfo = "text",
                             line=list(dash="dot", width = 2))
               }
-              
-              base_plot %>% 
-                layout(xaxis = list(title=""), 
-                       yaxis = list(title = "Temperature (F)", range = c(40, 65)), 
-                       shapes = make_compliance_rect(), 
-                       legend = list(orientation = 'h')) %>%
-                config(displayModeBar = FALSE)
+              base_plot
             }
     ) 
+    
+    if (!input$show_air_temp) {
+      p %>% 
+        layout(xaxis = list(title=""), 
+               yaxis = list(title = "Temperature (F)", range = c(40, 65)), 
+               shapes = make_compliance_rect(), 
+               legend = list(orientation = 'h')) %>%
+        config(displayModeBar = FALSE) 
+        
+    } else {
+      p %>% 
+        add_trace(data=selected_air_temp(), 
+                  x=~date, y=~parameter_value, 
+                  name = "Redding Air Temp (daily avg.)", type='scatter', mode='lines', 
+                  inherit = FALSE, 
+                  text=~paste0(date, "<br>",
+                               "Redding Daily Max <br>", 
+                               parameter_value, "°F"), 
+                  hoverinfo = "text") %>% 
+        layout(xaxis = list(title=""), 
+               yaxis = list(title = "Temperature (F)"), 
+               shapes = make_compliance_rect(), 
+               legend = list(orientation = 'h')) %>%
+        config(displayModeBar = FALSE) 
+    }
   })
   
   output$temperature_tabular <- renderDataTable({

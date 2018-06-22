@@ -84,6 +84,19 @@ shasta_storage_data <-
              parameter_value = col_double()
            ))
 
+redd_air_temp <- 
+  read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_daily_max_air_temp.csv", 
+           col_types = cols(
+             location_id = col_character(),
+             parameter_id = col_integer(),
+             datetime = col_datetime(format = ""),
+             parameter_value = col_integer()
+           )) %>% 
+  group_by(date = as_date(datetime)) %>% 
+  summarise(parameter_value = round(mean(parameter_value, na.rm = TRUE), 0))
+
+
+
 # This dataset is small enough and is static enough to live on the app.
 # redd_data <- 
 #   read_csv("https://s3-us-west-2.amazonaws.com/showr-data/cdfw/redds/aerial-survey-observations_no_error_codes.csv", 

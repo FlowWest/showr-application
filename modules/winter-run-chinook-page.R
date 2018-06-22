@@ -57,7 +57,12 @@ winter_run_server <- function(input, output, session, g_date) {
       
     }
   )
-
+  
+  redd_counts_today <- reactive({
+    rd_yr() %>% 
+      filter(date == lubridate::today(tzone="US/Pacific"))
+  })
+  
   # not working correctly
   output$wr_table <- renderTable(
     rd %>% 
@@ -69,7 +74,7 @@ winter_run_server <- function(input, output, session, g_date) {
       summarise(Total = as.integer(sum(Total)), 
                 `Temperature Threatened` = as.integer(sum(`Temperature Threatened`, na.rm = TRUE))))
   
-
+  
   
   rd_yr <- reactive({
     if (input$wr_show_temp_danger) {
@@ -115,7 +120,7 @@ winter_run_server <- function(input, output, session, g_date) {
     state$values$wr_year_hash <- digest::digest(input$wr_select_year, "md5")
   })
   
-
+  
   # observeEvent(input$wr_select_year, {
   #   val <- input$wr_select_year
   #   if (val == "2018" && (input$showrapp == "winter_run_tab")) {
@@ -130,5 +135,5 @@ winter_run_server <- function(input, output, session, g_date) {
   
   
   
-   
+  
 }
