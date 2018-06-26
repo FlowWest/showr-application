@@ -90,7 +90,6 @@ winter_run_server <- function(input, output, session, g_date) {
         summarise(total = sum(counts)) %>% 
         ungroup()
     }
-    
   })
   
   output$winter_run_plot <- renderPlotly({
@@ -119,21 +118,6 @@ winter_run_server <- function(input, output, session, g_date) {
   onBookmark(function(state) {
     state$values$wr_year_hash <- digest::digest(input$wr_select_year, "md5")
   })
-  
-  
-  # observeEvent(input$wr_select_year, {
-  #   val <- input$wr_select_year
-  #   if (val == "2018" && (input$showrapp == "winter_run_tab")) {
-  #     toastr_info(
-  #       paste0("Using USBR W2 Model to estimate temperatures past ",
-  #              format(today(), "%b"), " ", format(today(), "%d"))
-  #     )
-  #   } else {
-  #     return()
-  #   }
-  # })
-  
-  
   
   
 }

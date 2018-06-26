@@ -119,20 +119,20 @@ carcass_data <- read_rds("data/chinook/carcass_static_data.rds")
 # shape files for redd map 
 redd_reach <- readOGR("data/redd_reaches/redd_reach.shp", stringsAsFactors = FALSE)
 redd_reach <- spTransform(redd_reach, CRS("+proj=longlat +datum=WGS84 +no_defs"))
-carcass_reach <- readOGR("data/carcass_reaches/carcass_reach_line.shp")
-carcass_reach <- spTransform(carcass_reach, CRS("+proj=longlat +datum=WGS84 +no_defs"))
-carcass_location <- carcass_reach$Reach
-
-# TODO: this is ok for now but needs to be modified, by either having the data
-# come into the shiny app with the sections names already in the dataset
-carcass_section_to_reach_name <- data.frame(
-  river_section = as.character(1:4), 
-  section_name = carcass_reach$Reach, 
-  stringsAsFactors = FALSE
-)
-
-carcass_data <- 
-  left_join(carcass_data, carcass_section_to_reach_name, c("river_section" = "river_section"))
+# carcass_reach <- readOGR("data/carcass_reaches/carcass_reach_line.shp")
+# carcass_reach <- spTransform(carcass_reach, CRS("+proj=longlat +datum=WGS84 +no_defs"))
+# carcass_location <- carcass_reach$Reach
+# 
+# # TODO: this is ok for now but needs to be modified, by either having the data
+# # come into the shiny app with the sections names already in the dataset
+# carcass_section_to_reach_name <- data.frame(
+#   river_section = as.character(1:4), 
+#   section_name = carcass_reach$Reach, 
+#   stringsAsFactors = FALSE
+# )
+# 
+# carcass_data <- 
+#   left_join(carcass_data, carcass_section_to_reach_name, c("river_section" = "river_section"))
 
 # TCD Configurations
 tcd_configs_data <- read_rds("data/tcd_configurations/tcd_configs_through_2017-08-24.rds")
@@ -196,6 +196,7 @@ rd <- redd_data %>%
   do(
     tibble(
       date = seq(.$date, estimate_emergence(.$date, .$location) -1, by="day"), 
+      seed_day = .$date,
       location = .$location, 
       counts = .$counts,
       redd_id = .$redd_id
