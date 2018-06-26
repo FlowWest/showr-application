@@ -65,12 +65,11 @@ flow_UI <- function(id) {
            column(width = 12, class = "col-md-3", 
                   shinyWidgets::materialSwitch(ns("show_diversions"), 
                                                label = "Show diversion", 
+                                               right = TRUE),
+                  shinyWidgets::materialSwitch(ns("show_tcd_configs"),
+                                               label = "Show TCD Configs",
                                                right = TRUE)
-                  # , 
-                  # shinyWidgets::materialSwitch(ns("show_tcd_configs"), 
-                  #                              label = "Show TCD Configs", 
-                  #                              right = TRUE)
-                  )
+           )
          ), 
          
          fluidRow(
@@ -151,15 +150,10 @@ flow_server <- function(input, output, session, g_date) {
   })
   
   selected_tcd_config_data <- reactive({
-    # tcd_configs_data %>% 
-    #   filter(starting_date >= "dummy", 
-    #          starting_date <= "dummier") %>% 
-    #   mutate(
-    #     hover_text = paste0("From ", starting_date, " to ", ending_date,"<br>", 
-    #                        " ", operation_value, " gate(s) open at ", tcd_operation)
-    #   )
+    tcd_configs_data %>%
+      filter(starting_date >= input$flow_daterange[1],
+             starting_date <= input$flow_daterange[2]) 
     
-    data.frame() # hacks
     
     
   })
@@ -206,93 +200,69 @@ flow_server <- function(input, output, session, g_date) {
     validate(need(length(input$flow_station_select) != 0, "Select at least one station to plot"))
     validate(need(nrow(selected_flow_data()) > 0, "Combination of date range and stations did not return any data"))
     
-    if (nrow(selected_tcd_config_data()) == 0) {
-      base_plot <- selected_flow_data() %>% 
-        plot_ly(x=~date, y=~daily_flow, color=~station_code_to_name_flows[location_id], 
-                type='scatter', mode='lines', 
-                colors = "Dark2",
-                text = ~paste0("<b>",date, "</b><br><b>",
-                               station_code_to_name_flows[location_id], "</b><br><b>", 
-                               daily_flow, " cfs</b>"), 
-                hoverinfo = "text", 
-                line = list(width=3)) 
-      
-      if (input$flow_add_year != "None") {
-        base_plot <- base_plot %>% 
-          add_trace(data = select_add_year_flow(), 
-                    x=~date, y=~daily_flow, color=~station_code_to_name_flows[location_id], 
-                    type='scatter', mode='lines', 
-                    colors = "Dark2",
-                    name =~ paste0(input$flow_add_year),
-                    text = ~paste0("<b>",input$flow_add_year,"</b><br><b>",
-                                   station_code_to_name_flows[location_id], "</b><br><b>", 
-                                   daily_flow, " cfs</b>"), 
-                    hoverinfo = "text", 
-                    line = list(width=2, dash="dot"))
-      }
-      
-      if (input$show_diversions) {
-        base_plot <- base_plot %>% 
-          add_trace(data = selected_diversion_data(), 
-                    name = "SRSC Upstream Diversions",
-                    x=~draft_date, y=~actual_upstream, 
-                    type='scatter', mode='lines', 
-                    colors = "Dark2", 
-                    inherit = FALSE)
-      }
-      
-      base_plot %>% 
-        layout(xaxis=list(title=""), 
-               yaxis=list(title="flow (cfs)"), 
-               showlegend = TRUE, 
-               legend = list(orientation = 'h'))
-    } else {
-      base_plot <- selected_flow_data() %>% 
-        plot_ly(x=~date, y=~daily_flow, color=~station_code_to_name_flows[location_id], 
-                type='scatter', mode='lines', 
-                colors = "Dark2",
-                text = ~paste0("<b>",date, "</b><br><b>",
-                               station_code_to_name_flows[location_id], "</b><br><b>", 
-                               daily_flow, " cfs</b>"), 
-                hoverinfo = "text", 
-                line = list(width=3)) %>% 
-        add_trace(data=selected_tcd_config_data(), 
-                  x=~starting_date, y=max_flow_value_in_range(),
-                  color = ~tcd_operation,
-                  colors = "Pastel2",
-                  inherit = FALSE, type='bar', legendgroup = "tcd_operations", 
-                  visible = "legendonly", 
-                  text = ~hover_text, 
-                  hoverinfo = "text") 
-      
-      if (input$flow_add_year != "None") {
-        base_plot <- base_plot %>% 
-          add_trace(data = select_add_year_flow(),
-                    x=~date, y=~daily_flow, color=~station_code_to_name_flows[location_id], 
-                    type='scatter', mode='lines', 
-                    colors = "Dark2",
-                    text = ~paste0("<b>",date, "</b><br><b>",
-                                   station_code_to_name_flows[location_id], "</b><br><b>", 
-                                   daily_flow, " cfs</b>"), 
-                    hoverinfo = "text", 
-                    line = list(width=2, dash="dot"))
-      }
-      
-      if (input$show_diversions) {
-        base_plot <- base_plot %>% 
-          add_trace(data = selected_diversion_data(), 
-                    name = "SRSC Upstream Diversions",
-                    x=~draft_date, y=~actual_upstream, 
-                    type='scatter', mode='lines', 
-                    colors = "Dark2", 
-                    inherit = FALSE)
-      }
-      
-      base_plot %>% 
-        layout(xaxis=list(title=""), 
-               yaxis=list(title="flow (cfs)"), 
-               showlegend = TRUE)
+    base_plot <- selected_flow_data() %>% 
+      plot_ly(x=~date, y=~daily_flow, color=~station_code_to_name_flows[location_id], 
+              type='scatter', mode='lines', 
+              colors = "Dark2",
+              text = ~paste0("<b>",date, "</b><br><b>",
+                             station_code_to_name_flows[location_id], "</b><br><b>", 
+                             daily_flow, " cfs</b>"), 
+              hoverinfo = "text", 
+              line = list(width=3)) 
+    
+    if (input$flow_add_year != "None") {
+      base_plot <- base_plot %>% 
+        add_trace(data = select_add_year_flow(), 
+                  x=~date, y=~daily_flow, color=~station_code_to_name_flows[location_id], 
+                  type='scatter', mode='lines', 
+                  colors = "Dark2",
+                  name =~ paste0(input$flow_add_year),
+                  text = ~paste0("<b>",input$flow_add_year,"</b><br><b>",
+                                 station_code_to_name_flows[location_id], "</b><br><b>", 
+                                 daily_flow, " cfs</b>"), 
+                  hoverinfo = "text", 
+                  line = list(width=2, dash="dot"))
     }
+    
+    if (input$show_diversions) {
+      base_plot <- base_plot %>% 
+        add_trace(data = selected_diversion_data(), 
+                  name = "SRSC Upstream Diversions",
+                  x=~draft_date, y=~actual_upstream, 
+                  type='scatter', mode='lines', 
+                  colors = "Dark2", 
+                  inherit = FALSE)
+    }
+    
+    
+    if (input$show_tcd_configs) {
+      if (nrow(selected_tcd_config_data()) == 0) {
+        showNotification("No TCD configs available for this time period")
+        base_plot <- base_plot
+      } else {
+        
+        base_plot <- base_plot %>% 
+          add_trace(data=mutate(
+            selected_tcd_config_data(),
+            hover_text = paste0("From ", starting_date, " to ", ending_date,"<br>",
+                                " ", operation_value, " gate(s) open at ", tcd_operation)
+          ), 
+          x=~starting_date, y=max_flow_value_in_range(),
+          color = ~tcd_operation,
+          colors = "Pastel2",
+          inherit = FALSE, type='bar', legendgroup = "tcd_operations", 
+          visible = "legendonly", 
+          text = ~hover_text, 
+          hoverinfo = "text")  
+      }
+    }
+    
+    
+    base_plot %>% 
+      layout(xaxis=list(title=""), 
+             yaxis=list(title="flow (cfs)"), 
+             showlegend = TRUE)
+    
   })    
   
   
