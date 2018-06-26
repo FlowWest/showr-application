@@ -251,7 +251,6 @@ flow_server <- function(input, output, session, g_date) {
           color = ~tcd_operation,
           colors = "Pastel2",
           inherit = FALSE, type='bar', legendgroup = "tcd_operations", 
-          visible = "legendonly", 
           text = ~hover_text, 
           hoverinfo = "text")  
       }
