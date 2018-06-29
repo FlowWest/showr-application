@@ -2,6 +2,7 @@
   <div class="col-sm-12">
     <div class="about">
       <h1>About SHOWR</h1>
+      <h3>Project Overview</h3>
       <p>
         The SHO-WR application demonstrates the power of open data paired with open 
         source analytics and visualization tools for California water resources 
@@ -17,6 +18,26 @@
         operation of Shasta Reservoir, SRSC diversions, the Central Valley 
         Project (CVP), other project reservoirs, and the Bay Delta.
       </p>
+
+      <h3>Data on SHOWR</h3>
+      <p>
+        Most of the data on SHOWR is obtained from CDEC (<a href="https://cdec.water.ca.gov/" target="_blank">
+        https://cdec.water.ca.gov/</a>) and is managed using a small PostgreSQL database.
+        The reason for this is due to the unreliability of CDEC and demand from the application.
+        A direct connection to CDEC would result in excessive downtime and instability, and would severely degrade
+        the user experience. 
+      </p>
+      <h4>Downloading Data</h4>
+      <p>
+        Users can download data directly from one of the pages by first filtering
+        to the desired subset and then downloading. Those who want to go beyond 
+        what SHOWR provides for CDEC data can make use of <a href="https://github.com/FlowWest/CDECRetrieve">CDECRetrieve</a>, an R package developed for SHOWR to facilitate data queries
+        to CDEC. You can learn more about the package, as well as how to install it
+        <a href="https://flowwest.github.io/CDECRetrieve/">here</a>. 
+      </p>
+
+
+
 
       <br/>
       <a href="http://www.flowwest.com/" target="_blank">
