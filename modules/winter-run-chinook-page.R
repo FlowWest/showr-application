@@ -32,7 +32,9 @@ winter_run_UI <- function(id) {
                                   choices = 2010:2018, selected = 2018)),
                column(width = 12, class="col-md-3", 
                       checkboxInput(ns("wr_show_temp_danger"), 
-                                    label = "Show At Risk Redds"))),
+                                    label = "Show at risk redds"), 
+                      checkboxInput(ns("wr_show_spawn_dates"), 
+                                    label = "Plot by spawn dates"))),
              fluidRow(
                # plot
                column(width = 12, class="col-md-9", 
@@ -74,22 +76,29 @@ winter_run_server <- function(input, output, session, g_date) {
       summarise(Total = as.integer(sum(Total)), 
                 `Temperature Threatened` = as.integer(sum(`Temperature Threatened`, na.rm = TRUE))))
   
-  
+
   
   rd_yr <- reactive({
     if (input$wr_show_temp_danger) {
       rd %>% 
         filter(year(date) == input$wr_select_year, daily_mean > 56) %>%  
-        group_by(location, date) %>% 
+        group_by(location, seed_day, date) %>% 
         summarise(total = sum(counts)) %>% 
         ungroup()
     } else {
       rd %>% 
         filter(year(date) == input$wr_select_year) %>%  
-        group_by(location, date) %>% 
+        group_by(location, seed_day, date) %>% 
         summarise(total = sum(counts)) %>% 
         ungroup()
     }
+  })
+  
+  spawn_dates_in_year <- reactive({
+    rd %>% 
+      filter(year(date) == input$wr_select_year) %>% 
+      distinct(seed_day, location, .keep_all = TRUE)
+      
   })
   
   output$winter_run_plot <- renderPlotly({
@@ -97,12 +106,23 @@ winter_run_server <- function(input, output, session, g_date) {
       nrow(rd_yr()) > 0, "No redds at risk."
     ))
     
-    rd_yr() %>%    
+    p <- rd_yr() %>%    
       plot_ly(x = ~date, y = ~total, color = ~location, type='bar', 
               text = ~paste0(date, "<br>", 
                              location, "<br>", 
                              total), 
-              hoverinfo = "text") %>% 
+              hoverinfo = "text") 
+    
+    if (input$wr_show_spawn_dates) {
+      p <- rd_yr() %>%    
+        plot_ly(x = ~date, y = ~total, color = ~as.character(seed_day), type='bar', 
+                text = ~paste0(date, "<br>", 
+                               location, "<br>", 
+                               total), 
+                hoverinfo = "text", colors = "Dark2")
+    }
+    
+    p %>%
       layout(legend = list(orientation = 'h'), showlegend = TRUE, 
              xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
              barmode='stack')
