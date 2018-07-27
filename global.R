@@ -33,7 +33,6 @@ source("modules/welcome.R")
 # load general objects, documented in "data/make-general-objects.R"
 load("data/general-objects.RData")
 
-
 # diversion_data <- read_csv("data/flows/srsc_diversion_data.csv") %>% 
 #   mutate(draft_date = mdy(draft_date))
 diversion_data <- read_rds("data/flows/diversion_data_with_estimates.rds")
@@ -95,8 +94,6 @@ redd_air_temp <-
   group_by(date = as_date(datetime)) %>% 
   summarise(parameter_value = round(mean(parameter_value, na.rm = TRUE), 0))
 
-
-
 # This dataset is small enough and is static enough to live on the app.
 # redd_data <- 
 #   read_csv("https://s3-us-west-2.amazonaws.com/showr-data/cdfw/redds/aerial-survey-observations_no_error_codes.csv", 
@@ -112,7 +109,6 @@ redd_data <-
   filter(race == "Winter") 
 # %>% 
 #   mutate(location = factor(location, levels = redd_locations))
-
 
 carcass_data <- read_rds("data/chinook/carcass_static_data.rds")
 
@@ -172,12 +168,13 @@ get_year_classification <- function(y) {
       pull(classification) %>% 
       as.character()
   } else {
-    current_water_year_types %>% 
-      filter(probability == 99) %>% 
-      arrange(desc(date)) %>% 
-      head(1) %>% 
-      pull(classification) %>% 
-      as.character()
+    # current_water_year_types %>% 
+    #   filter(probability == 99) %>% 
+    #   arrange(desc(date)) %>% 
+    #   head(1) %>% 
+    #   pull(classification) %>% 
+    #   as.character()
+    "below normal"
   }
 }
 
@@ -220,3 +217,11 @@ make_estimated_diversion <- function(year) {
     mutate(
       fake_date = ymd(paste0(year, "/", month, "/", day))
     ) }
+
+
+compact <- function(x) {
+  empty <- vapply(x, is_empty, logical(1))
+  x[!empty]
+}
+
+is_empty <- function(x) length(x) == 0

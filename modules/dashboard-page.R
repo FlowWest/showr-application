@@ -62,7 +62,7 @@ dashboard_server <- function(input, output, session, g_date) {
   isothermal_percent_metric <- reactive({
     isothermal_data %>% 
       filter(date <= g_date(), year(date) == year(g_date())) %>% 
-      filter(temp <= 50) %>% 
+      filter(temp <= 52) %>% 
       group_by(date) %>% 
       summarise(
         total_volume_below_50 = sum(volume_taf)

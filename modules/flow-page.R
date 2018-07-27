@@ -230,7 +230,7 @@ flow_server <- function(input, output, session, g_date) {
                   name = "SRSC Upstream Diversions",
                   x=~draft_date, y=~actual_upstream, 
                   type='scatter', mode='lines', 
-                  colors = "Dark2", 
+                  line=list(color="#b71b93"), 
                   inherit = FALSE)
     }
     
