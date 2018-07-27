@@ -134,6 +134,7 @@ winter_run_server <- function(input, output, session, g_date) {
       
   })
   
+  # this whole thing needs some refactoring
   output$winter_run_plot <- renderPlotly({
     shiny::validate(errorClass = 'no-redds-alert', need(
       nrow(rd_yr()) > 0, "No redds at risk."
