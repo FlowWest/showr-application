@@ -35,7 +35,7 @@ load("data/general-objects.RData")
 
 # diversion_data <- read_csv("data/flows/srsc_diversion_data.csv") %>% 
 #   mutate(draft_date = mdy(draft_date))
-diversion_data <- read_rds("data/flows/diversion_data_with_estimates.rds")
+diversion_data <- read_rds("data/flows/mbk-diversion-data-2018-08-14.rds")
 
 # These data are all on a public S3 bucket 
 temp_data <- 
@@ -90,9 +90,7 @@ redd_air_temp <-
              parameter_id = col_integer(),
              datetime = col_datetime(format = ""),
              parameter_value = col_integer()
-           )) %>% 
-  group_by(date = as_date(datetime)) %>% 
-  summarise(parameter_value = round(mean(parameter_value, na.rm = TRUE), 0))
+           )) 
 
 # This dataset is small enough and is static enough to live on the app.
 # redd_data <- 

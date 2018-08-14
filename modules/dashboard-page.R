@@ -228,21 +228,24 @@ dashboard_server <- function(input, output, session, g_date) {
       if (g_date() == today(tzone = "America/Los_Angeles")) {
         flow_data_daily_mean %>% 
           filter(location_id == location, datetime == (g_date()-2)) %>%
-          pull(parameter_value)
+          pull(parameter_value) %>% 
+          round()
       } else if (g_date() == (today(tzone = "America/Los_Angeles")-1)) {
         flow_data_daily_mean %>% 
           filter(location_id == location, datetime == (g_date()-1)) %>%
-          pull(parameter_value)
+          pull(parameter_value) %>% round()
       } else {
         flow_data_daily_mean %>% 
           filter(location_id == location, datetime == g_date()) %>%
-          pull(parameter_value)
+          pull(parameter_value) %>% 
+          round()
       }
     } else {
       
       flow_data_daily_mean %>% 
         filter(location_id == location, datetime == g_date()) %>%
-        pull(parameter_value) 
+        pull(parameter_value) %>% 
+        round()
     }
   }
   

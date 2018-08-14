@@ -98,7 +98,20 @@ temp_page_server <- function(input, output, session, g_date) {
   
   
   selected_air_temp <- reactive({
-    redd_air_temp %>% 
+    switch (input$temp_summary_choice,
+      "Daily Mean" = {
+        redd_air_temp %>% group_by(date = as_date(datetime)) %>% 
+          summarise(parameter_value = round(mean(parameter_value, na.rm = TRUE), 0))
+      },
+      "7DADM" = {
+        redd_air_temp %>% group_by(date = as_date(datetime)) %>% 
+          summarise(parameter_value = round(max(parameter_value, na.rm = TRUE), 0))
+      }, 
+      "Daily Max" = {
+        redd_air_temp %>% group_by(date = as_date(datetime)) %>% 
+          summarise(parameter_value = round(max(parameter_value, na.rm = TRUE), 0))
+      }
+    ) %>% 
       filter(date >= input$temp_daterange[1], 
              date <= input$temp_daterange[2])
   })
