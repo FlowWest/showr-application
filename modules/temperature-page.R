@@ -355,22 +355,57 @@ temp_page_server <- function(input, output, session, g_date) {
                shapes = make_compliance_rect(), 
                legend = list(orientation = 'h')) %>%
         config(displayModeBar = FALSE) 
-        
     } else {
-      p %>% 
-        add_trace(data=selected_air_temp(), 
-                  x=~date, y=~parameter_value, 
-                  name = "Redding Air Temp (daily avg.)", type='scatter', mode='lines', 
-                  inherit = FALSE, 
-                  text=~paste0(date, "<br>",
-                               "Redding Daily Max <br>", 
-                               parameter_value, "°F"), 
-                  hoverinfo = "text") %>% 
-        layout(xaxis = list(title=""), 
-               yaxis = list(title = "Temperature (F)"), 
-               shapes = make_compliance_rect(), 
-               legend = list(orientation = 'h')) %>%
-        config(displayModeBar = FALSE) 
+      switch (input$temp_summary_choice,
+        "Daily Mean" = {
+          p %>% 
+            add_trace(data=selected_air_temp(), 
+                      x=~date, y=~parameter_value, 
+                      name = "Redding Air Temp (daily avg.)", type='scatter', mode='lines', 
+                      inherit = FALSE, 
+                      text=~paste0(date, "<br>",
+                                   "Redding Daily Average <br>", 
+                                   parameter_value, "°F"), 
+                      hoverinfo = "text") %>% 
+            layout(xaxis = list(title=""), 
+                   yaxis = list(title = "Temperature (F)"), 
+                   shapes = make_compliance_rect(), 
+                   legend = list(orientation = 'h')) %>%
+            config(displayModeBar = FALSE)
+        },
+        "7DADM" = {
+          p %>% 
+            add_trace(data=selected_air_temp(), 
+                      x=~date, y=~parameter_value, 
+                      name = "Redding Air Temp (daily max)", type='scatter', mode='lines', 
+                      inherit = FALSE, 
+                      text=~paste0(date, "<br>",
+                                   "Redding Daily Max <br>", 
+                                   parameter_value, "°F"), 
+                      hoverinfo = "text") %>% 
+            layout(xaxis = list(title=""), 
+                   yaxis = list(title = "Temperature (F)"), 
+                   shapes = make_compliance_rect(), 
+                   legend = list(orientation = 'h')) %>%
+            config(displayModeBar = FALSE)
+        },
+        "Daily Max" = {
+          p %>% 
+            add_trace(data=selected_air_temp(), 
+                      x=~date, y=~parameter_value, 
+                      name = "Redding Air Temp (daily max)", type='scatter', mode='lines', 
+                      inherit = FALSE, 
+                      text=~paste0(date, "<br>",
+                                   "Redding Daily Max <br>", 
+                                   parameter_value, "°F"), 
+                      hoverinfo = "text") %>% 
+            layout(xaxis = list(title=""), 
+                   yaxis = list(title = "Temperature (F)"), 
+                   shapes = make_compliance_rect(), 
+                   legend = list(orientation = 'h')) %>%
+            config(displayModeBar = FALSE)
+        }
+      ) 
     }
   })
   

@@ -37,7 +37,7 @@ flow_UI <- function(id) {
   tags$h5("Latest TCD configurations transcribed from",
           tags$a(target="_blank",
                  "CVO TCD Configurations",
-                 href="https://www.usbr.gov/mp/cvo/vungvari/ShastaTCD2017.pdf")),
+                 href="https://www.usbr.gov/mp/cvo/temperature.html")),
   tags$h5("Update schedule: data is updated on daily basis with both hourly and daily data"), 
   tags$h5("Diversions for 2017 and 2018 are estimated values from 2010-2016"))),
   # main interface
