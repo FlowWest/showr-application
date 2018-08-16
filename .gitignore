@@ -4,3 +4,4 @@ packrat/*
 rsconnect/*
 .Rproj.user
 .httr-oauth
+.Rhistory
