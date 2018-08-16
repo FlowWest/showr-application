@@ -86,7 +86,7 @@ flow_UI <- function(id) {
                     tags$tr(tags$td("Sac River at Delta"),
                             tags$td(textOutput(ns("delta_summary_flow"))),
                             tags$td(sparklineOutput(ns("sac_river_spark")), tags$h6("past 30 days"))),
-                    tags$tr(tags$td("Pitt River"),
+                    tags$tr(tags$td("Pit River"),
                             tags$td(textOutput(ns("pitt_summary_flow"))),
                             tags$td(sparklineOutput(ns("pitt_river_spark")), tags$h6("past 30 days")))
                   )))))

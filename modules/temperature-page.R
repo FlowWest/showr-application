@@ -52,15 +52,7 @@ temp_pageUI <- function(id) {
                                   width = "140px")
                ),
                column(width = 12, class = "col-md-3",
-                      selectInput(inputId = ns("temp_gage_location"),
-                                  label = "Select Gage(s)",
-                                  choices = c("Keswick" = "kwk",
-                                              "Sac. River Hwy 44" = "sac",
-                                              "Clear Creek" = "ccr",
-                                              "Balls Ferry" = "bsf",
-                                              "Jellys Ferry" = "jlf",
-                                              "Bend Bridge" = "bnd"),
-                                  multiple = TRUE, selected = c("kwk","ccr","bsf"))),
+                      uiOutput(ns("select_temp_gage_ui"))),
                column(width = 12, class = "col-md-3",
                       radioButtons(inputId = ns("temp_summary_choice"),
                                    label = "Select Temperature Statistic",
@@ -87,15 +79,30 @@ temp_page_server <- function(input, output, session, g_date) {
   
   ns <- session$ns
   
+  station_choices_for_temp <- reactive({
+    if (input$temp_summary_choice == "7DADM") {
+      c("Keswick" = "kwk",
+      "Sac. River Hwy 44" = "sac",
+      "Clear Creek" = "ccr",
+      "Jellys Ferry" = "jlf",
+      "Bend Bridge" = "bnd")
+    } else {
+      c("Keswick" = "kwk",
+      "Sac. River Hwy 44" = "sac",
+      "Clear Creek" = "ccr",
+      "Balls Ferry" = "bsf",
+      "Jellys Ferry" = "jlf",
+      "Bend Bridge" = "bnd")
+    }
+  })
   
-  # upadte the daterange input depending on the home page date
-  # observeEvent(g_date(), {
-  #   updateDateRangeInput(session = session, 
-  #                        inputId = "temp_daterange", 
-  #                        start = paste0(year(g_date()), "-01-01"), 
-  #                        end = g_date() - 1)
-  # })
-  
+  output$select_temp_gage_ui <- renderUI({
+    req(input$temp_summary_choice)
+    selectInput(inputId = ns("temp_gage_location"),
+                label = "Select Gage(s)",
+                choices = station_choices_for_temp(),
+                multiple = TRUE, selected = c("kwk","ccr"))
+  })
   
   selected_air_temp <- reactive({
     switch (input$temp_summary_choice,
