@@ -13,9 +13,6 @@ winter_run_UI <- function(id) {
                         tags$a("Winter Run Chinook", href="https://www.wildlife.ca.gov/Conservation/Fishes/Chinook-Salmon/Winter-run", target="_blank"),
                         "Salmon were listed as endangered under the California Endangered Species Act (CESA) and threatened under the Federal Endangered Species Act in 1989. Winter Run migrate between November and early August, and spawn in the upper mainstem Sacramento River from mid-April through August. Peak spawning typically occurs in June and July. The plot to the right shows the number and location (by river reach) of Winter Run redds mapped in the Upper Sacramento River. You can select “Show At Risk Redds” to view the redds potentially impacted by water temperatures exceeding the 56F compliance threshold."
                       ),
-                      tags$div(style = "display:inline-block;",
-                               actionButton(ns("wr_show_reaches"), label = "Show reaches map", 
-                                            icon = icon("map"))),
                       tags$hr(),
                       tags$h4("Download Data in View"),
                       downloadButton(ns("download_wr_data"), class="subpage-buttons"),
@@ -36,10 +33,10 @@ winter_run_UI <- function(id) {
                                   choices = 2010:2018, selected = 2018)),
                column(width = 12, class="col-md-4", 
                       tags$div(style = "display:inline-block",
-                      checkboxInput(ns("wr_show_temp_danger"), 
-                                    label = "Show at risk redds"), 
-                      checkboxInput(ns("wr_show_spawn_dates"), 
-                                    label = "Plot by spawn dates"))), 
+                               checkboxInput(ns("wr_show_temp_danger"), 
+                                             label = "Show at risk redds"), 
+                               checkboxInput(ns("wr_show_spawn_dates"), 
+                                             label = "Plot by spawn dates"))), 
                column(width = 12, class = "col-md-6", 
                       tags$div(style="display:inline-block", 
                                uiOutput(ns("wr_select_spawn_data_ui"))))),
@@ -49,7 +46,8 @@ winter_run_UI <- function(id) {
                       plotlyOutput(ns("winter_run_plot"), height = "500px")), 
                column(width = 12, class = "col-md-3", 
                       tags$h3('Number of Redds'),
-                      tableOutput(ns("wr_table"))))
+                      tableOutput(ns("wr_table")), 
+                      leafletOutput(ns("wr_redd_reaches_map"))))
       )
     )
   )
@@ -109,7 +107,7 @@ winter_run_server <- function(input, output, session, g_date) {
       summarise(Total = as.integer(sum(Total)), 
                 `Temperature Threatened` = as.integer(sum(`Temperature Threatened`, na.rm = TRUE))))
   
-
+  
   
   rd_yr <- reactive({
     if (input$wr_show_temp_danger) {
@@ -131,7 +129,7 @@ winter_run_server <- function(input, output, session, g_date) {
     rd %>% 
       filter(year(date) == input$wr_select_year) %>% 
       distinct(seed_day, location, .keep_all = TRUE)
-      
+    
   })
   
   # this whole thing needs some refactoring
@@ -145,7 +143,8 @@ winter_run_server <- function(input, output, session, g_date) {
               text = ~paste0(date, "<br>", 
                              location, "<br>", 
                              total), 
-              hoverinfo = "text") %>%
+              hoverinfo = "text", 
+              key = ~location) %>%
       layout(legend = list(orientation = 'h'), showlegend = TRUE, 
              xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
              barmode='stack')
@@ -172,7 +171,7 @@ winter_run_server <- function(input, output, session, g_date) {
     }
     
     return(p)
-
+    
   })
   
   # Bookmarking this page ----------
@@ -187,16 +186,14 @@ winter_run_server <- function(input, output, session, g_date) {
   })
   
   reaches_to_show_in_map <- reactive({
-    if (input$reaches_to_show == "Reaches wtih Redds")
-      subset(redd_reach, Reach %in% pull(distinct(rd_yr(), location)))
-    else 
-      redd_reach
+    subset(redd_reach, Reach %in% pull(distinct(rd_yr(), location)))
   })
   
   output$wr_redd_reaches_map <- renderLeaflet({
-    leaflet(reaches_to_show_in_map()) %>% 
-      addProviderTiles(providers$CartoDB.Positron) %>% 
+    leaflet(reaches_to_show_in_map()) %>%
+      addTiles() %>% 
       addPolylines(label=~Reach, weight = 5,
+                   color = "black",
                    highlight = highlightOptions(
                      weight = 7,
                      color = "red",
@@ -204,7 +201,25 @@ winter_run_server <- function(input, output, session, g_date) {
                      bringToFront = TRUE) )
   })
   
-  observeEvent(input$wr_show_reaches, {
-    showModal(dataModal(size="l", easyClose=TRUE))
+  hovered_reach <- reactive({
+    subset(redd_reach, Reach == event_data("plotly_hover")$key)
   })
+  
+  observe({
+    leafletProxy("wr_redd_reaches_map", data=hovered_reach()) %>% 
+      clearGroup("hovered_reach") %>% 
+      addPolylines(
+        # color = "#7a3d69", 
+        group = "hovered_reach", 
+        stroke = TRUE,
+        weight = 12, 
+        fillOpacity = .9, 
+        fillColor = "#7a3d69")
+    
+  })
+  
+  
+  
+  
+  
 }
