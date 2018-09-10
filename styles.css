@@ -299,3 +299,15 @@ label {
 .subpage-buttons {
     width: 127px;
 }
+
+
+
+.date_jump {
+  border-radius: 10px;
+}
+
+
+#app-global_date > input.form-control.shinyjs-resettable {
+  border-radius: 10px;
+  font-size: 20px;
+}

@@ -1,8 +1,20 @@
 <div class="row">
-  <div class="col-sm-12 col-md-2">
+  <div class="col-sm-12 col-md-3">
+<!--     <div style="display: inline-block;margin-right: 5px;">
+      <h3 class="panel-title">Compare to </h3>
+    </div> -->
+    <div style="display: inline-block;margin-right:5px;">
       {{ date_button }}
+    </div>
+    <div style="display: inline-block;">
+      {{ last_year_button }}
+    </div>
+    <div style="display: inline-block;">
+      {{ last_week_button }}
+    </div>
   </div>
 </div>
+<hr>
 <div class="row"> <!-- start main page row -->
   <div class="col-sm-12 col-md-6 home-metrics"> <!-- start left screen col -->
     <div class="row"> <!-- start left col top row -->
@@ -39,22 +51,22 @@
           </div>
           <ul class="list-group">
             <h5 class="list-group-item">
-                Keswick (KWK)
-                <span class="badge">
-                    {{mean_daily_temp_kwk}}
-                </span>
+              Keswick (KWK)
+              <span class="badge">
+                {{mean_daily_temp_kwk}}
+              </span>
             </h5>
             <h5 class="list-group-item">
-                Clear Creek (CCR)
-                <span class="badge">
-                    {{mean_daily_temp_ccr}}
-                </span>
+              Clear Creek (CCR)
+              <span class="badge">
+                {{mean_daily_temp_ccr}}
+              </span>
             </h5>
             <h5 class="list-group-item">
-                Ball's Ferry (BSF)
-                <span class="badge">
-                    {{mean_daily_temp_bsf}}
-                </span>
+              Ball's Ferry (BSF)
+              <span class="badge">
+                {{mean_daily_temp_bsf}}
+              </span>
             </h5>
           </ul>
         </div>
@@ -69,7 +81,7 @@
             </h3>
           </div>
           <ul class="list-group">
-          <h5 class="list-group-item" target="_blank" href="https://cdec.water.ca.gov/cgi-progs/staSearch">
+            <h5 class="list-group-item" target="_blank" href="https://cdec.water.ca.gov/cgi-progs/staSearch">
               Shasta Inflow 
               <span class="badge"> {{mean_daily_flow_sha}}</span>
             </h5>
@@ -86,28 +98,28 @@
     </div>
     <div class="col-sm-12 col-md-6">
       <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">Chinook Activity
-              {{help_me_with_chinook_activity}}
-            </h3>
-          </div>
-          <ul class="list-group">
+        <div class="panel-heading">
+          <h3 class="panel-title">Chinook Activity
+            {{help_me_with_chinook_activity}}
+          </h3>
+        </div>
+        <ul class="list-group">
           <h5 class="list-group-item">
-              Primary Life Stage(s) 
-              <span class="badge"> {{wr_presence}} </span>
-            </h5>
-            <h5 class="list-group-item">
-             Furthest Redd 
-             <span class="badge">{{limiting_reach}}</span>
-           </h5>
-           <h5 class="list-group-item">
-            Estimated Emergence 
-            <span class="badge">{{limiting_date}}</span>
+            Primary Life Stage(s) 
+            <span class="badge"> {{wr_presence}} </span>
           </h5>
-        </ul>
-      </div>
+          <h5 class="list-group-item">
+           Furthest Redd 
+           <span class="badge">{{limiting_reach}}</span>
+         </h5>
+         <h5 class="list-group-item">
+          Estimated Emergence 
+          <span class="badge">{{limiting_date}}</span>
+        </h5>
+      </ul>
     </div>
-  </div> <!-- end left col bottom row -->
+  </div>
+</div> <!-- end left col bottom row -->
 </div> <!-- end left screen col -->
 <div class="col-sm-12 col-md-6 home-plots"> <!-- start right screen col -->
   <ul class="nav nav-tabs" id="dashboard_plot_tabs">
@@ -121,7 +133,7 @@
       {{ shasta_elevation_plot }}
     </div>
     <div class="tab-pane" id="2a">
-        {{chinook_summary_plot}}
+      {{chinook_summary_plot}}
     </div>
   </div>
 </div> <!-- end right screen col -->

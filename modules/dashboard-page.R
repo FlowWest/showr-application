@@ -36,9 +36,27 @@ dashboardUI <- function(id){
                                                               icon = icon("question-circle")),
                  shasta_elevation_plot = plotlyOutput(ns("elevation_plot"), height = '500px'),
                  chinook_summary_plot = plotlyOutput(ns("chinook_summary_plot"), height = '500px'),
-                 date_button = dateInput(ns("global_date"), label = "Select Date", 
-                                         min = "2010-01-01", max = (today(tzone = "America/Los_Angeles")), value = (today(tzone = "America/Los_Angeles")), 
-                                         width = "150px")
+                 # date_button = dateInput(ns("global_date"), label = "Select Date", 
+                 #                         min = "2010-01-01", max = (today(tzone = "America/Los_Angeles")), value = (today(tzone = "America/Los_Angeles")), 
+                 #                         width = "150px"), 
+                 last_year_button = actionButton(ns("jump_to_last_year"), label = "last year", 
+                                                 class = "btn-sm date_jump"),
+                 last_week_button = actionButton(ns("jump_to_last_week"), label = "similar water year", 
+                                                 class = "btn-sm date_jump"), 
+                 date_button = dateInput(ns("global_date"), 
+                                         label = NULL, 
+                                         min = "2010-01-01", 
+                                         max = (today(tzone = "America/Los_Angeles")), 
+                                         value = (today(tzone = "America/Los_Angeles")), 
+                                         width = "135px")
+                 # date_button = dropdownButton(
+                 #   tags$h4("Custom date"),
+                 #   dateInput(ns("global_date"), label = "Select Date", 
+                 #             min = "2010-01-01", max = (today(tzone = "America/Los_Angeles")), value = (today(tzone = "America/Los_Angeles")), 
+                 #             width = "150px"),
+                 #   circle = TRUE, status = "info", icon = icon("calendar"), width = "400px",
+                 #   tooltip = tooltipOptions(title = "set custom date")
+                 # )
     ))
 }
 
@@ -46,6 +64,14 @@ dashboardUI <- function(id){
 dashboard_server <- function(input, output, session, g_date) {
   ns <- session$ns
   
+  observeEvent(input$jump_to_last_year, {
+    if (input$jump_to_last_year %% 2 == 0) {
+      updateActionButton(session, inputId = "jump_to_last_year", label = "last year")    
+    } else {
+      updateActionButton(session, inputId = "jump_to_last_year", label = "reset")    
+      
+    }
+  })
   
   home_year <- reactive({ lubridate::year(g_date()) })
   
@@ -96,6 +122,10 @@ dashboard_server <- function(input, output, session, g_date) {
       group_by(date) %>%
       mutate(accum_volume = cumsum(volume_af)) %>% ungroup() %>% 
       filter(year(date) == year(g_date()), date <= g_date())
+    
+    if (nrow(t) == 0) {
+      return(NULL)
+    }
     
     list(
       "dark_blue" = t %>% 
@@ -347,96 +377,102 @@ dashboard_server <- function(input, output, session, g_date) {
     shasta_spread_data <- selected_shasta_storage_data() %>% 
       spread(parameter_id, parameter_value) 
     
-    plot_ly() %>% 
+    p <- plot_ly() %>% 
       add_trace(data = shasta_spread_data, 
                 x=~datetime, y = ~`15`, name ="Reservoir Storage", fill = 'tozeroy',
                 fillcolor="#bcbcbc",
                 connectgaps = TRUE,
-                type='scatter', mode='none') %>%
-      add_trace(data = iso_thermal_data_for_plot()$red, 
-                x=~date, y=~accum_volume, 
-                fillcolor = '#d64646', inherit = FALSE, 
-                type='scatter', mode = 'none', fill='tozeroy', 
-                legendgroup="Isothermals", 
-                name=">71", 
-                text = ~paste0(
-                  "Storage Temperature Above 70 <br>",
-                  date, "<br>",
-                  "Volume ", round(total_storage_in_bin, 0), " taf"
-                ), 
-                hoverinfo = "text") %>% 
-      add_trace(data = iso_thermal_data_for_plot()$orange, 
-                x=~date, y=~accum_volume, 
-                fillcolor = '#ed8e12', inherit = FALSE, 
-                type='scatter', mode = 'none', fill='tozeroy', 
-                legendgroup="Isothermals", 
-                name="67-70", 
-                text = ~paste0(
-                  "Storage Temperature Between 67 & 70 °F <br>",
-                  date, "<br>",
-                  "Volume ", round(total_storage_in_bin, 0), " taf"
-                ), 
-                hoverinfo = "text") %>% 
-      add_trace(data = iso_thermal_data_for_plot()$baige, 
-                x=~date, y=~accum_volume, 
-                fillcolor = '#d9e0a3', inherit = FALSE, 
-                type='scatter', mode = 'none', fill='tozeroy', 
-                legendgroup="Isothermals", 
-                name="61-66", 
-                text = ~paste0(
-                  "Storage Temperature Between 61 & 66 °F <br>",
-                  date, "<br>",
-                  "Volume ", round(total_storage_in_bin, 0), " taf"
-                ), 
-                hoverinfo = "text") %>% 
-      add_trace(data = iso_thermal_data_for_plot()$green, 
-                x=~date, y=~accum_volume, 
-                fillcolor = '#27824c', inherit = FALSE, 
-                type='scatter', mode = 'none', fill='tozeroy', 
-                legendgroup="Isothermals", 
-                name="57-60", 
-                text = ~paste0(
-                  "Storage Temperature Between 57 & 60 °F <br>",
-                  date, "<br>",
-                  "Volume ", round(total_storage_in_bin, 0), " taf"
-                ), 
-                hoverinfo = "text") %>%  
-      add_trace(data = iso_thermal_data_for_plot()$cyan, 
-                x=~date, y=~accum_volume, 
-                fillcolor = '#56bfbd', inherit = FALSE, 
-                type='scatter', mode = 'none', fill='tozeroy', 
-                legendgroup="Isothermals", 
-                name="53-56",
-                text = ~paste0(
-                  "Storage Temperature Between 53 & 56 °F <br>",
-                  date, "<br>",
-                  "Volume ", round(total_storage_in_bin, 0), " taf"
-                ), 
-                hoverinfo = "text") %>%  
-      add_trace(data = iso_thermal_data_for_plot()$blue, 
-                x=~date, y=~accum_volume, 
-                fillcolor = '#4C74C9', inherit = FALSE, 
-                type='scatter', mode = 'none', fill='tozeroy', 
-                legendgroup="Isothermals", 
-                name="49-52", 
-                text = ~paste0(
-                  "Storage Temperature Between 49 & 52 °F <br>",
-                  date, "<br>",
-                  "Volume ", round(total_storage_in_bin, 0), " taf"
-                ), 
-                hoverinfo = "text") %>%  
-      add_trace(data = iso_thermal_data_for_plot()$dark_blue, 
-                x=~date, y=~accum_volume, 
-                fillcolor = '#274a82', inherit = FALSE, 
-                type='scatter', mode = 'none', fill='tozeroy', 
-                legendgroup="Isothermals", 
-                name="<48", 
-                text = ~paste0(
-                  "Storage Temperature Below 48 <br>",
-                  date, "<br>",
-                  "Volume ", round(total_storage_in_bin, 0), " taf"
-                ), 
-                hoverinfo = "text") %>% 
+                type='scatter', mode='none')
+    
+    # if iso data is available add them to the plot
+    if (!is.null(iso_thermal_data_for_plot())) {
+      p <- p %>% 
+        add_trace(data = iso_thermal_data_for_plot()$red,
+                  x=~date, y=~accum_volume,
+                  fillcolor = '#d64646', inherit = FALSE,
+                  type='scatter', mode = 'none', fill='tozeroy',
+                  legendgroup="Isothermals",
+                  name=">71",
+                  text = ~paste0(
+                    "Storage Temperature Above 70 <br>",
+                    date, "<br>",
+                    "Volume ", round(total_storage_in_bin, 0), " taf"
+                  ),
+                  hoverinfo = "text") %>%
+        add_trace(data = iso_thermal_data_for_plot()$orange,
+                  x=~date, y=~accum_volume,
+                  fillcolor = '#ed8e12', inherit = FALSE,
+                  type='scatter', mode = 'none', fill='tozeroy',
+                  legendgroup="Isothermals",
+                  name="67-70",
+                  text = ~paste0(
+                    "Storage Temperature Between 67 & 70 °F <br>",
+                    date, "<br>",
+                    "Volume ", round(total_storage_in_bin, 0), " taf"
+                  ),
+                  hoverinfo = "text") %>%
+        add_trace(data = iso_thermal_data_for_plot()$baige,
+                  x=~date, y=~accum_volume,
+                  fillcolor = '#d9e0a3', inherit = FALSE,
+                  type='scatter', mode = 'none', fill='tozeroy',
+                  legendgroup="Isothermals",
+                  name="61-66",
+                  text = ~paste0(
+                    "Storage Temperature Between 61 & 66 °F <br>",
+                    date, "<br>",
+                    "Volume ", round(total_storage_in_bin, 0), " taf"
+                  ),
+                  hoverinfo = "text") %>%
+        add_trace(data = iso_thermal_data_for_plot()$green,
+                  x=~date, y=~accum_volume,
+                  fillcolor = '#27824c', inherit = FALSE,
+                  type='scatter', mode = 'none', fill='tozeroy',
+                  legendgroup="Isothermals",
+                  name="57-60",
+                  text = ~paste0(
+                    "Storage Temperature Between 57 & 60 °F <br>",
+                    date, "<br>",
+                    "Volume ", round(total_storage_in_bin, 0), " taf"
+                  ),
+                  hoverinfo = "text") %>%
+        add_trace(data = iso_thermal_data_for_plot()$cyan,
+                  x=~date, y=~accum_volume,
+                  fillcolor = '#56bfbd', inherit = FALSE,
+                  type='scatter', mode = 'none', fill='tozeroy',
+                  legendgroup="Isothermals",
+                  name="53-56",
+                  text = ~paste0(
+                    "Storage Temperature Between 53 & 56 °F <br>",
+                    date, "<br>",
+                    "Volume ", round(total_storage_in_bin, 0), " taf"
+                  ),
+                  hoverinfo = "text") %>%
+        add_trace(data = iso_thermal_data_for_plot()$blue,
+                  x=~date, y=~accum_volume,
+                  fillcolor = '#4C74C9', inherit = FALSE,
+                  type='scatter', mode = 'none', fill='tozeroy',
+                  legendgroup="Isothermals",
+                  name="49-52",
+                  text = ~paste0(
+                    "Storage Temperature Between 49 & 52 °F <br>",
+                    date, "<br>",
+                    "Volume ", round(total_storage_in_bin, 0), " taf"
+                  ),
+                  hoverinfo = "text") %>%
+        add_trace(data = iso_thermal_data_for_plot()$dark_blue,
+                  x=~date, y=~accum_volume,
+                  fillcolor = '#274a82', inherit = FALSE,
+                  type='scatter', mode = 'none', fill='tozeroy',
+                  legendgroup="Isothermals",
+                  name="<48",
+                  text = ~paste0(
+                    "Storage Temperature Below 48 <br>",
+                    date, "<br>",
+                    "Volume ", round(total_storage_in_bin, 0), " taf"
+                  ),
+                  hoverinfo = "text")
+    }
+      p %>%
       add_lines(data=shasta_spread_data, 
                 x = ~datetime, y=~`94`, name = "Flood Conservation Max Storage", type = 'scatter', 
                 mode = 'lines', text = ~paste("<b>",datetime, "</b>",

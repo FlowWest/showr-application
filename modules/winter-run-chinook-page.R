@@ -20,7 +20,7 @@ winter_run_UI <- function(id) {
                       tags$br(),
                       bookmarkButton(id=ns("chinook_bookmark"), "Share page", 
                                      class="subpage-buttons"),
-                      tags$h5("Note: the final aerial redd survey was conducted on 08/16/2017"),
+                      # tags$h5("Note: the final aerial redd survey was conducted on 08/16/2017"),
                       tags$h5("Data source: CDFW provided through calfish.org"), 
                       tags$h5("Update schedule: data is updated by CDFW on a weekly basis") 
              )),
@@ -190,6 +190,11 @@ winter_run_server <- function(input, output, session, g_date) {
   })
   
   output$wr_redd_reaches_map <- renderLeaflet({
+    
+    shiny::validate(errorClass = 'no-redds-alert', need(
+      nrow(rd_yr()) > 0, "No redds at risk."
+    ))
+    
     leaflet(reaches_to_show_in_map()) %>%
       addTiles() %>% 
       addPolylines(label=~Reach, weight = 5,

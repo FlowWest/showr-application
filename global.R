@@ -182,7 +182,23 @@ daily_temps <- temp_data %>%
   group_by(cdec_gage = location_id, date = as_date(datetime)) %>% 
   summarise(
     daily_mean = mean(parameter_value, na.rm = TRUE)
-  ) %>% ungroup()
+  ) %>% ungroup() %>% 
+  mutate(temp_type="actual")
+
+max_daily_temp <- max(daily_temps$date, na.rm = TRUE)
+
+model_temp_to_append <- model_temps %>% filter(datetime > max_daily_temp) %>% 
+  transmute(
+    date = datetime,
+    cdec_gage = location_id,
+    daily_mean = temp_50, 
+    temp_type="model"
+  )
+
+daily_temps <- bind_rows(
+  daily_temps,
+  model_temp_to_append
+)
 
 ### NO TEMPERATURE DATA BEFORE 2010!!!!
 rd <- redd_data %>%
@@ -191,17 +207,16 @@ rd <- redd_data %>%
   rowwise() %>% 
   do(
     tibble(
-      date = seq(.$date, estimate_emergence(.$date, .$location) -1, by="day"), 
+      date = seq(.$date, estimate_emergence(.$date, .$location) -1, by="day"), # this give a sequence from the seed day to the estiamted emergence value
       seed_day = .$date,
       location = .$location, 
-      counts = .$counts,
+      counts = .$counts, # how many redds will exist in the water for this time
       redd_id = .$redd_id
     )
   ) %>% ungroup() %>% 
   mutate(cdec_gage = redd_cdec_lookup[location], 
          location = factor(location, levels = unique(redd_data$location))) %>%
   left_join(daily_temps)
-
 
 
 make_estimated_diversion <- function(year) {
