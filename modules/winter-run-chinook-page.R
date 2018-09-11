@@ -144,7 +144,7 @@ winter_run_server <- function(input, output, session, g_date) {
                              location, "<br>", 
                              total), 
               hoverinfo = "text", 
-              key = ~location) %>%
+              key = ~location, source = "redd_presence_plot") %>%
       layout(legend = list(orientation = 'h'), showlegend = TRUE, 
              xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
              barmode='stack')
@@ -207,7 +207,7 @@ winter_run_server <- function(input, output, session, g_date) {
   })
   
   hovered_reach <- reactive({
-    subset(redd_reach, Reach == event_data("plotly_hover")$key)
+    subset(redd_reach, Reach == event_data("plotly_hover", source = "redd_presence_plot")$key)
   })
   
   observe({

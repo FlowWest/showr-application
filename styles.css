@@ -306,8 +306,23 @@ label {
   border-radius: 10px;
 }
 
+.dash_help {
+      border-radius: 15px;
+      color: #ffffff;
+    background-color: #7a9ec5;
+    border-color: #7a9ec5;
+}
+
+.details_button {
+color: #ffffff;
+    background-color: #79ab69;
+    border-color: #79ab69;
+    border-radius: 15px;
+    margin-right: 9px;
+}
 
 #app-global_date > input.form-control.shinyjs-resettable {
   border-radius: 10px;
   font-size: 20px;
 }
+

@@ -48,32 +48,49 @@ dashboardUI <- function(id){
                                          min = "2010-01-01", 
                                          max = (today(tzone = "America/Los_Angeles")), 
                                          value = (today(tzone = "America/Los_Angeles")), 
-                                         width = "135px")
-                 # date_button = dropdownButton(
-                 #   tags$h4("Custom date"),
-                 #   dateInput(ns("global_date"), label = "Select Date", 
-                 #             min = "2010-01-01", max = (today(tzone = "America/Los_Angeles")), value = (today(tzone = "America/Los_Angeles")), 
-                 #             width = "150px"),
-                 #   circle = TRUE, status = "info", icon = icon("calendar"), width = "400px",
-                 #   tooltip = tooltipOptions(title = "set custom date")
-                 # )
+                                         width = "135px"), 
+                 help_me_button = actionButton(ns("dashboard_help_me"), label=NULL,
+                                               icon = icon("question"), 
+                                               class = "btn-sm dash_help btn-primary"), 
+                 temp_go_to_details_button = actionButton(ns("go_to_temp_details"), 
+                                                          label = "details",
+                                                          icon = icon("arrow-right"), 
+                                                          class = "btn-xs details_button btn-success pull-right"),
+                 storage_go_to_details_button = actionButton(ns("go_to_storage_details"), 
+                                                          label = "plot",
+                                                          icon = icon("line-chart"), 
+                                                          class = "btn-xs details_button btn-success pull-right"),
+                 flow_go_to_details_button = actionButton(ns("go_to_flow_details"), 
+                                                          label = NULL,
+                                                          icon = icon("arrow-right"), 
+                                                          class = "btn-xs details_button btn-success pull-right"),
+                 chinook_go_to_details_button = actionButton(ns("go_to_chinook_details"), 
+                                                          label = NULL,
+                                                          icon = icon("arrow-right"), 
+                                                          class = "btn-xs details_button btn-success pull-right")
     ))
 }
 
 
-dashboard_server <- function(input, output, session, g_date) {
+dashboard_server <- function(input, output, session, g_date, x) {
   ns <- session$ns
+  
+  starting_date <- today(tzone = "America/Los_Angeles")
+  home_year <- reactive({ lubridate::year(g_date()) })
+  date_last_year <- reactive({ `year<-`(g_date(), home_year()-1)})
   
   observeEvent(input$jump_to_last_year, {
     if (input$jump_to_last_year %% 2 == 0) {
-      updateActionButton(session, inputId = "jump_to_last_year", label = "last year")    
+      updateDateInput(session, "global_date", value = starting_date)
+      updateActionButton(session, inputId = "jump_to_last_year", label = "last year") # when reset it clicked  
     } else {
-      updateActionButton(session, inputId = "jump_to_last_year", label = "reset")    
+      updateDateInput(session, "global_date", value = date_last_year())
+      updateActionButton(session, inputId = "jump_to_last_year", label = "reset") # when last year is clicked 
       
     }
   })
   
-  home_year <- reactive({ lubridate::year(g_date()) })
+  
   
   # Reservoir Metrics ----------------------------------------------------------
   selected_shasta_storage <- reactive({
@@ -633,6 +650,28 @@ dashboard_server <- function(input, output, session, g_date) {
       ), 
       easyClose = TRUE
     ))
+  })
+  
+  observeEvent(input$dashboard_help_me, {
+    showModal(modalDialog(
+      title = "Welcome to the SHOWR Dash!",
+      tagList(
+        tags$h5("Quickly navigate through historical data"), 
+        tags$img(src="dash-help-dates.gif"), 
+        tags$hr(),
+        tags$h5("Be alert for concerning river temperatures"), 
+        tags$img(src="temp-alerts.gif",width= "670px"), 
+        tags$hr()
+        ),
+      easyClose = TRUE, 
+      size = "l"
+    ))
+  })
+  
+  # go to details pages 
+  observeEvent(input$go_to_temp_details, {
+    cat("Hey you for sure clicked on the temp details button!!!")
+    updateNavbarPage(x, inputId = "showrapp", selected = "temp_tab")
   })
 }
 

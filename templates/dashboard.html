@@ -12,6 +12,9 @@
     <div style="display: inline-block;">
       {{ last_week_button }}
     </div>
+    <div style="display: inline-block;">
+      {{ help_me_button }}
+    </div>
   </div>
 </div>
 <hr>
@@ -23,6 +26,7 @@
           <div class="panel-heading">
             <h3 class="panel-title">Shasta Operations
               {{help_me_with_storage}}
+              {{ storage_go_to_details_button }}
             </h3>
           </div>
           <ul class="list-group">
@@ -47,6 +51,8 @@
           <div class="panel-heading">
             <h3 class="panel-title">River Temperature
               {{help_me_with_temps}}
+              {{ temp_go_to_details_button }}
+              
             </h3>
           </div>
           <ul class="list-group">
@@ -78,6 +84,7 @@
           <div class="panel-heading">
             <h3 class="panel-title">Flow
               {{help_me_with_flows}}
+              {{ flow_go_to_details_button }}
             </h3>
           </div>
           <ul class="list-group">
@@ -101,6 +108,7 @@
         <div class="panel-heading">
           <h3 class="panel-title">Chinook Activity
             {{help_me_with_chinook_activity}}
+            {{ chinook_go_to_details_button }}
           </h3>
         </div>
         <ul class="list-group">
