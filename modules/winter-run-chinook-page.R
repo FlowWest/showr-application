@@ -145,7 +145,8 @@ winter_run_server <- function(input, output, session, g_date) {
       p <- p %>% add_segments(
         data=filter(rd_yr(), date == Sys.Date()),
         x=~date, xend = ~date, y = 0, yend = ~sum(total),
-        line=list(color="#7c247f", width=4), name="today", showlegend=FALSE)  
+        line=list(color="#7c247f", width=4), name="today", showlegend=FALSE, 
+        hoverinfo = "text", text="Today!")  
     }
     p <- p %>% add_bars(data=rd_yr(), 
                x = ~date, y = ~total, color = ~location, 
