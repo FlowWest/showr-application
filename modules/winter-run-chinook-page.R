@@ -138,8 +138,17 @@ winter_run_server <- function(input, output, session, g_date) {
       nrow(rd_yr()) > 0, "No redds at risk."
     ))
     
-    p <- rd_yr() %>%    
-      plot_ly(x = ~date, y = ~total, color = ~location, type='bar', 
+    p <- rd_yr() %>%
+      plot_ly(source="redd_presence_plot") 
+    
+    if (input$wr_select_year == 2018) {
+      p <- p %>% add_segments(
+        data=filter(rd_yr(), date == Sys.Date()),
+        x=~date, xend = ~date, y = 0, yend = ~sum(total),
+        line=list(color="#7c247f", width=4), name="today", showlegend=FALSE)  
+    }
+    p <- p %>% add_bars(data=rd_yr(), 
+               x = ~date, y = ~total, color = ~location, 
               text = ~paste0(date, "<br>", 
                              location, "<br>", 
                              total), 
