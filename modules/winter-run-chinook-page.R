@@ -139,7 +139,9 @@ winter_run_server <- function(input, output, session, g_date) {
   })
   
   output$winter_run_temp_plot <- renderPlotly({
-    p <- plot_ly() 
+    p <- plot_ly()  %>% 
+      add_lines(data=wr_temp_data(), x=~date, y=~daily_mean, 
+                color=~cdec_gage, inherit = FALSE, colors="Accent")
     
     if (input$wr_select_year == 2018) {
       p <- p %>% 
@@ -150,13 +152,13 @@ winter_run_server <- function(input, output, session, g_date) {
           y=~min(daily_mean)-5, 
           yend=~max(daily_mean)+5, showlegend=FALSE,
           line=list(color="#7c247f", width=4))
-        
+      
     }
     
-    p %>%   add_lines(data=wr_temp_data(), x=~date, y=~daily_mean, 
-                color=~cdec_gage, colors="Dark2") %>% 
+     p %>%  
       layout(xaxis=list(title=""), yaxis=list(title="daily mean temperature (F)"))
   })
+  
   
   # this whole thing needs some refactoring
   output$winter_run_plot <- renderPlotly({
@@ -175,12 +177,12 @@ winter_run_server <- function(input, output, session, g_date) {
         hoverinfo = "text", text="Today!")  
     }
     p <- p %>% add_bars(data=rd_yr(), 
-               x = ~date, y = ~total, color = ~location, 
-              text = ~paste0(date, "<br>", 
-                             location, "<br>", 
-                             total), 
-              hoverinfo = "text", 
-              key = ~location, source = "redd_presence_plot") %>%
+                        x = ~date, y = ~total, color = ~location, 
+                        text = ~paste0(date, "<br>", 
+                                       location, "<br>", 
+                                       total), 
+                        hoverinfo = "text", 
+                        key = ~location) %>%
       layout(legend = list(orientation = 'h'), showlegend = TRUE, 
              xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
              barmode='stack')
@@ -257,10 +259,8 @@ winter_run_server <- function(input, output, session, g_date) {
         fillOpacity = .9, 
         fillColor = "#7a3d69")
     
+    
   })
-  
-  
-  
   
   
 }
