@@ -36,14 +36,6 @@ dashboardUI <- function(id){
                                                               icon = icon("question-circle")),
                  shasta_elevation_plot = plotlyOutput(ns("elevation_plot"), height = '500px'),
                  chinook_summary_plot = plotlyOutput(ns("chinook_summary_plot"), height = '500px'),
-                 # date_button = dateInput(ns("global_date"), label = "Select Date", 
-                 #                         min = "2010-01-01", max = (today(tzone = "America/Los_Angeles")), value = (today(tzone = "America/Los_Angeles")), 
-                 #                         width = "150px"), 
-                 # last_year_button = actionButton(ns("jump_to_last_year"), label = NULL, 
-                 #                                 class = "btn-sm date_jump", 
-                 #                                 icon = icon("reply")),
-                 # last_week_button = actionButton(ns("jump_to_similar_year"), label = "similar water year", 
-                 #                                 class = "btn-sm date_jump"), 
                  date_button = dateInput(ns("global_date"), 
                                          label = NULL, 
                                          min = "2010-01-01", 
@@ -58,29 +50,30 @@ dashboardUI <- function(id){
                                                           icon = icon("line-chart"), 
                                                           class = "btn-xs details_button btn-success pull-right"),
                  storage_go_to_details_button = actionButton(ns("go_to_storage_details"), 
-                                                          label = "plot",
-                                                          icon = icon("line-chart"), 
-                                                          class = "btn-xs details_button btn-success pull-right"),
+                                                             label = "plot",
+                                                             icon = icon("line-chart"), 
+                                                             class = "btn-xs details_button btn-success pull-right"),
                  flow_go_to_details_button = actionButton(ns("go_to_flow_details"), 
                                                           label = NULL,
                                                           icon = icon("arrow-right"), 
                                                           class = "btn-xs details_button btn-success pull-right"),
                  chinook_go_to_details_button = actionButton(ns("go_to_chinook_details"), 
-                                                          label = NULL,
-                                                          icon = icon("arrow-right"), 
-                                                          class = "btn-xs details_button btn-success pull-right"),
+                                                             label = NULL,
+                                                             icon = icon("arrow-right"), 
+                                                             class = "btn-xs details_button btn-success pull-right"),
                  jump_to_year_button = dropdownButton(
                    actionButton(ns("jump_to_2016"), 
-                                label = "2016 (below normal)",
-                                icon = icon("arrow-right"), 
+                                label = "Below Normal (2016)",
                                 class = "btn-sm jump_year_button btn-success"),
                    actionButton(ns("jump_to_2015"), 
-                                label = "2015 (dry)",
-                                icon = icon("arrow-right"), 
+                                label = "Dry (2015)",
                                 class = "btn-sm jump_year_button btn-success"),
                    circle = FALSE, status = "info", icon = icon("calendar-plus-o"), width = "300px",
+                   actionButton(ns("jump_to_2017"), 
+                                label = "Wet (2017)",
+                                class = "btn-sm jump_year_button btn-success"),
                    tooltip = FALSE, label = "Toggle year",
-                   size = "sm", class="jump_year_selector"
+                   size = "sm"
                  )
     ))
 }
@@ -515,7 +508,7 @@ dashboard_server <- function(input, output, session, g_date, x) {
                   ),
                   hoverinfo = "text")
     }
-      p %>%
+    p %>%
       add_lines(data=shasta_spread_data, 
                 x = ~datetime, y=~`94`, name = "Flood Conservation Max Storage", type = 'scatter', 
                 mode = 'lines', text = ~paste("<b>",datetime, "</b>",
@@ -688,7 +681,7 @@ dashboard_server <- function(input, output, session, g_date, x) {
         tags$h5("Be alert for concerning river temperatures"), 
         tags$img(src="temp-alerts.gif",width= "670px"), 
         tags$hr()
-        ),
+      ),
       easyClose = TRUE, 
       size = "l"
     ))

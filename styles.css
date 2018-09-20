@@ -341,9 +341,9 @@ color: #ffffff;
     /*margin-left: 9px;*/
 }
 
-.jump_year_button:active {
+.jump_year_button:active:hover {
 color: #ffffff;
-    background-color: #694e7c;
+    background-color: #342a3a;
     border-color: #694e7c;
     border-radius: 5px;
     width: 250px;
