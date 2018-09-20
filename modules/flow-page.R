@@ -75,7 +75,7 @@ flow_UI <- function(id) {
          fluidRow(
            # plot
            column(width = 12, class = "col-md-9", 
-                  plotlyOutput(ns("flow_plot"))), 
+                  plotlyOutput(ns("flow_plot"), height = "500px")), 
            column(width = 12, 
                   class = "col-md-3", 
                   uiOutput(ns("table_title")),
@@ -260,7 +260,8 @@ flow_server <- function(input, output, session, g_date) {
     base_plot %>% 
       layout(xaxis=list(title=""), 
              yaxis=list(title="flow (cfs)"), 
-             showlegend = TRUE)
+             showlegend = TRUE, 
+             legend = list(orientation = 'h'))
     
   })    
   

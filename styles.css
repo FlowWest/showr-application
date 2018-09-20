@@ -317,12 +317,80 @@ label {
 color: #ffffff;
     background-color: #79ab69;
     border-color: #79ab69;
-    border-radius: 15px;
+    border-radius: 5px;
     margin-right: 9px;
+}
+
+.jump_year_button {
+color: #ffffff;
+    background-color: #694e7c;
+    border-color: #694e7c;
+    border-radius: 5px;
+    width: 250px;
+        margin-bottom: 5px;
+    /*margin-left: 9px;*/
+}
+
+.jump_year_button:hover {
+color: #ffffff;
+    background-color: #694e7c;
+    border-color: #694e7c;
+    border-radius: 5px;
+    width: 250px;
+        margin-bottom: 5px;
+    /*margin-left: 9px;*/
+}
+
+.jump_year_button:active {
+color: #ffffff;
+    background-color: #694e7c;
+    border-color: #694e7c;
+    border-radius: 5px;
+    width: 250px;
+        margin-bottom: 5px;
+    /*margin-left: 9px;*/
+}
+
+.jump_year_button:focus {
+color: #ffffff;
+    background-color: #694e7c;
+    border-color: #694e7c;
+    border-radius: 5px;
+    width: 250px;
+        margin-bottom: 5px;
+    /*margin-left: 9px;*/
 }
 
 #app-global_date > input.form-control.shinyjs-resettable {
   border-radius: 10px;
   font-size: 20px;
 }
+
+.jump_year_selector {
+  border-radius: 5px;
+  background-color: #593b6d;
+}
+
+
+.btn-sm {
+  border-radius: 5px;
+}
+
+.btn-md {
+  border-radius: 5px;
+}
+
+.btn-xs {
+  border-radius: 5px;
+}
+
+.btn {
+  border-radius: 5px;
+}
+
+
+
+
+
+
 

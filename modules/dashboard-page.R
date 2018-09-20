@@ -39,10 +39,11 @@ dashboardUI <- function(id){
                  # date_button = dateInput(ns("global_date"), label = "Select Date", 
                  #                         min = "2010-01-01", max = (today(tzone = "America/Los_Angeles")), value = (today(tzone = "America/Los_Angeles")), 
                  #                         width = "150px"), 
-                 last_year_button = actionButton(ns("jump_to_last_year"), label = "last year", 
-                                                 class = "btn-sm date_jump"),
-                 last_week_button = actionButton(ns("jump_to_last_week"), label = "similar water year", 
-                                                 class = "btn-sm date_jump"), 
+                 # last_year_button = actionButton(ns("jump_to_last_year"), label = NULL, 
+                 #                                 class = "btn-sm date_jump", 
+                 #                                 icon = icon("reply")),
+                 # last_week_button = actionButton(ns("jump_to_similar_year"), label = "similar water year", 
+                 #                                 class = "btn-sm date_jump"), 
                  date_button = dateInput(ns("global_date"), 
                                          label = NULL, 
                                          min = "2010-01-01", 
@@ -53,8 +54,8 @@ dashboardUI <- function(id){
                                                icon = icon("question"), 
                                                class = "btn-sm dash_help btn-primary"), 
                  temp_go_to_details_button = actionButton(ns("go_to_temp_details"), 
-                                                          label = "details",
-                                                          icon = icon("arrow-right"), 
+                                                          label = "plot",
+                                                          icon = icon("line-chart"), 
                                                           class = "btn-xs details_button btn-success pull-right"),
                  storage_go_to_details_button = actionButton(ns("go_to_storage_details"), 
                                                           label = "plot",
@@ -67,7 +68,20 @@ dashboardUI <- function(id){
                  chinook_go_to_details_button = actionButton(ns("go_to_chinook_details"), 
                                                           label = NULL,
                                                           icon = icon("arrow-right"), 
-                                                          class = "btn-xs details_button btn-success pull-right")
+                                                          class = "btn-xs details_button btn-success pull-right"),
+                 jump_to_year_button = dropdownButton(
+                   actionButton(ns("jump_to_2016"), 
+                                label = "2016 (below normal)",
+                                icon = icon("arrow-right"), 
+                                class = "btn-sm jump_year_button btn-success"),
+                   actionButton(ns("jump_to_2015"), 
+                                label = "2015 (dry)",
+                                icon = icon("arrow-right"), 
+                                class = "btn-sm jump_year_button btn-success"),
+                   circle = FALSE, status = "info", icon = icon("calendar-plus-o"), width = "300px",
+                   tooltip = FALSE, label = "Toggle year",
+                   size = "sm", class="jump_year_selector"
+                 )
     ))
 }
 
@@ -82,14 +96,26 @@ dashboard_server <- function(input, output, session, g_date, x) {
   observeEvent(input$jump_to_last_year, {
     if (input$jump_to_last_year %% 2 == 0) {
       updateDateInput(session, "global_date", value = starting_date)
-      updateActionButton(session, inputId = "jump_to_last_year", label = "last year") # when reset it clicked  
+      # updateActionButton(session, inputId = "jump_to_last_year", label = "last year") # when reset it clicked  
     } else {
       updateDateInput(session, "global_date", value = date_last_year())
-      updateActionButton(session, inputId = "jump_to_last_year", label = "reset") # when last year is clicked 
+      # updateActionButton(session, inputId = "jump_to_last_year", label = "reset") # when last year is clicked 
       
     }
   })
   
+  
+  # observeEvent(input$jump_to_similar_year, {
+  #   similar_year <- get_similar_year("")
+  #   if (input$jump_to_similar_year %% 2 == 0) {
+  #     updateDateInput(session, "global_date", value = starting_date)
+  #     updateActionButton(session, inputId = "jump_to_similar_year", label = "similar year") # when reset it clicked  
+  #   } else {
+  #     updateDateInput(session, "global_date", value = date_last_year())
+  #     updateActionButton(session, inputId = "jump_to_similar_year", label = "reset") # when last year is clicked 
+  #     
+  #   }
+  # })
   
   
   # Reservoir Metrics ----------------------------------------------------------
@@ -670,9 +696,55 @@ dashboard_server <- function(input, output, session, g_date, x) {
   
   # go to details pages 
   observeEvent(input$go_to_temp_details, {
-    cat("Hey you for sure clicked on the temp details button!!!")
+    showModal(modalDialog(
+      title = "Current Temperature Conditions", 
+      tagList(
+        radioButtons(ns("temp_modal_location_select"), label = NULL, inline = TRUE,
+                     choices = c("Keswick"="kwk", "Clear Creek"="ccr", "Balls Ferry"="bsf")),
+        plotlyOutput(ns("temp_modal_plot")), 
+        actionButton(ns("temp_modal_to_temp_page_button"), "Show me more")), 
+      size = "l", easyClose = TRUE
+    ))
+  })
+  
+  observeEvent(input$temp_modal_to_temp_page_button, {
     updateNavbarPage(x, inputId = "showrapp", selected = "temp_tab")
   })
+  
+  # go to details pages 
+  observeEvent(input$go_to_storage_details, {
+    showModal(modalDialog(
+      title = "Current Storage Conditions", 
+      tagList(plotlyOutput(ns("storage_modal_plot"))), 
+      size = "l"
+    ))
+  })
+  
+  output$temp_modal_plot <- renderPlotly({
+    plot_ly() %>% 
+      add_lines(data=filter(daily_temps_historical_min_max, 
+                            location_id == input$temp_modal_location_select, datetime>=Sys.Date()-90,
+                            datetime<=Sys.Date()), x=~datetime, y=~min_value, 
+                line=list(color='rgb(196, 196, 196)'), name="Historical Max", 
+                hoverinfo="text", text=~paste(min_value)) %>% 
+      add_lines(data=filter(daily_temps_historical_min_max, 
+                            location_id == input$temp_modal_location_select, datetime>=Sys.Date()-90,
+                            datetime<=Sys.Date()), x=~datetime, y=~max_value, 
+                line=list(color='rgb(196, 196, 196)'), name="Historical Min", 
+                hoverinfo="text", text=~paste(max_value)) %>% 
+      add_lines(data=filter(temp_compliance_points_daily_mean, location_id ==input$temp_modal_location_select, 
+                            datetime>=Sys.Date()-90),
+                x=~datetime, y=~parameter_value, 
+                line=list(color="black"), name=~location_id) %>% 
+      layout(xaxis=list(title=""), yaxis=list(title="Temperature (F)"))
+    
+  })
+  
+  output$storage_modal_plot <- renderPlotly({
+    mtcars %>% plot_ly(x=~mpg, y=~disp, type='scatter', mode='lines')
+  })
+  
+  
 }
 
 global_date <- function(input, output, session) {
