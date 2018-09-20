@@ -43,7 +43,8 @@ winter_run_UI <- function(id) {
              fluidRow(
                # plot
                column(width = 12, class="col-md-9", 
-                      plotlyOutput(ns("winter_run_plot"), height = "500px")), 
+                      plotlyOutput(ns("winter_run_plot"), height = "500px"), 
+                      plotlyOutput(ns("winter_run_temp_plot"), height = "200px")), 
                column(width = 12, class = "col-md-3", 
                       tags$h3('Number of Redds'),
                       tableOutput(ns("wr_table")), 
@@ -130,6 +131,17 @@ winter_run_server <- function(input, output, session, g_date) {
       filter(year(date) == input$wr_select_year) %>% 
       distinct(seed_day, location, .keep_all = TRUE)
     
+  })
+  
+  wr_temp_data <- reactive({
+    daily_temps %>%
+      filter(year(date) == input$wr_select_year, cdec_gage %in% c("kwk", "ccr", "bsf"))
+  })
+  
+  output$winter_run_temp_plot <- renderPlotly({
+    plot_ly() %>% 
+      add_lines(data=wr_temp_data(), x=~date, y=~daily_mean, 
+                color=~cdec_gage, linetype=~temp_type, colors="Dark2")
   })
   
   # this whole thing needs some refactoring
