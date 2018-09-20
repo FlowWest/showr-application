@@ -139,9 +139,23 @@ winter_run_server <- function(input, output, session, g_date) {
   })
   
   output$winter_run_temp_plot <- renderPlotly({
-    plot_ly() %>% 
-      add_lines(data=wr_temp_data(), x=~date, y=~daily_mean, 
-                color=~cdec_gage, linetype=~temp_type, colors="Dark2")
+    p <- plot_ly() 
+    
+    if (input$wr_select_year == 2018) {
+      p <- p %>% 
+        add_segments(
+          data=filter(wr_temp_data(), date==Sys.Date()), 
+          x=Sys.Date(), 
+          xend=Sys.Date(),
+          y=~min(daily_mean)-5, 
+          yend=~max(daily_mean)+5, showlegend=FALSE,
+          line=list(color="#7c247f", width=4))
+        
+    }
+    
+    p %>%   add_lines(data=wr_temp_data(), x=~date, y=~daily_mean, 
+                color=~cdec_gage, colors="Dark2") %>% 
+      layout(xaxis=list(title=""), yaxis=list(title="daily mean temperature (F)"))
   })
   
   # this whole thing needs some refactoring
