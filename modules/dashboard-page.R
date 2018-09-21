@@ -55,8 +55,8 @@ dashboardUI <- function(id){
                  #                                             icon = icon("line-chart"), 
                  #                                             class = "btn-xs details_button btn-success pull-right"),
                  flow_go_to_details_button = actionButton(ns("go_to_flow_details"), 
-                                                          label = NULL,
-                                                          icon = icon("arrow-right"), 
+                                                          label = "plot",
+                                                          icon = icon("line-chart"),
                                                           class = "btn-xs details_button btn-success pull-right"),
                  chinook_go_to_details_button = actionButton(ns("go_to_chinook_details"), 
                                                              label = NULL,
@@ -73,7 +73,7 @@ dashboardUI <- function(id){
                    actionButton(ns("jump_to_2017"), 
                                 label = "Wet (2017)",
                                 class = "btn-sm jump_year_button btn-success"),
-                   tooltip = FALSE, label = "Toggle year",
+                   tooltip = FALSE, label = "Select Water Year Type",
                    size = "sm"
                  )
     ))
@@ -735,9 +735,51 @@ dashboard_server <- function(input, output, session, g_date, x) {
     
   })
   
-  output$storage_modal_plot <- renderPlotly({
-    mtcars %>% plot_ly(x=~mpg, y=~disp, type='scatter', mode='lines')
+  
+  observeEvent(input$go_to_flow_details, {
+    showModal(modalDialog(
+      title = "Current Flow Conditions", 
+      tagList(
+        radioButtons(ns("flow_modal_location_select"), label = NULL, inline = TRUE,
+                     choices = c("Shasta Inflow"="sha", 
+                                 "Keswick Outflow"="kwk", 
+                                 "Wilkins Slough"="wlk")),
+        plotlyOutput(ns("flow_modal_plot")), 
+        actionButton(ns("flow_modal_to_flow_page_button"), "Show me more")), 
+      size = "l", easyClose = TRUE
+    ))
   })
+  
+  flow_daily_min_max <- reactive({
+    historical_daily_min_max_flows %>% 
+      mutate(
+        datetime = ymd(paste(year(g_date()), m, d, sep = "/"))
+      ) %>% 
+      filter(
+        location_id == input$flow_modal_location_select,
+        datetime <= g_date(), 
+        datetime >= g_date()-60)
+  })
+  
+  output$flow_modal_plot <- renderPlotly({
+    
+    plot_ly() %>% 
+      add_lines(data=flow_daily_min_max(), 
+                x=~datetime, y=~min_value, 
+                line=list(color='rgb(196, 196, 196)'), name="Historical Mean Max", 
+                hoverinfo="text", text=~paste(min_value)) %>% 
+      add_lines(data=flow_daily_min_max(),
+                x=~datetime, y=~max_value, 
+                line=list(color='rgb(196, 196, 196)'), name="Historical Mean Min", 
+                hoverinfo="text", text=~paste(max_value)) %>% 
+      add_lines(data=filter(flow_data_daily_mean, location_id ==input$flow_modal_location_select, 
+                            datetime>=g_date()-60, datetime <= g_date()),
+                x=~datetime, y=~parameter_value, 
+                line=list(color="black"), name=~location_id) %>% 
+      layout(xaxis=list(title=""), yaxis=list(title="Flow (cfs)"))
+    
+  })
+  
   
   
 }

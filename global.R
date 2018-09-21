@@ -212,7 +212,7 @@ daily_temps <- bind_rows(
 )
 
 historical_daily_min_max_temps <- read_rds("data/temperatures/historical-daily-min-max.rds")
-
+historical_daily_min_max_flows <- read_rds("data/flows/flow_historical_daily_min_max.rds")
 
 ### NO TEMPERATURE DATA BEFORE 2010!!!!
 rd <- redd_data %>%
