@@ -165,20 +165,12 @@ winter_run_server <- function(input, output, session, g_date) {
     }
     
      p %>%  
-      layout(xaxis=list(title=""), yaxis=list(title="daily mean temperature (F)"))
+      layout(xaxis=list(title=""), yaxis=list(title="daily mean temperature (F)"), 
+             legend=list(orientation='h'))
   })
   
   daterange_from_presence_plot <- reactive({
     plotly::event_data("plotly_relayout", source="redd_presence_plot")
-  })
-  
-  observe({
-    cat(input$showrapp)
-    cat("the first value of the range:", ifelse(
-      is.null(daterange_from_presence_plot()$`xaxis.range[0]`), "its a null!",
-        as_date(daterange_from_presence_plot()$`xaxis.range[0]`)), "\n")
-    cat("the second value of the range:", daterange_from_presence_plot()$`xaxis.range[1]`, "\n")
-    
   })
   
   

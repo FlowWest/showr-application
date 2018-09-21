@@ -41,7 +41,8 @@ dashboardUI <- function(id){
                                          min = "2010-01-01", 
                                          max = (today(tzone = "America/Los_Angeles")), 
                                          value = (today(tzone = "America/Los_Angeles")), 
-                                         width = "135px"), 
+                                         width = "145px", 
+                                         format = "M d, yyyy"), 
                  help_me_button = actionButton(ns("dashboard_help_me"), label=NULL,
                                                icon = icon("question"), 
                                                class = "btn-sm dash_help btn-primary"), 
@@ -703,29 +704,31 @@ dashboard_server <- function(input, output, session, g_date, x) {
     updateNavbarPage(x, inputId = "showrapp", selected = "temp_tab")
   })
   
-  # go to details pages 
-  observeEvent(input$go_to_storage_details, {
-    showModal(modalDialog(
-      title = "Current Storage Conditions", 
-      tagList(plotlyOutput(ns("storage_modal_plot"))), 
-      size = "l"
-    ))
+  
+  temp_daily_min_max <- reactive({
+    historical_daily_min_max_temps %>% 
+      mutate(
+        datetime = ymd(paste(year(g_date()), m, d, sep = "/"))
+      ) %>% 
+      filter(
+        location_id == input$temp_modal_location_select,
+        datetime <= g_date(), 
+        datetime >= g_date()-60)
   })
   
   output$temp_modal_plot <- renderPlotly({
+    
     plot_ly() %>% 
-      add_lines(data=filter(daily_temps_historical_min_max, 
-                            location_id == input$temp_modal_location_select, datetime>=Sys.Date()-90,
-                            datetime<=Sys.Date()), x=~datetime, y=~min_value, 
+      add_lines(data=temp_daily_min_max(), 
+                x=~datetime, y=~min_value, 
                 line=list(color='rgb(196, 196, 196)'), name="Historical Max", 
                 hoverinfo="text", text=~paste(min_value)) %>% 
-      add_lines(data=filter(daily_temps_historical_min_max, 
-                            location_id == input$temp_modal_location_select, datetime>=Sys.Date()-90,
-                            datetime<=Sys.Date()), x=~datetime, y=~max_value, 
+      add_lines(data=temp_daily_min_max(),
+                x=~datetime, y=~max_value, 
                 line=list(color='rgb(196, 196, 196)'), name="Historical Min", 
                 hoverinfo="text", text=~paste(max_value)) %>% 
       add_lines(data=filter(temp_compliance_points_daily_mean, location_id ==input$temp_modal_location_select, 
-                            datetime>=Sys.Date()-90),
+                            datetime>=g_date()-60, datetime <= g_date()),
                 x=~datetime, y=~parameter_value, 
                 line=list(color="black"), name=~location_id) %>% 
       layout(xaxis=list(title=""), yaxis=list(title="Temperature (F)"))

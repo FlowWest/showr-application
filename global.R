@@ -177,6 +177,17 @@ get_year_classification <- function(y) {
   }
 }
 
+# a naive similar year picker just looks at the water year index
+get_similar_year <- function(yr) {
+  
+  as.numeric(c(
+    "BN" = 2016,
+    "W" = 2017,
+    "D" = 2014, 
+    "C" = 2013
+  )[class])
+}
+
 # for winter run emergence
 daily_temps <- temp_data %>% 
   group_by(cdec_gage = location_id, date = as_date(datetime)) %>% 
@@ -199,6 +210,9 @@ daily_temps <- bind_rows(
   daily_temps,
   model_temp_to_append
 )
+
+historical_daily_min_max_temps <- read_rds("data/temperatures/historical-daily-min-max.rds")
+
 
 ### NO TEMPERATURE DATA BEFORE 2010!!!!
 rd <- redd_data %>%
