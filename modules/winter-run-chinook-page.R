@@ -134,8 +134,17 @@ winter_run_server <- function(input, output, session, g_date) {
   })
   
   wr_temp_data <- reactive({
-    daily_temps %>%
+    d <- daily_temps %>%
       filter(year(date) == input$wr_select_year, cdec_gage %in% c("kwk", "ccr", "bsf"))
+    
+    if (is.null(daterange_from_presence_plot()$`xaxis.range[0]`)) {
+      return(d)
+    } else {
+      return(d %>% filter(
+        date >= as_date(daterange_from_presence_plot()$`xaxis.range[0]`), 
+        date <= as_date(daterange_from_presence_plot()$`xaxis.range[1]`)
+      ))
+    }
   })
   
   output$winter_run_temp_plot <- renderPlotly({
@@ -157,6 +166,19 @@ winter_run_server <- function(input, output, session, g_date) {
     
      p %>%  
       layout(xaxis=list(title=""), yaxis=list(title="daily mean temperature (F)"))
+  })
+  
+  daterange_from_presence_plot <- reactive({
+    plotly::event_data("plotly_relayout", source="redd_presence_plot")
+  })
+  
+  observe({
+    cat(input$showrapp)
+    cat("the first value of the range:", ifelse(
+      is.null(daterange_from_presence_plot()$`xaxis.range[0]`), "its a null!",
+        as_date(daterange_from_presence_plot()$`xaxis.range[0]`)), "\n")
+    cat("the second value of the range:", daterange_from_presence_plot()$`xaxis.range[1]`, "\n")
+    
   })
   
   

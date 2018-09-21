@@ -84,15 +84,14 @@ dashboard_server <- function(input, output, session, g_date, x) {
   
   starting_date <- today(tzone = "America/Los_Angeles")
   home_year <- reactive({ lubridate::year(g_date()) })
-  date_last_year <- reactive({ `year<-`(g_date(), home_year()-1)})
   
-  observeEvent(input$jump_to_last_year, {
-    if (input$jump_to_last_year %% 2 == 0) {
+  observeEvent(input$jump_to_2016, {
+    if (input$jump_to_2016 %% 2 == 0) {
       updateDateInput(session, "global_date", value = starting_date)
-      # updateActionButton(session, inputId = "jump_to_last_year", label = "last year") # when reset it clicked  
+      updateActionButton(session, inputId = "jump_to_2016", label = "Below Normal (2016)") # when reset it clicked
     } else {
-      updateDateInput(session, "global_date", value = date_last_year())
-      # updateActionButton(session, inputId = "jump_to_last_year", label = "reset") # when last year is clicked 
+      updateDateInput(session, "global_date", value = `year<-`(g_date(), 2016))
+      updateActionButton(session, inputId = "jump_to_2016", label = "reset") # when last year is clicked
       
     }
   })
