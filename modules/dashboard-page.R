@@ -109,7 +109,7 @@ dashboard_server <- function(input, output, session, g_date, x) {
   })
   
   observeEvent(input$jump_to_2017, {
-    if (input$jump_to_2015 %% 2 == 0) {
+    if (input$jump_to_2017 %% 2 == 0) {
       updateDateInput(session, "global_date", value = starting_date)
       updateActionButton(session, inputId = "jump_to_2017", label = "Wet (2017)") # when reset it clicked
     } else {
