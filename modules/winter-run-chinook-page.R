@@ -13,6 +13,8 @@ winter_run_UI <- function(id) {
                         tags$a("Winter Run Chinook", href="https://www.wildlife.ca.gov/Conservation/Fishes/Chinook-Salmon/Winter-run", target="_blank"),
                         "Salmon were listed as endangered under the California Endangered Species Act (CESA) and threatened under the Federal Endangered Species Act in 1989. Winter Run migrate between November and early August, and spawn in the upper mainstem Sacramento River from mid-April through August. Peak spawning typically occurs in June and July. The plot to the right shows the number and location (by river reach) of Winter Run redds mapped in the Upper Sacramento River. You can select “Show At Risk Redds” to view the redds potentially impacted by water temperatures exceeding the 56F compliance threshold."
                       ),
+                      tags$p("Emergence calculations are based on Chinook Linear (Zeug et al. 2012): Target ATUs 958 degree C days. More information at", 
+                             tags$a("SacPAS", href="http://www.cbr.washington.edu/sacramento/migration/", target="_blank")),
                       tags$hr(),
                       tags$h4("Download Data in View"),
                       downloadButton(ns("download_wr_data"), class="subpage-buttons"),
