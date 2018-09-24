@@ -1,6 +1,6 @@
 # Author: Emanuel
 # Details:
-# This file defines both the UI and server for the home page of showr.
+# This file defines both the UI and server for the dashboard page of showr.
 
 dashboardUI <- function(id){
   ns <- NS(id)
@@ -97,6 +97,27 @@ dashboard_server <- function(input, output, session, g_date, x) {
     }
   })
   
+  observeEvent(input$jump_to_2015, {
+    if (input$jump_to_2015 %% 2 == 0) {
+      updateDateInput(session, "global_date", value = starting_date)
+      updateActionButton(session, inputId = "jump_to_2015", label = "Dry (2015)") # when reset it clicked
+    } else {
+      updateDateInput(session, "global_date", value = `year<-`(g_date(), 2015))
+      updateActionButton(session, inputId = "jump_to_2015", label = "reset") # when last year is clicked
+      
+    }
+  })
+  
+  observeEvent(input$jump_to_2017, {
+    if (input$jump_to_2015 %% 2 == 0) {
+      updateDateInput(session, "global_date", value = starting_date)
+      updateActionButton(session, inputId = "jump_to_2017", label = "Wet (2017)") # when reset it clicked
+    } else {
+      updateDateInput(session, "global_date", value = `year<-`(g_date(), 2017))
+      updateActionButton(session, inputId = "jump_to_2017", label = "reset") # when last year is clicked
+      
+    }
+  })
   
   # observeEvent(input$jump_to_similar_year, {
   #   similar_year <- get_similar_year("")
