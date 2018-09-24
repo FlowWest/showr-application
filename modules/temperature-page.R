@@ -82,13 +82,13 @@ temp_page_server <- function(input, output, session, g_date) {
   station_choices_for_temp <- reactive({
     if (input$temp_summary_choice == "7DADM") {
       c("Keswick" = "kwk",
-      "Sac. River Hwy 44" = "sac",
+      # "Sac. River Hwy 44" = "sac",
       "Clear Creek" = "ccr",
       "Jellys Ferry" = "jlf",
       "Bend Bridge" = "bnd")
     } else {
       c("Keswick" = "kwk",
-      "Sac. River Hwy 44" = "sac",
+      # "Sac. River Hwy 44" = "sac",
       "Clear Creek" = "ccr",
       "Balls Ferry" = "bsf",
       "Jellys Ferry" = "jlf",
