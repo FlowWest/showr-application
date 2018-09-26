@@ -37,7 +37,7 @@ estimate_emergence <- function(spawn_date, redd_location) {
     current_atu <- atu %>% tail(1) %>% pull(atu) # store latest accumulated value
     current_date <- atu %>% tail(1) %>% pull(date)
     
-    if (length(current_atu) == 0) current_atu <- 0 
+    if (length(current_atu) == 0) current_atu <- 0 # cases where no atu 
     
     thresh <- 958 - current_atu # new thresh will be old thresh minus current atu
     
@@ -51,7 +51,8 @@ estimate_emergence <- function(spawn_date, redd_location) {
       head(1)
     
     # na indicates the model is unable to project that far in the future
-    # this usually means that the redd was observed TODAY
+    # this usually means that the redd was observed and its emergence is
+    # predicted to extend passed november
     if (nrow(model_estimated_emergence) == 0) {
       return(NA)
     } else{ 
@@ -62,6 +63,19 @@ estimate_emergence <- function(spawn_date, redd_location) {
     return(emergence %>% head(1) %>% pull(date))
   } 
 }
+
+# the redd hatching distribution 
+redd_hatching <- function(temp) {
+  
+}
+
+
+
+
+
+
+
+
 
 
 
