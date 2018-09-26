@@ -1,5 +1,4 @@
 config.yml
-_scratch/*
 packrat/*
 rsconnect/*
 .Rproj.user
