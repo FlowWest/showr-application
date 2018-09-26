@@ -58,17 +58,3 @@ rd_with_hatching <-
     hatching_day = date[which(flag == 1)],
     hatching_day_bool = date == hatching_day
     ) %>% ungroup()
-
-
-rd_with_hatching %>% 
-  plot_ly() %>%
-  add_bars(x=~date, y=~counts, color=~location) %>% 
-  layout(barmode='stack') %>% 
-  add_bars(x=~hatching_day, y=~counts, color=~location) 
-
-rd_with_hatching %>% 
-  plot_ly(x=~hatching_day, y=~counts, 
-          color=~location, 
-          type='bar')
-
-
