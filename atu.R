@@ -63,7 +63,3 @@ estimate_emergence <- function(spawn_date, redd_location) {
     return(emergence %>% head(1) %>% pull(date))
   } 
 }
-
-
-
-

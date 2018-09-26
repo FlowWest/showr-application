@@ -37,7 +37,8 @@ rd %>%
   plot_ly(x=~date, y=~counts, type='bar', color=~location) %>% 
   layout(barmode='stack') 
 
-rd_with_hatching <- rd %>% 
+# rd_with_hatching <- 
+rd %>% 
   filter(year(date) == 2018) %>% 
   group_by(redd_id) %>% 
   mutate(hatching_devel = redd_hatching(daily_mean), 
@@ -49,12 +50,16 @@ rd_with_hatching <- rd %>%
     counts, 
     exp(hatching_devel),
     hatching_accum, 
-    hatching_day = ifelse(abs(hatching_accum-100) < 5, TRUE, FALSE)) %>% 
+    hatching_day = hatching_accum > 100) %>% 
   ungroup() %>% 
-  group_by(date) %>% 
-  summarise(
-    active_hatching = sum(hatching_day)
+  group_by(redd_id) %>% 
+  mutate(
+    flag = cumsum(hatching_day), 
+    hatching_day = date[which(flag == 1)]
   )
+
+
+
 
 
 # redd counts UP TO hatching stage
@@ -73,8 +78,6 @@ plot_ly(data=filter(rd, year(date) == 2018),
   add_lines(data=rd_up_to_hatching %>% group_by(date) %>% summarise(counts=sum(counts)),
             x=~date, y=~counts, inherit = FALSE) %>% 
   layout(barmode='stack')
-
-
 
 
 
