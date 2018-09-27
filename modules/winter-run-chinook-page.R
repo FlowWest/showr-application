@@ -33,14 +33,16 @@ winter_run_UI <- function(id) {
                column(width = 12, class="col-md-2", 
                       selectInput(ns("wr_select_year"), label = "Select a Year", 
                                   choices = 2010:2018, selected = 2018)),
-               column(width = 12, class="col-md-4", 
+               column(width = 12, class="col-md-2", 
                       tags$div(style = "display:inline-block",
                                checkboxInput(ns("wr_show_temp_danger"), 
                                              label = "Show at risk redds"), 
                                checkboxInput(ns("wr_show_spawn_dates"), 
                                              label = "Plot by spawn dates"))), 
                column(width = 12, class = "col-md-6", 
-                      tags$div(style="display:inline-block", 
+                      tags$div(style="display:inline-block",
+                               checkboxInput(ns("wr_show_by_hatching"),
+                                             label = "Plot by Hatching"),
                                uiOutput(ns("wr_select_spawn_data_ui"))))),
              fluidRow(
                # plot
