@@ -22,6 +22,11 @@ chinook_hatch <- function(temp) {
   log(0.08646) + (1.23473 * log(t + 2.26721)) 
 }
 
+redd_hatching <- function(temp) {
+  log(0.08646) + (1.23473 * log(temp + 2.26721)) 
+}
+
+
 rd %>% 
   filter(year(date) == 2018) %>% 
   group_by(redd_id) %>% 
@@ -48,7 +53,6 @@ rd_with_hatching <-
     seed_day, 
     location, 
     counts, 
-    exp(hatching_devel),
     hatching_accum, 
     hatching_day = hatching_accum > 100) %>% 
   ungroup() %>% 
@@ -56,5 +60,21 @@ rd_with_hatching <-
   mutate(
     flag = cumsum(hatching_day), 
     hatching_day = date[which(flag == 1)],
-    hatching_day_bool = date == hatching_day
+    hatching_day_bool = date == hatching_day,
+    has_hatched = date >= hatching_day
     ) %>% ungroup()
+
+rd_with_hatching %>% 
+  plot_ly() %>% 
+  add_bars(x=~date, y=~counts, opacity=~as.numeric(factor(location))) %>% 
+  layout(barmode='stack')
+
+
+rd_with_hatching %>% 
+  plot_ly(x=~date, y=~counts, color=~has_hatched, type='bar', 
+          opacity=~has_hatched) %>% 
+  layout(barmode="stack")
+
+
+
+
