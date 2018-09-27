@@ -1,9 +1,7 @@
 # functions for automating the calculations of atu's and redd emergence 
-
 get_gage_location <- function(redd_location) {
   as.character(redd_cdec_lookup[redd_location])
 }
-
 
 # given a date of observation and the location of it, we can estiamte emergence 
 # using Accumulated Temperature Units

@@ -39,12 +39,14 @@ winter_run_UI <- function(id) {
                #                               label = "Show at risk redds"), 
                #                 checkboxInput(ns("wr_show_spawn_dates"), 
                #                               label = "Plot by spawn dates"))), 
-               column(width = 12, class = "col-md-6", 
+               column(width = 12, class = "col-md-1", 
                       tags$div(style="display:inline-block",
                                radioButtons(ns("wr_show_plot_by"),
                                              label = "Plot by", 
                                              choices = c("Reach", "Spawn Date", "Hatch Date")),
-                               uiOutput(ns("wr_select_spawn_data_ui"))))),
+                               uiOutput(ns("wr_select_spawn_data_ui")))), 
+               column(width = 12, class = "col-md-4", 
+                      uiOutput(ns("wr_help_message")))),
              fluidRow(
                # plot
                column(width = 12, class="col-md-9", 
@@ -185,6 +187,20 @@ winter_run_server <- function(input, output, session, g_date) {
     plotly::event_data("plotly_relayout", source="redd_presence_plot")
   })
   
+  output$wr_help_message <- renderUI({
+    switch (input$wr_show_plot_by,
+      "Reach" = helpText("Plotting by reach shows the number of non-expired redds in a reach.
+                         The reaches are seperated by color, the height shows the number of 
+                         redds within the reach. The overall height of the plot shows total
+                         redds in Upper Sacramento."),
+      "Spawn Date" = helpText("Plotting by spawn date shows the trajectory of a redd by 
+                              the day it was mapped on the Sacramento River. You should
+                              expect early redds to expire first."),
+      "Hatch Date" = helpText("Plotting by hatch date shows the distribution of non-expired
+                              redds, colored by whether they have hatched or not. You can 
+                              think of the.")
+    )
+  })
   
   # this whole thing needs some refactoring
   output$winter_run_plot <- renderPlotly({
@@ -246,7 +262,11 @@ winter_run_server <- function(input, output, session, g_date) {
       "Hatch Date" = {
         p <- rd_hatching() %>% 
           plot_ly(x=~date, y=~counts, color=~has_hatched, type='bar', 
-                  opacity=~has_hatched, 
+                  opacity=~has_hatched,
+                  text = ~paste0(date, "<br>", 
+                                 location, "<br>", 
+                                 counts), 
+                  hoverinfo = "text",
                   source="redd_presence_plot", key = ~location) %>% 
           layout(legend = list(orientation = 'h'), showlegend = TRUE, 
                  xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
