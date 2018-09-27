@@ -41,8 +41,9 @@ winter_run_UI <- function(id) {
                                              label = "Plot by spawn dates"))), 
                column(width = 12, class = "col-md-6", 
                       tags$div(style="display:inline-block",
-                               checkboxInput(ns("wr_show_by_hatching"),
-                                             label = "Plot by Hatching"),
+                               radioButtons(ns("wr_show_plot_by"),
+                                             label = "Plot by", 
+                                             choices = c("Reach", "Spawn Date", "Hatch Date")),
                                uiOutput(ns("wr_select_spawn_data_ui"))))),
              fluidRow(
                # plot
@@ -130,6 +131,30 @@ winter_run_server <- function(input, output, session, g_date) {
     }
   })
   
+  rd_hatching <- reactive({
+      rd %>% 
+      filter(year(date) == input$wr_select_year) %>% 
+      group_by(redd_id) %>% 
+      mutate(hatching_devel = redd_hatching(daily_mean), 
+             hatching_accum = cumsum(hatching_devel)) %>%
+      transmute(
+        date,
+        seed_day, 
+        location, 
+        counts, 
+        hatching_accum, 
+        hatching_day = hatching_accum > 100) %>% 
+      ungroup() %>% 
+      group_by(redd_id) %>% 
+      mutate(
+        flag = cumsum(hatching_day), 
+        hatching_day = date[which(flag == 1)],
+        hatching_day_bool = date == hatching_day,
+        has_hatched = ifelse(date >= hatching_day, "Has Hatched", "Not Hatched")
+      ) %>% ungroup()
+    
+  })
+  
   spawn_dates_in_year <- reactive({
     rd %>% 
       filter(year(date) == input$wr_select_year) %>% 
@@ -184,49 +209,74 @@ winter_run_server <- function(input, output, session, g_date) {
       nrow(rd_yr()) > 0, "No redds at risk."
     ))
     
-    p <- rd_yr() %>%
-      plot_ly(source="redd_presence_plot") 
-    
-    if (input$wr_select_year == 2018) {
-      p <- p %>% add_segments(
-        data=filter(rd_yr(), date == Sys.Date()),
-        x=~date, xend = ~date, y = 0, yend = ~sum(total),
-        line=list(color="#7c247f", width=4), name="today", showlegend=FALSE, 
-        hoverinfo = "text", text="Today!")  
-    }
-    p <- p %>% add_bars(data=rd_yr(), 
-                        x = ~date, y = ~total, color = ~location, 
-                        text = ~paste0(date, "<br>", 
-                                       location, "<br>", 
-                                       total), 
-                        hoverinfo = "text", 
-                        key = ~location) %>%
-      layout(legend = list(orientation = 'h'), showlegend = TRUE, 
-             xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
-             barmode='stack')
-    
-    if (input$wr_show_spawn_dates) {
-      req(input$wr_select_spawn_date)
-      if (input$wr_select_spawn_date == "all") {
-        p <- rd_yr() %>%    
-          plot_ly(x = ~date, y = ~total, color = ~as.character(seed_day), type='bar', 
-                  text = ~paste0(date, "<br>", 
-                                 location, "<br>", 
-                                 total), 
-                  hoverinfo = "text", colors = "Dark2")  %>%
+    # giant switch to control what plot to show
+    switch (input$wr_show_plot_by,
+      "Reach" = {
+        p <- rd_yr() %>%
+          plot_ly(source="redd_presence_plot") 
+        
+        if (input$wr_select_year == 2018) {
+          p <- p %>% add_segments(
+            data=filter(rd_yr(), date == Sys.Date()),
+            x=~date, xend = ~date, y = 0, yend = ~sum(total),
+            line=list(color="#7c247f", width=4), name="today", showlegend=FALSE, 
+            hoverinfo = "text", text="Today!")  
+        }
+        
+        p <- p %>% add_bars(data=rd_yr(), 
+                            x = ~date, y = ~total, color = ~location, 
+                            text = ~paste0(date, "<br>", 
+                                           location, "<br>", 
+                                           total), 
+                            hoverinfo = "text", 
+                            key = ~location) %>%
           layout(legend = list(orientation = 'h'), showlegend = TRUE, 
                  xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
                  barmode='stack')
-      } else {
-        p <- redd_data %>% 
-          filter(date == input$wr_select_spawn_date, 
-                 counts > 0) %>% 
-          plot_ly(x=~location, y=~counts, type='bar', color=~location)
+        p
+        
+      }, 
+      "Spawn Date" = {
+        p <- rd_yr() %>% 
+          plot_ly(x = ~date, y = ~total, 
+                  color = ~as.character(seed_day), type='bar', 
+                  text = ~paste0(date, "<br>", 
+                                 location, "<br>", 
+                                 total), 
+                  hoverinfo = "text", colors = "Dark2", 
+                  source="redd_presence_plot")  %>%
+          layout(legend = list(orientation = 'h'), showlegend = TRUE, 
+                 xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
+                 barmode='stack')
+        
+        if (input$wr_select_year == 2018) {
+          p <- p %>% add_segments(
+            data=filter(rd_yr(), date == Sys.Date()),
+            x=~date, xend = ~date, y = 0, yend = ~sum(total),
+            line=list(color="#7c247f", width=4), name="today", showlegend=FALSE, 
+            hoverinfo = "text", text="Today!")  
+        }
+        
+        p
+        
+      }, 
+      "Hatch Date" = {
+        p <- rd_hatching() %>% 
+          plot_ly(x=~date, y=~counts, color=~has_hatched, type='bar', 
+                  opacity=~has_hatched) %>% 
+          layout(barmode="stack")
+        
+        if (input$wr_select_year == 2018) {
+          p <- p %>% add_segments(
+            data=filter(rd_hatching(), date == Sys.Date()),
+            x=~date, xend = ~date, y = 0, yend = ~sum(counts),
+            line=list(color="#7c247f", width=4), name="today", showlegend=FALSE, 
+            hoverinfo = "text", text="Today!")  
+        }
+        
+        p
       }
-      
-    }
-    
-    return(p)
+    )
     
   })
   
