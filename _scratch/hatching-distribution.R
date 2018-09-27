@@ -44,7 +44,7 @@ rd %>%
 
 rd_with_hatching <-
   rd %>% 
-  filter(year(date) == 2018) %>% 
+  filter(year(date) == 2016) %>% 
   group_by(redd_id) %>% 
   mutate(hatching_devel = redd_hatching(daily_mean), 
          hatching_accum = cumsum(hatching_devel)) %>%
@@ -64,10 +64,6 @@ rd_with_hatching <-
     has_hatched = date >= hatching_day
     ) %>% ungroup()
 
-rd_with_hatching %>% 
-  plot_ly() %>% 
-  add_bars(x=~date, y=~counts, opacity=~as.numeric(factor(location))) %>% 
-  layout(barmode='stack')
 
 
 rd_with_hatching %>% 
