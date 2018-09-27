@@ -33,12 +33,12 @@ winter_run_UI <- function(id) {
                column(width = 12, class="col-md-2", 
                       selectInput(ns("wr_select_year"), label = "Select a Year", 
                                   choices = 2010:2018, selected = 2018)),
-               column(width = 12, class="col-md-2", 
-                      tags$div(style = "display:inline-block",
-                               checkboxInput(ns("wr_show_temp_danger"), 
-                                             label = "Show at risk redds"), 
-                               checkboxInput(ns("wr_show_spawn_dates"), 
-                                             label = "Plot by spawn dates"))), 
+               # column(width = 12, class="col-md-2", 
+               #        tags$div(style = "display:inline-block",
+               #                 checkboxInput(ns("wr_show_temp_danger"), 
+               #                               label = "Show at risk redds"), 
+               #                 checkboxInput(ns("wr_show_spawn_dates"), 
+               #                               label = "Plot by spawn dates"))), 
                column(width = 12, class = "col-md-6", 
                       tags$div(style="display:inline-block",
                                radioButtons(ns("wr_show_plot_by"),
@@ -92,15 +92,6 @@ winter_run_server <- function(input, output, session, g_date) {
       filter(date == lubridate::today(tzone="US/Pacific"))
   })
   
-  output$wr_select_spawn_data_ui <- renderUI({
-    spawn_choices <- as.Date.character(pull(distinct(spawn_dates_in_year(), seed_day)))
-    if (input$wr_show_spawn_dates) {
-      selectInput(ns("wr_select_spawn_date"), "Select a spawn date", 
-                  choices = list("All" = "all", "Spawn Date" = spawn_choices))
-    } else {
-      return(NULL)
-    }
-  })
   
   # not working correctly
   output$wr_table <- renderTable(
@@ -116,19 +107,11 @@ winter_run_server <- function(input, output, session, g_date) {
   
   
   rd_yr <- reactive({
-    if (input$wr_show_temp_danger) {
-      rd %>% 
-        filter(year(date) == input$wr_select_year, daily_mean > 56) %>%  
-        group_by(location, seed_day, date) %>% 
-        summarise(total = sum(counts)) %>% 
-        ungroup()
-    } else {
       rd %>% 
         filter(year(date) == input$wr_select_year) %>%  
         group_by(location, seed_day, date) %>% 
         summarise(total = sum(counts)) %>% 
         ungroup()
-    }
   })
   
   rd_hatching <- reactive({
@@ -244,7 +227,7 @@ winter_run_server <- function(input, output, session, g_date) {
                                  location, "<br>", 
                                  total), 
                   hoverinfo = "text", colors = "Dark2", 
-                  source="redd_presence_plot")  %>%
+                  source="redd_presence_plot", key = ~location)  %>%
           layout(legend = list(orientation = 'h'), showlegend = TRUE, 
                  xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
                  barmode='stack')
@@ -263,8 +246,11 @@ winter_run_server <- function(input, output, session, g_date) {
       "Hatch Date" = {
         p <- rd_hatching() %>% 
           plot_ly(x=~date, y=~counts, color=~has_hatched, type='bar', 
-                  opacity=~has_hatched) %>% 
-          layout(barmode="stack")
+                  opacity=~has_hatched, 
+                  source="redd_presence_plot", key = ~location) %>% 
+          layout(legend = list(orientation = 'h'), showlegend = TRUE, 
+                 xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
+                 barmode='stack')
         
         if (input$wr_select_year == 2018) {
           p <- p %>% add_segments(
