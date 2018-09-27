@@ -229,3 +229,7 @@ compact <- function(x) {
 }
 
 is_empty <- function(x) length(x) == 0
+
+redd_hatching <- function(temp) {
+  log(0.08646) + (1.23473 * log(temp + 2.26721)) 
+}
