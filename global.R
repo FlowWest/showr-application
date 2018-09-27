@@ -93,16 +93,6 @@ redd_air_temp <-
              parameter_value = col_integer()
            )) 
 
-# This dataset is small enough and is static enough to live on the app.
-# redd_data <- 
-#   read_csv("https://s3-us-west-2.amazonaws.com/showr-data/cdfw/redds/aerial-survey-observations_no_error_codes.csv", 
-#                   col_types = cols(
-#                     date = col_date(format = ""),
-#                     location = col_character(),
-#                     race = col_character(),
-#                     counts = col_double()
-#                   )) %>% filter(race == "Winter")
-
 redd_data <- 
   read_rds("data/chinook/aerial-survey-observations_no_error_codes.rds") %>% 
   filter(race == "Winter") 
@@ -114,20 +104,6 @@ carcass_data <- read_rds("data/chinook/carcass_static_data.rds")
 # shape files for redd map 
 redd_reach <- readOGR("data/redd_reaches/redd_reach.shp", stringsAsFactors = FALSE)
 redd_reach <- spTransform(redd_reach, CRS("+proj=longlat +datum=WGS84 +no_defs"))
-# carcass_reach <- readOGR("data/carcass_reaches/carcass_reach_line.shp")
-# carcass_reach <- spTransform(carcass_reach, CRS("+proj=longlat +datum=WGS84 +no_defs"))
-# carcass_location <- carcass_reach$Reach
-# 
-# # TODO: this is ok for now but needs to be modified, by either having the data
-# # come into the shiny app with the sections names already in the dataset
-# carcass_section_to_reach_name <- data.frame(
-#   river_section = as.character(1:4), 
-#   section_name = carcass_reach$Reach, 
-#   stringsAsFactors = FALSE
-# )
-# 
-# carcass_data <- 
-#   left_join(carcass_data, carcass_section_to_reach_name, c("river_section" = "river_section"))
 
 # TCD Configurations
 tcd_configs_data <- read_rds("data/tcd_configurations/tcd_configs_through_2017-08-24.rds")
