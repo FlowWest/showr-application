@@ -395,14 +395,22 @@ dashboard_server <- function(input, output, session, g_date, x) {
   })
   
   output$redd_limiting_reach <- renderText({
+    if (length(limititng_reach_in_system()$location) == 0) return("preseason")
     limititng_reach_in_system()$location
   })
   
   output$redd_limiting_date <- renderText({
     x <- limititng_reach_in_system()$emergence
+    if (length(x) == 0) return("preseason")
     paste(as.numeric(x - g_date()), "days")
   })
   
+  
+  observe({
+    x <- limititng_reach_in_system()$emergence
+    cat(length(x), "\n")
+    cat(length(limititng_reach_in_system()$location), "\n")
+  })
   
   
   # Visualizations -------------------------------------------------------------
