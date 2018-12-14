@@ -1,4 +1,5 @@
-function(request) {tagList(
+function(request) {
+  tagList(
   useShinyjs(),
   useToastr(),
   navbarPage(title=div(class="logo", tags$img(class="logo-img",

@@ -37,10 +37,14 @@ winter_run_UI <- function(id) {
                       tags$div(style="display:inline-block",
                                radioButtons(ns("wr_show_plot_by"),
                                              label = "Plot by", 
-                                             choices = c("Reach", "Spawn Date", "Hatch Date")),
+                                             choices = c("Reach", "Spawn Date"
+                                                         # , "Hatch Date"
+                                                         )),
                                uiOutput(ns("wr_select_spawn_data_ui")))), 
-               column(width = 12, class = "col-md-4", 
-                      uiOutput(ns("wr_help_message")))),
+               column(width = 12, class = "col-md-4"
+                      # , 
+                      # uiOutput(ns("wr_help_message"))
+                      )),
              fluidRow(
                # plot
                column(width = 12, class="col-md-9", 
@@ -181,20 +185,20 @@ winter_run_server <- function(input, output, session, g_date) {
     plotly::event_data("plotly_relayout", source="redd_presence_plot")
   })
   
-  output$wr_help_message <- renderUI({
-    switch (input$wr_show_plot_by,
-      "Reach" = helpText("Plotting by reach shows the number of non-expired redds in a reach.
-                         The reaches are seperated by color, the height shows the number of 
-                         redds within the reach. The overall height of the plot shows total
-                         redds in Upper Sacramento."),
-      "Spawn Date" = helpText("Plotting by spawn date shows the trajectory of a redd by 
-                              the day it was mapped on the Sacramento River. You should
-                              expect early redds to expire first."),
-      "Hatch Date" = helpText("Plotting by hatch date shows the distribution of non-expired
-                              redds, colored by whether they have hatched or not. You can 
-                              think of the.")
-    )
-  })
+  # output$wr_help_message <- renderUI({
+  #   switch (input$wr_show_plot_by,
+  #     "Reach" = helpText("Plotting by reach shows the number of non-expired redds in a reach.
+  #                        The reaches are seperated by color, the height shows the number of 
+  #                        redds within the reach. The overall height of the plot shows total
+  #                        redds in Upper Sacramento."),
+  #     "Spawn Date" = helpText("Plotting by spawn date shows the trajectory of a redd by 
+  #                             the day it was mapped on the Sacramento River. You should
+  #                             expect early redds to expire first."),
+  #     "Hatch Date" = helpText("Plotting by hatch date shows the distribution of non-expired
+  #                             redds, colored by whether they have hatched or not. You can 
+  #                             think of the.")
+  #   )
+  # })
   
   # this whole thing needs some refactoring
   output$winter_run_plot <- renderPlotly({
@@ -208,14 +212,14 @@ winter_run_server <- function(input, output, session, g_date) {
         p <- rd_yr() %>%
           plot_ly(source="redd_presence_plot") 
         
-        if (input$wr_select_year == 2018) {
-          p <- p %>% add_segments(
-            data=filter(rd_yr(), date == Sys.Date()),
-            x=~date, xend = ~date, y = 0, yend = ~sum(total),
-            line=list(color="#7c247f", width=4), name="today", showlegend=FALSE, 
-            hoverinfo = "text", text="Today!")  
-        }
-        
+        # if (input$wr_select_year == 2018) {
+        #   p <- p %>% add_segments(
+        #     data=filter(rd_yr(), date == Sys.Date()),
+        #     x=~date, xend = ~date, y = 0, yend = ~sum(total),
+        #     line=list(color="#7c247f", width=4), name="today", showlegend=FALSE, 
+        #     hoverinfo = "text", text="Today!")  
+        # }
+        # 
         p <- p %>% add_bars(data=rd_yr(), 
                             x = ~date, y = ~total, color = ~location, 
                             text = ~paste0(date, "<br>", 
@@ -242,13 +246,13 @@ winter_run_server <- function(input, output, session, g_date) {
                  xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
                  barmode='stack')
         
-        if (input$wr_select_year == 2018) {
-          p <- p %>% add_segments(
-            data=filter(rd_yr(), date == Sys.Date()),
-            x=~date, xend = ~date, y = 0, yend = ~sum(total),
-            line=list(color="#7c247f", width=4), name="today", showlegend=FALSE, 
-            hoverinfo = "text", text="Today!")  
-        }
+        # if (input$wr_select_year == 2018) {
+        #   p <- p %>% add_segments(
+        #     data=filter(rd_yr(), date == Sys.Date()),
+        #     x=~date, xend = ~date, y = 0, yend = ~sum(total),
+        #     line=list(color="#7c247f", width=4), name="today", showlegend=FALSE, 
+        #     hoverinfo = "text", text="Today!")  
+        # }
         
         p
         
@@ -266,13 +270,13 @@ winter_run_server <- function(input, output, session, g_date) {
                  xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
                  barmode='stack')
         
-        if (input$wr_select_year == 2018) {
-          p <- p %>% add_segments(
-            data=filter(rd_hatching(), date == Sys.Date()),
-            x=~date, xend = ~date, y = 0, yend = ~sum(counts),
-            line=list(color="#7c247f", width=4), name="today", showlegend=FALSE, 
-            hoverinfo = "text", text="Today!")  
-        }
+        # if (input$wr_select_year == 2018) {
+        #   p <- p %>% add_segments(
+        #     data=filter(rd_hatching(), date == Sys.Date()),
+        #     x=~date, xend = ~date, y = 0, yend = ~sum(counts),
+        #     line=list(color="#7c247f", width=4), name="today", showlegend=FALSE, 
+        #     hoverinfo = "text", text="Today!")  
+        # }
         
         p
       }

@@ -133,7 +133,7 @@ pretty_num <- function(num, places = 2) {
   format(round(num, places), big.mark = ',', drop = FALSE)
 }
 
-isothermal_data <- read_rds("data/operations/shasta_storage_temperature.rds")
+isothermal_data <- read_rds("data/operations/shasta_storage_temperature2.rds")
 
 get_year_classification <- function(y) {
   if (y != year(today())) {
@@ -231,5 +231,5 @@ compact <- function(x) {
 is_empty <- function(x) length(x) == 0
 
 redd_hatching <- function(temp) {
-  log(0.08646) + (1.23473 * log(temp + 2.26721)) 
+  exp(log(0.08646) + (1.23473 * log(temp + 2.26721))) 
 }
