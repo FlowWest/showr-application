@@ -164,7 +164,7 @@ winter_run_server <- function(input, output, session, g_date) {
       add_lines(data=wr_temp_data(), x=~date, y=~daily_mean, 
                 color=~cdec_gage, inherit = FALSE, colors="Accent")
     
-    if (input$wr_select_year == 2018) {
+    if (input$wr_select_year == 2019) {
       p <- p %>% 
         add_segments(
           data=filter(wr_temp_data(), date==Sys.Date()), 
@@ -185,20 +185,6 @@ winter_run_server <- function(input, output, session, g_date) {
     plotly::event_data("plotly_relayout", source="redd_presence_plot")
   })
   
-  # output$wr_help_message <- renderUI({
-  #   switch (input$wr_show_plot_by,
-  #     "Reach" = helpText("Plotting by reach shows the number of non-expired redds in a reach.
-  #                        The reaches are seperated by color, the height shows the number of 
-  #                        redds within the reach. The overall height of the plot shows total
-  #                        redds in Upper Sacramento."),
-  #     "Spawn Date" = helpText("Plotting by spawn date shows the trajectory of a redd by 
-  #                             the day it was mapped on the Sacramento River. You should
-  #                             expect early redds to expire first."),
-  #     "Hatch Date" = helpText("Plotting by hatch date shows the distribution of non-expired
-  #                             redds, colored by whether they have hatched or not. You can 
-  #                             think of the.")
-  #   )
-  # })
   
   # this whole thing needs some refactoring
   output$winter_run_plot <- renderPlotly({

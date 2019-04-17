@@ -122,34 +122,27 @@ wr_presence_data <- read_csv("data/chinook/wr_chinook_presence.csv")
 # water year index classifications
 
 historic_water_year_types <- 
-  readr::read_rds("data/operations/historical-water-year-index.rds") %>% 
-  tibble::add_row(year =2017, yr_type="W")
+  readr::read_rds("data/operations/current_water_year_classifications.rds")
 
-current_water_year_types <- 
-  readr::read_rds("data/operations/2018-04-17-water-year-index.rds")
+# current_water_year_types <- 
+#   readr::read_rds("data/operations/2018-04-17-water-year-index.rds")
 
 
 pretty_num <- function(num, places = 2) {
   format(round(num, places), big.mark = ',', drop = FALSE)
 }
 
-isothermal_data <- read_rds("data/operations/shasta_storage_temperature2.rds")
+isothermal_data <- read_rds("data/operations/shasta-storage-temps-2019.rds")
 
 get_year_classification <- function(y) {
   if (y != year(today())) {
     historic_water_year_types %>% 
-      filter(year == y) %>% 
-      mutate(classification = wy_class_lookups[yr_type]) %>% 
+      filter(water_year == y) %>% 
+      mutate(classification = wy_class_lookups[sac_valley_class]) %>% 
       pull(classification) %>% 
       as.character()
   } else {
-    # current_water_year_types %>% 
-    #   filter(probability == 99) %>% 
-    #   arrange(desc(date)) %>% 
-    #   head(1) %>% 
-    #   pull(classification) %>% 
-    #   as.character()
-    "below normal"
+    wy_class_lookups["AN"]
   }
 }
 
