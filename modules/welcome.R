@@ -3,7 +3,7 @@ welcome_UI <- function(id) {
   
   htmlTemplate("templates/welcome.html", 
                select_year_dropdown = selectInput(ns("welcome_summary_year_select"), 
-                                                  label=NULL, choices = 2010:2017, 
+                                                  label=NULL, choices = 2010:2018, 
                                                   selected = 2017), 
                summary_water_year_type = textOutput(ns("summary_water_year_type_value")),
                summary_total_winter_redds = textOutput(ns("summary_total_winter_redds_value")),

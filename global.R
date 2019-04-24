@@ -17,6 +17,7 @@ library(measurements)
 library(purrr)
 library(shinytoastr)
 library(shinyWidgets)
+library(shinycssloaders)
 
 enableBookmarking(store = "url")
 

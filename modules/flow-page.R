@@ -51,7 +51,7 @@ flow_UI <- function(id) {
                                  start = paste0(year(today()), "-01-01"), 
                                  end = today(tzone = "America/Los_Angeles")-1)), 
            column(width = 12, class = "col-md-2", 
-                  selectInput(ns("flow_add_year"), label = "Add Previous Year", choices = c("None", 2010:2017), 
+                  selectInput(ns("flow_add_year"), label = "Add Previous Year", choices = c("None", 2010:2018), 
                               width = "140px")), 
            column(width = 12, class = "col-md-3", 
                   selectInput(inputId = ns("flow_station_select"), 

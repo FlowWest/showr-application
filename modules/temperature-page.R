@@ -48,7 +48,7 @@ temp_pageUI <- function(id) {
                column(width = 12, class = "col-md-2",
                       selectInput(inputId = ns("temp_add_year"),
                                   label = "Add Previous Year",
-                                  choices = c("None", 2010:2017),
+                                  choices = c("None", 2010:2018),
                                   width = "140px")
                ),
                column(width = 12, class = "col-md-3",
@@ -64,7 +64,9 @@ temp_pageUI <- function(id) {
              fluidRow(
                # temp plot
                column(width = 12, class = "col-md-9", 
-                      plotlyOutput(ns("temperature_ts_plot"), height = "500px")),
+                      withSpinner(plotlyOutput(ns("temperature_ts_plot"), height = "500px"), 
+                                  type = "5", 
+                                  color = "#707070")),
                # temp schematic
                column(width = 12, class = "col-md-3", 
                       tags$img(class="gage_map", src="temp_sites.png"), 
