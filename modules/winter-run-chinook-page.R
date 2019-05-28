@@ -32,7 +32,7 @@ winter_run_UI <- function(id) {
                # Controls
                column(width = 12, class="col-md-2", 
                       selectInput(ns("wr_select_year"), label = "Select a Year", 
-                                  choices = 2010:2018, selected = 2018)),
+                                  choices = 2010:2019, selected = 2019)),
                column(width = 12, class = "col-md-1", 
                       tags$div(style="display:inline-block",
                                radioButtons(ns("wr_show_plot_by"),
@@ -110,7 +110,7 @@ winter_run_server <- function(input, output, session, g_date) {
       rd %>% 
         filter(year(date) == input$wr_select_year) %>%  
         group_by(location, seed_day, date) %>% 
-        summarise(total = sum(counts)) %>% 
+        summarise(total = as.integer(sum(counts))) %>% 
         ungroup()
   })
   
@@ -199,7 +199,7 @@ winter_run_server <- function(input, output, session, g_date) {
           plot_ly(source="redd_presence_plot") 
         
         p <- p %>% add_bars(data=rd_yr(), 
-                            x = ~date, y = ~total, color = ~location, 
+                            x = ~date, y = ~as.integer(total), color = ~location, 
                             text = ~paste0(date, "<br>", 
                                            location, "<br>", 
                                            total), 
@@ -213,7 +213,7 @@ winter_run_server <- function(input, output, session, g_date) {
       }, 
       "Spawn Date" = {
         p <- rd_yr() %>% 
-          plot_ly(x = ~date, y = ~total, 
+          plot_ly(x = ~date, y = ~as.integer(total), 
                   color = ~as.character(seed_day), type='bar', 
                   text = ~paste0(date, "<br>", 
                                  location, "<br>", 

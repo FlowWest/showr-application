@@ -37,7 +37,7 @@ load("data/general-objects.RData")
 
 # diversion_data <- read_csv("data/flows/srsc_diversion_data.csv") %>% 
 #   mutate(draft_date = mdy(draft_date))
-diversion_data <- read_rds("data/flows/mbk-diversion-data-2018-08-14.rds")
+diversion_data <- read_rds("data/flows/diversions-2019-05-16.rds")
 
 # These data are all on a public S3 bucket 
 temp_data <- 
@@ -95,7 +95,7 @@ redd_air_temp <-
            )) 
 
 redd_data <- 
-  read_rds("data/chinook/aerial-survey-observations_no_error_codes.rds") %>% 
+  read_rds("data/chinook/2019-redd-data-no-error-codes.rds") %>% 
   filter(race == "Winter") 
 # %>% 
 #   mutate(location = factor(location, levels = redd_locations))
@@ -112,10 +112,11 @@ tcd_configs_data <- read_rds("data/tcd_configurations/tcd_configs_through_2017-0
 # temp locations metadata 
 cdec_temperature_locations <- read_rds("data/temperatures/cdec_temperature_locations.rds")
 
-model_temps <- read_csv("data/temperatures/cvtemp/sim_run_20150529.csv") %>% 
-  filter(model_type == "usbr_no_w2", 
-         scenario_name == "may_23_2018_input_90_output_90_50l3mto")
-model_temps$datetime <- as_date(model_temps$datetime)
+model_temps <- read_csv("data/temperatures/cvtemp/sim_run_2019-05-20.csv") 
+# %>% 
+#   filter(model_type == "usbr_no_w2", 
+#          scenario_name == "may_23_2018_input_90_output_90_50l3mto")
+# model_temps$datetime <- as_date(model_temps$datetime)
 
 # winter run presence 
 wr_presence_data <- read_csv("data/chinook/wr_chinook_presence.csv")
@@ -123,7 +124,8 @@ wr_presence_data <- read_csv("data/chinook/wr_chinook_presence.csv")
 # water year index classifications
 
 historic_water_year_types <- 
-  readr::read_rds("data/operations/current_water_year_classifications.rds")
+  readr::read_rds("data/operations/current_water_year_classifications.rds") %>% 
+  add_row("water_year" = 2018, "sac_valley_class"="BN", "san_joaquin_class"=NA)
 
 # current_water_year_types <- 
 #   readr::read_rds("data/operations/2018-04-17-water-year-index.rds")
@@ -133,7 +135,7 @@ pretty_num <- function(num, places = 2) {
   format(round(num, places), big.mark = ',', drop = FALSE)
 }
 
-isothermal_data <- read_rds("data/operations/shasta-storage-temps-2019.rds")
+isothermal_data <- read_rds("data/operations/2019-storage-temps.rds")
 
 get_year_classification <- function(y) {
   if (y != year(today())) {
@@ -191,10 +193,10 @@ rd <- redd_data %>%
   rowwise() %>% 
   do(
     tibble(
-      date = seq(.$date, estimate_emergence(.$date, .$location) -1, by="day"), # this give a sequence from the seed day to the estiamted emergence value
+      date = seq(.$date, as_date(estimate_emergence(.$date, .$location)) -1, by="day"), # this give a sequence from the seed day to the estiamted emergence value
       seed_day = .$date,
       location = .$location, 
-      counts = .$counts, # how many redds will exist in the water for this time
+      counts = as.integer(.$counts), # how many redds will exist in the water for this time
       redd_id = .$redd_id
     )
   ) %>% ungroup() %>% 

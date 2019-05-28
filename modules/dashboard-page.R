@@ -558,7 +558,8 @@ dashboard_server <- function(input, output, session, g_date, x) {
                 inherit = FALSE) %>%
       layout(xaxis = list(title = '', fixedrange = TRUE),
              yaxis = list(title = "storage (AF)") 
-             ,legend = list(orientation = 'h')
+             ,legend = list(orientation = 'h'), 
+             showlegend=FALSE
       ) %>% 
       config(displayModeBar = FALSE)
   })

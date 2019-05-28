@@ -8,8 +8,8 @@ welcome_UI <- function(id) {
                summary_water_year_type = textOutput(ns("summary_water_year_type_value")),
                summary_total_winter_redds = textOutput(ns("summary_total_winter_redds_value")),
                summary_eos = textOutput(ns("summary_eos_value")),
-               summary_out_of_compliance = textOutput(ns("summary_out_of_compliance_value")), 
-               action_link_to_about_page = actionLink(ns("goto_about_page"), label="Learn more about SHOWR")
+               summary_out_of_compliance = textOutput(ns("summary_out_of_compliance_value")) 
+               # action_link_to_about_page = actionLink(ns("goto_about_page"), label="Learn more about SHOWR")
   )
 }
 
