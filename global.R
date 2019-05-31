@@ -37,7 +37,10 @@ load("data/general-objects.RData")
 
 # diversion_data <- read_csv("data/flows/srsc_diversion_data.csv") %>% 
 #   mutate(draft_date = mdy(draft_date))
-diversion_data <- read_rds("data/flows/diversions-2019-05-16.rds")
+diversion_data <- read_rds("data/flows/total-diversions-2019-05-28.rds")
+
+upstream_diversions <- read_rds("data/flows/upstream-diversions-2019-05-28.rds")
+downstream_diversions <- read_rds("data/flows/downstream-diversions-2019-05-28.rds")
 
 # These data are all on a public S3 bucket 
 temp_data <- 

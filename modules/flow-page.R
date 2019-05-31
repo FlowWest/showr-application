@@ -39,7 +39,8 @@ flow_UI <- function(id) {
                  "CVO TCD Configurations",
                  href="https://www.usbr.gov/mp/cvo/temperature.html")),
   tags$h5("Update schedule: data is updated on daily basis with both hourly and daily data"), 
-  tags$h5("Diversions for 2017 and 2018 are estimated values from 2010-2016"))),
+  tags$h5("Diversions for 2017 and 2018 are estimated values from 2010-2016"), 
+  tags$h5("Diversions annual total represents only a portion of diversions from the Sacramento River and includes up to ten contractors of the SRSC"))),
   # main interface
   column(width = 12, class = "col-md-9",
          # controls
@@ -228,9 +229,10 @@ flow_server <- function(input, output, session, g_date) {
       base_plot <- base_plot %>% 
         add_trace(data = selected_diversion_data(), 
                   name = "SRSC Upstream Diversions",
-                  x=~draft_date, y=~actual_upstream, 
-                  type='scatter', mode='lines', 
-                  line=list(color="#b71b93"), 
+                  x=~draft_date, y=~diversion, 
+                  type='scatter', mode='lines',
+                  color=~type,
+                  # line=list(color="#b71b93"), 
                   inherit = FALSE)
     }
     
