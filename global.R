@@ -37,10 +37,10 @@ load("data/general-objects.RData")
 
 # diversion_data <- read_csv("data/flows/srsc_diversion_data.csv") %>% 
 #   mutate(draft_date = mdy(draft_date))
-diversion_data <- read_rds("data/flows/total-diversions-2019-05-28.rds")
+diversion_data <- read_rds("data/flows/total-diversions-2019-07-23.rds")
 
-upstream_diversions <- read_rds("data/flows/upstream-diversions-2019-05-28.rds")
-downstream_diversions <- read_rds("data/flows/downstream-diversions-2019-05-28.rds")
+upstream_diversions <- read_rds("data/flows/upstream-diversions-2019-07-23.rds")
+downstream_diversions <- read_rds("data/flows/downstream-diversions-2019-07-23.rds")
 
 # These data are all on a public S3 bucket 
 temp_data <- 
@@ -98,7 +98,7 @@ redd_air_temp <-
            )) 
 
 redd_data <- 
-  read_rds("data/chinook/2019-redd-data-no-error-codes.rds") %>% 
+  read_rds("data/chinook/2019-07-26-redd-counts.rds") %>% 
   filter(race == "Winter") 
 # %>% 
 #   mutate(location = factor(location, levels = redd_locations))
@@ -115,7 +115,7 @@ tcd_configs_data <- read_rds("data/tcd_configurations/tcd_configs_through_2017-0
 # temp locations metadata 
 cdec_temperature_locations <- read_rds("data/temperatures/cdec_temperature_locations.rds")
 
-model_temps <- read_csv("data/temperatures/cvtemp/sim_run_2019-05-20.csv") 
+model_temps <- read_csv("data/temperatures/cvtemp/sim_run_2019-05-24.csv") 
 # %>% 
 #   filter(model_type == "usbr_no_w2", 
 #          scenario_name == "may_23_2018_input_90_output_90_50l3mto")
@@ -138,7 +138,7 @@ pretty_num <- function(num, places = 2) {
   format(round(num, places), big.mark = ',', drop = FALSE)
 }
 
-isothermal_data <- read_rds("data/operations/2019-storage-temps.rds")
+isothermal_data <- read_rds("data/operations/shasta-temp-profile-june-2019.rds")
 
 get_year_classification <- function(y) {
   if (y != year(today())) {

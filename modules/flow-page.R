@@ -98,6 +98,10 @@ flow_UI <- function(id) {
 flow_server <- function(input, output, session, g_date) {
   ns <- session$ns
   
+  diversion_labels <- c(
+    "downstream" = "Downstream Diversions*", 
+    "upstream" = "Upstream Diversions*"
+  )
   
   diversion_data_for_plot <- reactive({
     d <- diversion_data %>% 
@@ -203,8 +207,9 @@ flow_server <- function(input, output, session, g_date) {
     
     base_plot <- selected_flow_data() %>% 
       plot_ly(x=~date, y=~daily_flow, color=~station_code_to_name_flows[location_id], 
-              type='scatter', mode='lines', 
-              colors = "Dark2",
+              type='scatter', mode='lines',
+              line = list(color=c("#1b9e77", "#7570b3", "#d95f02", "#e7298a"), 
+                          width = 3),
               text = ~paste0("<b>",date, "</b><br><b>",
                              station_code_to_name_flows[location_id], "</b><br><b>", 
                              daily_flow, " cfs</b>"), 
@@ -228,11 +233,11 @@ flow_server <- function(input, output, session, g_date) {
     if (input$show_diversions) {
       base_plot <- base_plot %>% 
         add_trace(data = selected_diversion_data(), 
-                  name = "SRSC Upstream Diversions",
+                  name = ~diversion_labels[type],
                   x=~draft_date, y=~diversion, 
                   type='scatter', mode='lines',
-                  color=~type,
-                  # line=list(color="#b71b93"), 
+                  color=~diversion_labels[type],
+                  line=list(color=c("#232323", "#232323"), dash="dot"),
                   inherit = FALSE)
     }
     
