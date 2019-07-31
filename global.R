@@ -18,6 +18,7 @@ library(purrr)
 library(shinytoastr)
 library(shinyWidgets)
 library(shinycssloaders)
+library(sf)
 
 enableBookmarking(store = "url")
 
@@ -31,9 +32,22 @@ source("modules/winter-run-chinook-page.R")
 source("modules/flow-page.R")
 source("modules/about-page.R")
 source("modules/welcome.R")
+source("modules/shallow-redds-page.R")
 
 # load general objects, documented in "data/make-general-objects.R"
 load("data/general-objects.RData")
+
+
+sac_river_miles <- 
+  st_read("data/sac-river-river-mile-markers/river_mile_markers_sacriver_2012.shp") %>% 
+  st_cast("POINT") %>% 
+  as_tibble() %>% 
+  transmute(
+    river_mile = as.character(MARKER),
+    lat, lon
+  )
+
+shallow_redds_danger <- read_csv("data/chinook/shallow-redds-temp.csv")
 
 # diversion_data <- read_csv("data/flows/srsc_diversion_data.csv") %>% 
 #   mutate(draft_date = mdy(draft_date))

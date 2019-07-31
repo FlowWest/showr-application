@@ -7,4 +7,5 @@ shinyServer(function(input, output, session) {
   callModule(winter_run_server, 'app', g_date)
   callModule(flow_server, 'app', g_date)
   callModule(about_server, 'app')
+  callModule(shallow_redds_server, 'app')
 })
