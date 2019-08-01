@@ -138,7 +138,7 @@ pretty_num <- function(num, places = 2) {
   format(round(num, places), big.mark = ',', drop = FALSE)
 }
 
-isothermal_data <- read_rds("data/operations/shasta-temp-profile-june-2019.rds")
+isothermal_data <- read_rds("data/operations/shasta-temp-profile-july-2019.rds")
 
 get_year_classification <- function(y) {
   if (y != year(today())) {
