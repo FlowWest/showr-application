@@ -98,7 +98,7 @@ redd_air_temp <-
            )) 
 
 redd_data <- 
-  read_rds("data/chinook/2019-07-26-redd-counts.rds") %>% 
+  read_rds("data/chinook/2019-08-02-redd-counts.rds") %>% 
   filter(race == "Winter") 
 # %>% 
 #   mutate(location = factor(location, levels = redd_locations))
