@@ -37,10 +37,10 @@ load("data/general-objects.RData")
 
 # diversion_data <- read_csv("data/flows/srsc_diversion_data.csv") %>% 
 #   mutate(draft_date = mdy(draft_date))
-diversion_data <- read_rds("data/flows/total-diversions-2019-07-23.rds")
+diversion_data <- read_rds("data/flows/total-diversions-2019-09-05.rds")
 
-upstream_diversions <- read_rds("data/flows/upstream-diversions-2019-07-23.rds")
-downstream_diversions <- read_rds("data/flows/downstream-diversions-2019-07-23.rds")
+upstream_diversions <- read_rds("data/flows/upstream-diversions-2019-09-05.rds")
+downstream_diversions <- read_rds("data/flows/downstream-diversions-2019-09-05.rds")
 
 # These data are all on a public S3 bucket 
 temp_data <- 
@@ -69,7 +69,7 @@ flow_data <-
              datetime = col_datetime(format = ""),
              parameter_value = col_integer()
            ))
-
+  
 flow_data_daily_mean <- 
   read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_flow.csv", 
            col_types = cols(
@@ -98,7 +98,7 @@ redd_air_temp <-
            )) 
 
 redd_data <- 
-  read_rds("data/chinook/2019-08-02-redd-counts.rds") %>% 
+  read_rds("data/chinook/2019-08-30-redd-couts.rds") %>% 
   filter(race == "Winter") 
 # %>% 
 #   mutate(location = factor(location, levels = redd_locations))
@@ -138,7 +138,7 @@ pretty_num <- function(num, places = 2) {
   format(round(num, places), big.mark = ',', drop = FALSE)
 }
 
-isothermal_data <- read_rds("data/operations/shasta-temp-profile-july-2019.rds")
+isothermal_data <- read_rds("data/operations/shasta-temp-profile-august-2019.rds")
 
 get_year_classification <- function(y) {
   if (y != year(today())) {
