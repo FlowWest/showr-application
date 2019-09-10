@@ -4,6 +4,7 @@ shallow_redds_ui <- function(id) {
   tagList(
     column(width = 6,
            tags$h2("Shallow Redds Monitoring"),
+           tags$hr(),
            leafletOutput(ns("shallow_redds_map"))), 
     column(width = 6, 
            tags$h4("Shallow Redd at river mile 256"),

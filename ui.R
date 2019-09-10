@@ -2,7 +2,7 @@ function(request) {
   tagList(
     useShinyjs(),
     useToastr(),
-    tags$style(type = "text/css", "#app-shallow_redds_map {height: calc(100vh - 140px) !important;}"),
+    tags$style(type = "text/css", "#app-shallow_redds_map {height: calc(100vh - 175px) !important;}"),
     navbarPage(title=div(class="logo", tags$img(class="logo-img",
                                                 src="chinook (1).svg", width="140px"), 
                          "SHOWR"), 
