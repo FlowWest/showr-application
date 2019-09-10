@@ -3,7 +3,7 @@ shallow_redds_ui <- function(id) {
   
   tagList(
     column(width = 6,
-           tags$h2("Shallow Redds Monitoring"),
+           tags$h3("Shallow Redds Monitoring"),
            tags$hr(),
            leafletOutput(ns("shallow_redds_map"))), 
     column(width = 6, 
@@ -24,9 +24,11 @@ shallow_redds_server <- function(input, output, session) {
     shallow_redds_danger %>% 
       leaflet() %>% 
       addTiles() %>% 
-      addCircleMarkers(popup = ~paste0("<b>Shallow Redd</b><br>", 
+      addCircleMarkers(popup = ~paste0("<b>Shallow Redds at RM: ", river_mile, "</b><br>", 
                                        "Total in danger: ", total, "<br>", 
-                                       "Dewater Threshold: 5,000 cfs"), 
+                                       "Dewater Threshold: 5,000 cfs <br>", 
+                                       "Estimated Emergence: ", days_to_emergece, 
+                                       " (", format(last_emergence, "%b %d)")), 
                        color=~shallow_color(total), 
                        fillColor = ~shallow_color(total), 
                        fillOpacity = .7)
