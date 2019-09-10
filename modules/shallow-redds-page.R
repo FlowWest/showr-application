@@ -1,6 +1,8 @@
 shallow_redds_ui <- function(id) {
   ns <- NS(id)
   
+  # layout distributes 1/2 the screen to the map (100% height) and 1/2
+  # the screen to the metrics and plot (50% height each)
   tagList(
     column(width = 6,
            tags$h3("Shallow Redds Monitoring"),
@@ -16,6 +18,7 @@ shallow_redds_ui <- function(id) {
 
 shallow_redds_server <- function(input, output, session) {
   
+  # Shallow redds map
   output$shallow_redds_map <- renderLeaflet({
     shallow_color <- leaflet::colorNumeric(
       c("#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"), 
@@ -31,11 +34,13 @@ shallow_redds_server <- function(input, output, session) {
                                        " (", format(last_emergence, "%b %d)")), 
                        color=~shallow_color(total), 
                        fillColor = ~shallow_color(total), 
+                       layerId = ~river_mile,
                        fillOpacity = .7)
     
     
   })
   
+  # lat longs for selected redd in danger
   selected_redd_in_danger <- reactive({
     if (is.null(input$shallow_redds_map_marker_click)) {
       NULL
@@ -45,8 +50,15 @@ shallow_redds_server <- function(input, output, session) {
     }
   })
   
+  # map data for the selected redd in danger 
+  # this is used for adding color the selected marker
+  selected_marker <- reactive({
+    shallow_redds_danger %>% 
+      filter(river_mile == input$shallow_redds_map_marker_click$id)
+  })
   
-  last_emergence_data <- reactive({
+  # the last emergence within a river mile for the selected redd in danger
+  last_emergence_date <- reactive({
     
     if (is.null(selected_redd_in_danger())) return(NULL)
     
@@ -56,6 +68,8 @@ shallow_redds_server <- function(input, output, session) {
       pull(last_emergence)
   })
   
+  # calculate the historical flows up to the last emergence data
+  # this is used for the timer series plot
   average_flow <- reactive({
     flow_data_daily_mean %>% 
       filter(location_id %in% c("kwk", "wlk")) %>% 
@@ -65,13 +79,13 @@ shallow_redds_server <- function(input, output, session) {
         parameter_value = mean(parameter_value, na.rm = TRUE) 
       ) %>% 
       filter(datetime > today(), 
-             datetime <= last_emergence_data()) %>% ungroup()
+             datetime <= last_emergence_date()) %>% ungroup()
   })
   
   output$shallow_flow_plot <- renderPlotly({
     
     validate(
-      need(!is.null(last_emergence_data()), "Select a shallow redd from the map to view details")
+      need(!is.null(last_emergence_date()), "Select a shallow redd from the map to view details")
     )
     
     p <- flow_data_daily_mean %>% 
@@ -82,18 +96,32 @@ shallow_redds_server <- function(input, output, session) {
       add_lines() 
     
     
-    if (is.null(last_emergence_data())) return(p)
+    if (is.null(last_emergence_date())) return(p)
     
     p %>% 
-      add_segments(x = as_date("2019-01-01"), xend=last_emergence_data(), 
+      add_segments(x = as_date("2019-01-01"), xend=last_emergence_date(), 
                    y = 5000, yend = 5000, name="Dewater Threshold", 
                    inherit = FALSE, 
                    line = list(color= "red", dash = "dash")) %>% 
-      add_segments(x = last_emergence_data(), xend=last_emergence_data(), 
+      add_segments(x = last_emergence_date(), xend=last_emergence_date(), 
                    y = 0, yend = 7000, name = "Expected Emergence", 
                    inherit = FALSE)
     
     
   })
+  
+  observeEvent(input$shallow_redds_map_marker_click$id, {
+    leafletProxy("shallow_redds_map") %>% 
+      clearGroup("selected_shallow_redd") %>% 
+      addCircleMarkers(data=selected_marker(), color = "#57a0ff",
+                       weight = 5,
+                       opacity = 1,
+                       group = "selected_shallow_redd")
+  })
+  
+  
+  
+  
+  
   
 }
