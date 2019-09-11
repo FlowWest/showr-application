@@ -17,11 +17,12 @@ shallow_redds_ui <- function(id) {
 }
 
 shallow_redds_server <- function(input, output, session) {
+
   
   # Shallow redds map
   output$shallow_redds_map <- renderLeaflet({
     shallow_color <- leaflet::colorNumeric(
-      c("#fd8d3c", "#fc4e2a", "#e31a1c", "#b10026"), 
+      palette = "OrRd", 
       domain = shallow_redds_danger$total)
     
     shallow_redds_danger %>% 
@@ -32,10 +33,11 @@ shallow_redds_server <- function(input, output, session) {
                                        "Dewater Threshold: 5,000 cfs <br>", 
                                        "Estimated Emergence: ", days_to_emergece, 
                                        " (", format(last_emergence, "%b %d)")), 
-                       color=~shallow_color(total), 
+                       color= "#666666", 
                        fillColor = ~shallow_color(total), 
                        layerId = ~river_mile,
-                       fillOpacity = .7)
+                       fillOpacity = .7) %>% 
+      addLegend(pal=shallow_color, values = ~total)
     
     
   })
