@@ -37,7 +37,8 @@ shallow_redds_server <- function(input, output, session) {
                        fillColor = ~shallow_color(total), 
                        layerId = ~river_mile,
                        fillOpacity = .7) %>% 
-      addLegend(pal=shallow_color, values = ~total)
+      addLegend(pal=shallow_color, values = ~total, 
+                title = "Total Redds")
     
     
   })
