@@ -97,7 +97,10 @@ shallow_redds_server <- function(input, output, session) {
   
   output$shallow_flow_plot <- renderPlotly({
     validate(need(!is.null(input$shallow_redds_map_marker_click$id), 
-                  "Select a river mile from the map"))
+                  "Select a river mile from the map"), 
+             errorClass = "shallow-redds-plot")
+    
+    
     shallow_redds_flow() %>% 
       plot_ly(x = ~datetime, y = ~parameter_value, type='scatter', mode='lines', 
               name = "Keswick flow") %>%

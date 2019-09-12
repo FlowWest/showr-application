@@ -389,8 +389,13 @@ color: #ffffff;
 }
 
 
-
-
+/*error class for the shallows redds
+when waiting for user to select a marker*/
+.shiny-output-error-shallow-redds-plot {
+    font-weight: bold;
+    font-size: large;
+    color: salmon;
+}
 
 
 
