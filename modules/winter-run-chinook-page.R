@@ -41,10 +41,13 @@ winter_run_UI <- function(id) {
                                                          # , "Hatch Date"
                                                          )),
                                uiOutput(ns("wr_select_spawn_data_ui")))), 
-               column(width = 12, class = "col-md-4",
+               column(width = 12, class = "col-md-2",
                       selectInput(ns("wr_add_year"), "Add historic curve", 
                                   choices = c("None", 2010:2018), width = 150)
-                      )),
+                      ), 
+               column(width = 12, class = "col-md-2",
+                      uiOutput(ns("comparison_button_ui"))
+               )),
              fluidRow(
                # plot
                column(width = 12, class="col-md-9", 
@@ -126,6 +129,13 @@ winter_run_server <- function(input, output, session, g_date) {
     } else {
       NULL
     }
+  })
+  
+  output$comparison_button_ui <- renderUI({
+    if (input$wr_add_year != "None") {
+      actionButton(ns("comparison_button"), "Compare Years")
+    } else 
+      NULL
   })
   
   rd_hatching <- reactive({
