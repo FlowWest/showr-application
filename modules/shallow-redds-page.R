@@ -71,45 +71,52 @@ shallow_redds_server <- function(input, output, session) {
       pull(last_emergence)
   })
   
+  shallow_redds_flow <- reactive({
+    flow_data_daily_mean %>% 
+      filter(year(datetime) == 2019, month(datetime) >= 5, 
+             location_id == "kwk") %>% 
+      arrange(datetime)
+  })
+  
   # calculate the historical flows up to the last emergence data
   # this is used for the timer series plot
-  average_flow <- reactive({
+  projected_flows <- reactive({
     flow_data_daily_mean %>% 
-      filter(location_id %in% c("kwk", "wlk")) %>% 
+      filter(location_id == "kwk") %>% 
       mutate(datetime = `year<-`(datetime, 2019)) %>% 
       group_by(location_id, datetime) %>% 
       summarise(
-        parameter_value = mean(parameter_value, na.rm = TRUE) 
+        min_value = min(parameter_value, na.rm = TRUE), 
+        max_value = max(parameter_value, na.rm = TRUE),
+        avg_value = mean(parameter_value, na.rm = TRUE) 
       ) %>% 
-      filter(datetime > today(), 
+      filter(datetime > max(shallow_redds_flow()$datetime), 
              datetime <= last_emergence_date()) %>% ungroup()
   })
   
+  
   output$shallow_flow_plot <- renderPlotly({
-    
-    validate(
-      need(!is.null(last_emergence_date()), "Select a shallow redd from the map to view details")
-    )
-    
-    p <- flow_data_daily_mean %>% 
-      filter(year(datetime) == 2019, 
-             location_id %in% c("kwk", "wlk")) %>% 
-      bind_rows(average_flow()) %>% 
-      plot_ly(x=~datetime, y=~parameter_value, color=~location_id) %>% 
-      add_lines() 
-    
-    
-    if (is.null(last_emergence_date())) return(p)
-    
-    p %>% 
-      add_segments(x = as_date("2019-01-01"), xend=last_emergence_date(), 
+    validate(need(!is.null(input$shallow_redds_map_marker_click$id), 
+                  "Select a river mile from the map"))
+    shallow_redds_flow() %>% 
+      plot_ly(x = ~datetime, y = ~parameter_value, type='scatter', mode='lines', 
+              name = "Keswick flow") %>%
+      add_segments(x = as_date("2019-05-01"), xend=last_emergence_date(), 
                    y = 5000, yend = 5000, name="Dewater Threshold", 
                    inherit = FALSE, 
                    line = list(color= "red", dash = "dash")) %>% 
-      add_segments(x = last_emergence_date(), xend=last_emergence_date(), 
-                   y = 0, yend = 7000, name = "Expected Emergence", 
-                   inherit = FALSE)
-    
+      add_ribbons(data=projected_flows(), 
+                  x = ~datetime, ymin = ~min_value, ymax = ~max_value, 
+                  fillcolor = 'rgba(7, 164, 181, 0.2)', inherit = FALSE, 
+                  line = list(color = 'rgba(7, 164, 181, 0.5)'),
+                  name = "Historical Range 2010-2018") %>% 
+      add_trace(data=projected_flows(),
+                x = ~datetime, y = ~avg_value,
+                type='scatter', mode='lines', name="Historical Average (2010-2018)", 
+                line = list(color = '#666666')) %>% 
+      layout(xaxis = list(title = ""), 
+             yaxis = list(title = "Flow (cfs)", rangemode="tozero"), 
+             legend = list(orientation = 'h'))
     
   })
   
