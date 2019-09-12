@@ -9,10 +9,33 @@ shallow_redds_ui <- function(id) {
            tags$hr(),
            leafletOutput(ns("shallow_redds_map"))), 
     column(width = 6, 
-           tags$h4("Shallow Redd at river mile 256"),
-           tags$p("Redd is expected to emerge on September 26 2019"),
-           plotlyOutput(ns("shallow_flow_plot")) 
-           )
+           tabsetPanel(type = "pills",
+             tabPanel("Monitoring", 
+                      fluidRow(
+                        uiOutput(ns("shallow_title_text")),
+                        plotlyOutput(ns("shallow_flow_plot")) 
+                      )), 
+             tabPanel("Calculator", 
+                      fluidRow(
+                        tags$div(style="width:75%;",
+                                 tags$h4("Winter Run Redds Dewater Calulator"), 
+                                 tags$p("This tool provides a simple way to evaluate and experiment with 
+                    different flow reduction scenarios. Select a date and a 
+                    desired Keswick flow reduction to view potential Winter 
+                    Run redd strandings."), 
+                                 tags$div(
+                                   tags$div(style="display:inline-block;", 
+                                            dateInput(ns("dewater_calc_date"), "Reduce flow on", 
+                                                      value = today() + 30, width = 150, 
+                                                      format = "M d, yyyy")),
+                                   tags$div(style="display:inline-block;", 
+                                            numericInput(ns("dewater_calc_flow"), "Change flow to", 
+                                                         value = 5000, width = 150)),
+                                   tags$div(style="display:inline-block;", 
+                                            actionButton(ns("run_dewater_calc"), "run"))
+                                 )
+                        )))
+           ))
   )
 }
 
@@ -97,7 +120,7 @@ shallow_redds_server <- function(input, output, session) {
   
   output$shallow_flow_plot <- renderPlotly({
     validate(need(!is.null(input$shallow_redds_map_marker_click$id), 
-                  "Select a river mile from the map"), 
+                  "Select a river mile from the map to view additional details for redds."), 
              errorClass = "shallow-redds-plot")
     
     
