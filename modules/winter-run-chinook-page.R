@@ -226,8 +226,8 @@ winter_run_server <- function(input, output, session, g_date) {
         if (input$wr_add_year != "None") {
           p <- p %>% add_lines(data=rd_historic_counts(), 
                                x = ~date, y = ~current_active, 
-                               name = paste(input$wr_add_year), 
-                               line = list(color="#2291e0"))
+                               name = paste(input$wr_add_year, "distribution"), 
+                               line = list(color="#2291e0", width=4))
         }
         p
         
@@ -235,7 +235,7 @@ winter_run_server <- function(input, output, session, g_date) {
       "Spawn Date" = {
         p <- rd_yr() %>% 
           plot_ly(x = ~date, y = ~as.integer(total), 
-                  color = ~as.character(seed_day), type='bar', 
+                  color = ~format(seed_day, "%b %d"), type='bar', 
                   text = ~paste0(date, "<br>", 
                                  location, "<br>", 
                                  total), 
@@ -245,6 +245,13 @@ winter_run_server <- function(input, output, session, g_date) {
                  xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
                  barmode='stack')
         
+        if (input$wr_add_year != "None") {
+          p <- p %>% add_lines(data=rd_historic_counts(), 
+                               x = ~date, y = ~current_active, 
+                               name = paste(input$wr_add_year, "distribution"), 
+                               line = list(color="#2291e0", width=4), 
+                               inherit = FALSE)
+        }
         
         p
         
