@@ -11,30 +11,39 @@ shallow_redds_ui <- function(id) {
     column(width = 6, 
            tabsetPanel(type = "pills",
              tabPanel("Monitoring", 
+                      tags$div(style="width:50%;",
+                               tags$h4("Winter Run Redds Monitoring"), 
+                               tags$p("The monitoring tool provides details about
+                                      redds at risk of dewaterting. Select a 
+                                      river mile from map to view details for
+                                      redds at that location. Use the time series
+                                      plot to evaluate current and historical
+                                      flow trends. For a addtional information 
+                                      click the ?")),
                       fluidRow(
-                        uiOutput(ns("shallow_title_text")),
+                        uiOutput(ns("shallow_monitoring_text")),
                         plotlyOutput(ns("shallow_flow_plot")) 
                       )), 
              tabPanel("Calculator", 
                       fluidRow(
-                        tags$div(style="width:75%;",
+                        tags$div(style="width:50%;",
                                  tags$h4("Winter Run Redds Dewater Calulator"), 
                                  tags$p("This tool provides a simple way to evaluate and experiment with 
                     different flow reduction scenarios. Select a date and a 
                     desired Keswick flow reduction to view potential Winter 
-                    Run redd strandings."), 
-                                 tags$div(
-                                   tags$div(style="display:inline-block;", 
-                                            dateInput(ns("dewater_calc_date"), "Reduce flow on", 
-                                                      value = today() + 30, width = 150, 
-                                                      format = "M d, yyyy")),
-                                   tags$div(style="display:inline-block;", 
-                                            numericInput(ns("dewater_calc_flow"), "Change flow to", 
-                                                         value = 5000, width = 150)),
-                                   tags$div(style="display:inline-block;", 
-                                            actionButton(ns("run_dewater_calc"), "run"))
-                                 )
-                        )))
+                    Run redd strandings.")), 
+                        tags$div(
+                          tags$div(style="display:inline-block;", 
+                                   dateInput(ns("dewater_calc_date"), "Reduce flow on", 
+                                             value = today() + 30, width = 150, 
+                                             format = "M d, yyyy")),
+                          tags$div(style="display:inline-block;", 
+                                   numericInput(ns("dewater_calc_flow"), "Change flow to", 
+                                                value = 5000, width = 150)),
+                          tags$div(style="display:inline-block;", 
+                                   actionButton(ns("run_dewater_calc"), "run"))
+                        )
+                      ))
            ))
   )
 }
