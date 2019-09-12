@@ -52,6 +52,10 @@ shallow_redds_danger <- read_csv("data/chinook/shallow-redds-temp.csv") %>%
   mutate(days_to_emergece = as.numeric(last_emergence - today())) %>% 
   filter(days_to_emergece > 1)
 
+shallow_redds_details <- read_csv("data/chinook/shallow-redd-detailed.csv") %>% 
+  mutate(days_to_emergece = as.numeric(emergence_date - today())) %>% 
+  filter(days_to_emergece > 1)
+
 # diversion_data <- read_csv("data/flows/srsc_diversion_data.csv") %>% 
 #   mutate(draft_date = mdy(draft_date))
 diversion_data <- read_rds("data/flows/total-diversions-2019-09-05.rds")
