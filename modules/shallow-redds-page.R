@@ -19,7 +19,8 @@ shallow_redds_ui <- function(id) {
                                       redds at that location. Use the time series
                                       plot to evaluate current and historical
                                       flow trends. For a addtional information 
-                                      click the ?")),
+                                      click the ?")), 
+                      tags$hr(),
                       fluidRow(
                         uiOutput(ns("shallow_monitoring_text")),
                         plotlyOutput(ns("shallow_flow_plot")) 
@@ -126,6 +127,19 @@ shallow_redds_server <- function(input, output, session) {
              datetime <= last_emergence_date()) %>% ungroup()
   })
   
+  # this is the detail text for when a redd marker is selected from the map
+  output$shallow_monitoring_text <- renderUI({
+      if (is.null(input$shallow_redds_map_marker_click$id)) return()
+    
+      tags$div(style="padding:15px;",
+      tags$h4("Selected River Mile:", selected_marker()$river_mile, 
+              style="font-weight:500;"),
+      tags$h4("Total Redds:", selected_marker()$total, 
+              style="font-weight:500;"),
+      tags$h4("Limiting Emergence:", format(selected_marker()$last_emergence, "%B %d, %Y"), 
+              style="font-weight:500;")
+    )
+  })
   
   output$shallow_flow_plot <- renderPlotly({
     validate(need(!is.null(input$shallow_redds_map_marker_click$id), 
