@@ -41,9 +41,9 @@ winter_run_UI <- function(id) {
                                                          # , "Hatch Date"
                                                          )),
                                uiOutput(ns("wr_select_spawn_data_ui")))), 
-               column(width = 12, class = "col-md-4"
-                      # , 
-                      # uiOutput(ns("wr_help_message"))
+               column(width = 12, class = "col-md-4",
+                      selectInput(ns("wr_add_year"), "Add historic curve", 
+                                  choices = c("None", 2010:2018), width = 150)
                       )),
              fluidRow(
                # plot
@@ -112,6 +112,20 @@ winter_run_server <- function(input, output, session, g_date) {
         group_by(location, seed_day, date) %>% 
         summarise(total = as.integer(sum(counts))) %>% 
         ungroup()
+  })
+  
+  rd_historic_counts <- reactive({
+    if (input$wr_add_year != "None") {
+    rd %>% 
+      filter(year(date) == as.numeric(input$wr_add_year)) %>% 
+        group_by(date) %>% 
+        summarise(
+          current_active = sum(counts)
+        ) %>% 
+        mutate(date = `year<-`(date, as.numeric(input$wr_select_year)))
+    } else {
+      NULL
+    }
   })
   
   rd_hatching <- reactive({
@@ -208,13 +222,20 @@ winter_run_server <- function(input, output, session, g_date) {
           layout(legend = list(orientation = 'h'), showlegend = TRUE, 
                  xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
                  barmode='stack')
+        
+        if (input$wr_add_year != "None") {
+          p <- p %>% add_lines(data=rd_historic_counts(), 
+                               x = ~date, y = ~current_active, 
+                               name = paste(input$wr_add_year, "distribution"), 
+                               line = list(color="#2291e0", width=4))
+        }
         p
         
       }, 
       "Spawn Date" = {
         p <- rd_yr() %>% 
           plot_ly(x = ~date, y = ~as.integer(total), 
-                  color = ~as.character(seed_day), type='bar', 
+                  color = ~format(seed_day, "%b %d"), type='bar', 
                   text = ~paste0(date, "<br>", 
                                  location, "<br>", 
                                  total), 
@@ -224,6 +245,13 @@ winter_run_server <- function(input, output, session, g_date) {
                  xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
                  barmode='stack')
         
+        if (input$wr_add_year != "None") {
+          p <- p %>% add_lines(data=rd_historic_counts(), 
+                               x = ~date, y = ~current_active, 
+                               name = paste(input$wr_add_year, "distribution"), 
+                               line = list(color="#2291e0", width=4), 
+                               inherit = FALSE)
+        }
         
         p
         
