@@ -8,50 +8,37 @@ shallow_redds_ui <- function(id) {
            tags$h3("Shallow Redds Monitoring"),
            tags$hr(),
            leafletOutput(ns("shallow_redds_map"))), 
-    column(width = 6, 
-           tabsetPanel(type = "pills",
-             tabPanel("Monitoring", 
-                      tags$div(style="width:50%;",
-                               tags$h4("Winter Run Redds Monitoring"), 
-                               tags$p("The monitoring tool provides details about
-                                      redds at risk of dewaterting. Select a 
-                                      river mile from map to view details for
-                                      redds at that location. Use the time series
-                                      plot to evaluate current and historical
-                                      flow trends. For a addtional information 
-                                      click the ?")), 
-                      tags$hr(),
-                      fluidRow(
-                        uiOutput(ns("shallow_monitoring_text")),
-                        plotlyOutput(ns("shallow_flow_plot")) 
-                      )), 
-             tabPanel("Calculator", 
-                      fluidRow(
-                        tags$div(style="width:50%;",
-                                 tags$h4("Winter Run Redds Dewater Calulator"), 
-                                 tags$p("This tool provides a simple way to evaluate and experiment with 
+    column(width = 6,
+           fluidRow(
+             uiOutput(ns("shallow_monitoring_text")),
+             plotlyOutput(ns("shallow_flow_plot")) 
+           ), 
+           fluidRow(
+             tags$div(style="width:50%;",
+                      tags$h4("Winter Run Redds Dewater Calulator"), 
+                      tags$p("This tool provides a simple way to evaluate and experiment with 
                     different flow reduction scenarios. Select a date and a 
                     desired Keswick flow reduction to view potential Winter 
                     Run redd strandings.")), 
-                        tags$div(
-                          tags$div(style="display:inline-block;", 
-                                   dateInput(ns("dewater_calc_date"), "Reduce flow on", 
-                                             value = today() + 30, width = 150, 
-                                             format = "M d, yyyy")),
-                          tags$div(style="display:inline-block;", 
-                                   numericInput(ns("dewater_calc_flow"), "Change flow to", 
-                                                value = 5000, width = 150)),
-                          tags$div(style="display:inline-block;", 
-                                   actionButton(ns("run_dewater_calc"), "run"))
-                        ), 
-                        uiOutput(ns("dewater_calc_output"))
-                      ))
+             tags$div(
+               tags$div(style="display:inline-block;", 
+                        dateInput(ns("dewater_calc_date"), "Reduce flow on", 
+                                  value = today() + 30, width = 150, 
+                                  format = "M d, yyyy")),
+               tags$div(style="display:inline-block;", 
+                        numericInput(ns("dewater_calc_flow"), "Change flow to", 
+                                     value = 5000, width = 150)),
+               tags$div(style="display:inline-block;", 
+                        actionButton(ns("run_dewater_calc"), "run"))
+             ), 
+             uiOutput(ns("dewater_calc_output"))
            ))
+    
   )
 }
 
 shallow_redds_server <- function(input, output, session) {
-
+  
   
   # Shallow redds map -----------------------------------------------------------
   output$shallow_redds_map <- renderLeaflet({
@@ -119,7 +106,7 @@ shallow_redds_server <- function(input, output, session) {
       summarise(
         total = n() 
       )
-      
+    
   })
   
   
@@ -147,15 +134,15 @@ shallow_redds_server <- function(input, output, session) {
   
   # this is the detail text for when a redd marker is selected from the map
   output$shallow_monitoring_text <- renderUI({
-      if (is.null(input$shallow_redds_map_marker_click$id)) return()
+    if (is.null(input$shallow_redds_map_marker_click$id)) return()
     
-      tags$div(style="padding:15px;",
-      tags$h4("Selected River Mile:", selected_marker()$river_mile, 
-              style="font-weight:500;"),
-      tags$h4("Total Redds:", selected_marker()$total, 
-              style="font-weight:500;"),
-      tags$h4("Limiting Emergence:", format(selected_marker()$last_emergence, "%B %d, %Y"), 
-              style="font-weight:500;")
+    tags$div(style="padding:15px;",
+             tags$h4("Selected River Mile:", selected_marker()$river_mile, 
+                     style="font-weight:500;"),
+             tags$h4("Total Redds:", selected_marker()$total, 
+                     style="font-weight:500;"),
+             tags$h4("Limiting Emergence:", format(selected_marker()$last_emergence, "%B %d, %Y"), 
+                     style="font-weight:500;")
     )
   })
   
