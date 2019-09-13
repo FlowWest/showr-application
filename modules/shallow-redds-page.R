@@ -39,30 +39,9 @@ shallow_redds_ui <- function(id) {
 
 shallow_redds_server <- function(input, output, session) {
   
+  # general functions ----------------------------------------------------------
   
-  # Shallow redds map -----------------------------------------------------------
-  output$shallow_redds_map <- renderLeaflet({
-    shallow_color <- leaflet::colorNumeric(
-      palette = "OrRd", 
-      domain = shallow_redds_danger$total)
-    
-    shallow_redds_danger %>% 
-      leaflet() %>% 
-      addTiles() %>% 
-      addCircleMarkers(popup = ~paste0("<b>Shallow Redds at RM: ", river_mile, "</b><br>", 
-                                       "Total in danger: ", total, "<br>", 
-                                       "Dewater Threshold: 5,000 cfs <br>", 
-                                       "Estimated Emergence: ", days_to_emergece, 
-                                       " (", format(last_emergence, "%b %d)")), 
-                       color= "#666666", 
-                       fillColor = ~shallow_color(total), 
-                       layerId = ~river_mile,
-                       fillOpacity = .7) %>% 
-      addLegend(pal=shallow_color, values = ~total, 
-                title = "Total Redds")
-    
-    
-  })
+  # reactives ------------------------------------------------------------------
   
   # lat longs for selected redd in danger
   selected_redd_in_danger <- reactive({
@@ -102,18 +81,14 @@ shallow_redds_server <- function(input, output, session) {
   shallow_redds_remaining <- eventReactive(input$run_dewater_calc, {
     shallow_redds_details %>% 
       filter(emergence_date >= input$dewater_calc_date) %>% 
-      group_by(river_mile) %>% 
+      group_by(river_mile = as.character(river_mile)) %>% 
       summarise(
+        days_to_emergece = as.numeric(max(emergence_date) - today()),
+        last_emergence = max(emergence_date),
         total = n() 
-      )
+      ) %>% 
+      left_join(select(sac_river_miles, river_mile, lat, lon)) 
     
-  })
-  
-  
-  output$dewater_calc_output <- renderUI({
-    tags$div(
-      tags$p(sum(shallow_redds_remaining()$total))
-    )
   })
   
   # calculate the historical flows up to the last emergence data
@@ -130,6 +105,76 @@ shallow_redds_server <- function(input, output, session) {
       ) %>% 
       filter(datetime > max(shallow_redds_flow()$datetime), 
              datetime <= last_emergence_date()) %>% ungroup()
+  })
+  
+  
+  # observers ------------------------------------------------------------------
+  
+  observeEvent(input$shallow_redds_map_marker_click$id, {
+    leafletProxy("shallow_redds_map") %>% 
+      clearGroup("selected_shallow_redd") %>% 
+      addCircleMarkers(data=selected_marker(), color = "#57a0ff",
+                       weight = 5,
+                       opacity = 1,
+                       group = "selected_shallow_redd")
+    })
+  
+  observeEvent(input$run_dewater_calc, {
+    shallow_color <- leaflet::colorNumeric(
+      palette = "OrRd", 
+      domain = shallow_redds_remaining()$total)
+    
+    leafletProxy("shallow_redds_map", data = shallow_redds_remaining()) %>%
+      clearGroup("shallow_redds") %>% 
+      clearGroup("shallow_redds_calculated") %>% 
+      clearControls() %>% 
+      addCircleMarkers(popup = ~paste0("<b>Shallow Redds at RM: ", river_mile, "</b><br>", 
+                                       "Total in danger: ", total, "<br>", 
+                                       "Dewater Threshold: 5,000 cfs <br>", 
+                                       "Estimated Emergence: ", days_to_emergece, 
+                                       " (", format(last_emergence, "%b %d)")), 
+                       color= "#666666", 
+                       fillColor = ~shallow_color(total), 
+                       layerId = ~river_mile,
+                       fillOpacity = .7, 
+                       group = "shallow_redds_calculated") %>% 
+      addLegend(pal=shallow_color, values = ~total, 
+                title = "Total Redds")
+  })
+  
+  # output ---------------------------------------------------------------------
+  
+  
+  # Shallow redds map ---------------------------------
+  
+  output$shallow_redds_map <- renderLeaflet({
+    shallow_color <- leaflet::colorNumeric(
+      palette = "OrRd", 
+      domain = shallow_redds_danger$total)
+    
+    shallow_redds_danger %>% 
+      leaflet() %>% 
+      addTiles() %>% 
+      addCircleMarkers(popup = ~paste0("<b>Shallow Redds at RM: ", river_mile, "</b><br>", 
+                                       "Total in danger: ", total, "<br>", 
+                                       "Dewater Threshold: 5,000 cfs <br>", 
+                                       "Estimated Emergence: ", days_to_emergece, 
+                                       " (", format(last_emergence, "%b %d)")), 
+                       color= "#666666", 
+                       fillColor = ~shallow_color(total), 
+                       layerId = ~river_mile,
+                       fillOpacity = .7, 
+                       group = "shallow_redds") %>% 
+      addLegend(pal=shallow_color, values = ~total, 
+                title = "Total Redds")
+    
+    
+  })
+  
+  output$dewater_calc_output <- renderUI({
+    tags$div(
+      tags$p(sum(shallow_redds_remaining()$total))
+    )
   })
   
   # this is the detail text for when a redd marker is selected from the map
@@ -173,19 +218,6 @@ shallow_redds_server <- function(input, output, session) {
              legend = list(orientation = 'h'))
     
   })
-  
-  observeEvent(input$shallow_redds_map_marker_click$id, {
-    leafletProxy("shallow_redds_map") %>% 
-      clearGroup("selected_shallow_redd") %>% 
-      addCircleMarkers(data=selected_marker(), color = "#57a0ff",
-                       weight = 5,
-                       opacity = 1,
-                       group = "selected_shallow_redd")
-  })
-  
-  
-  
-  
   
   
 }

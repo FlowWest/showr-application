@@ -367,7 +367,7 @@ winter_run_server <- function(input, output, session, g_date) {
                                   key = ~location) %>%
                 layout(legend = list(orientation = 'h'), showlegend = TRUE, 
                        xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
-                       barmode='stack')
+                       barmode='stack', hovermode = "compare")
               
               if (input$wr_add_year != "None") {
                 p <- p %>% add_lines(data=rd_historic_counts(), 
@@ -389,7 +389,7 @@ winter_run_server <- function(input, output, session, g_date) {
                         source="redd_presence_plot", key = ~location)  %>%
                 layout(legend = list(orientation = 'h'), showlegend = TRUE, 
                        xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
-                       barmode='stack')
+                       barmode='stack', hovermode = "compare")
               
               if (input$wr_add_year != "None") {
                 p <- p %>% add_lines(data=rd_historic_counts(), 

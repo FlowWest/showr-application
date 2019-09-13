@@ -47,6 +47,7 @@ sac_river_miles <-
     lat, lon
   )
 
+
 # add column to determine days until the emergence
 shallow_redds_danger <- read_csv("data/chinook/shallow-redds-temp.csv") %>% 
   mutate(days_to_emergece = as.numeric(last_emergence - today())) %>% 
