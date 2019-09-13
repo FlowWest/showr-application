@@ -297,7 +297,47 @@ winter_run_server <- function(input, output, session, g_date) {
   observeEvent(input$comparison_button, {
     showModal(modalDialog(
       title = paste(input$wr_select_year, "vs", input$wr_add_year), 
-      size = "l"
+      tags$div(
+        tags$table(
+          class = "table", 
+          tags$thead(
+            tags$tr(
+              tags$th(scope ="col", ""),
+              tags$th(scope ="col", "2019"), 
+              tags$th(scope ="col", "2017")
+            )
+          ), 
+          tags$tbody(
+            tags$tr(
+              tags$th("Total Redds Counted"),
+              tags$th("251"), 
+              tags$th("44")
+            )
+          ),
+          tags$tbody(
+            tags$tr(
+              tags$th("First Spawn"),
+              tags$th("August 3"), 
+              tags$th("July 5")
+            )
+          ), 
+          tags$tbody(
+            tags$tr(
+              tags$th("Last Emergence"),
+              tags$th("October 21"), 
+              tags$th("November 1")
+            )
+          ),
+          tags$tbody(
+            tags$tr(
+              tags$th("Most Dense Month (count)"),
+              tags$th("July (460)"), 
+              tags$th("June (34)")
+            )
+          )
+          ), 
+        tags$p(tags$em("Notes:"))),
+      size = "m"
     ))
   })
   
