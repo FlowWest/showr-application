@@ -133,7 +133,8 @@ winter_run_server <- function(input, output, session, g_date) {
   
   output$comparison_button_ui <- renderUI({
     if (input$wr_add_year != "None") {
-      actionButton(ns("comparison_button"), "Compare Years")
+      actionButton(ns("comparison_button"), "Compare Years", class="btn-sm", 
+                   style="margin-top:25px;")
     } else 
       NULL
   })
@@ -291,6 +292,13 @@ winter_run_server <- function(input, output, session, g_date) {
       }
     )
     
+  })
+  
+  observeEvent(input$comparison_button, {
+    showModal(modalDialog(
+      title = paste(input$wr_select_year, "vs", input$wr_add_year), 
+      size = "l"
+    ))
   })
   
   # Bookmarking this page ----------
