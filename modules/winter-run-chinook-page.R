@@ -36,15 +36,18 @@ winter_run_UI <- function(id) {
                column(width = 12, class = "col-md-1", 
                       tags$div(style="display:inline-block",
                                radioButtons(ns("wr_show_plot_by"),
-                                             label = "Plot by", 
-                                             choices = c("Reach", "Spawn Date"
-                                                         # , "Hatch Date"
-                                                         )),
+                                            label = "Plot by", 
+                                            choices = c("Reach", "Spawn Date"
+                                                        # , "Hatch Date"
+                                            )),
                                uiOutput(ns("wr_select_spawn_data_ui")))), 
-               column(width = 12, class = "col-md-4",
+               column(width = 12, class = "col-md-2",
                       selectInput(ns("wr_add_year"), "Add historic curve", 
                                   choices = c("None", 2010:2018), width = 150)
-                      )),
+               ), 
+               column(width = 12, class = "col-md-2",
+                      uiOutput(ns("comparison_button_ui"))
+               )),
              fluidRow(
                # plot
                column(width = 12, class="col-md-9", 
@@ -63,6 +66,8 @@ winter_run_UI <- function(id) {
 winter_run_server <- function(input, output, session, g_date) {
   ns <- session$ns
   
+  # General Functions ----------------------------------------------------------
+  
   dataModal <- function(...) {
     modalDialog(
       title = "Upper Sacramento Redd Reaches",
@@ -77,47 +82,25 @@ winter_run_server <- function(input, output, session, g_date) {
     )
   }
   
-  output$download_wr_data <- downloadHandler(
-    filename = function() {
-      "showr-aerial-redd-survey.csv"
-    },
-    content = function(file){
-      write.csv(redd_data, file, row.names = FALSE)
-      
-    }
-  )
+  # Reactives ------------------------------------------------------------------
   
   redd_counts_today <- reactive({
     rd_yr() %>% 
       filter(date == lubridate::today(tzone="US/Pacific"))
   })
   
-  
-  # not working correctly
-  output$wr_table <- renderTable(
-    rd %>% 
-      filter(year(date) == input$wr_select_year, counts > 0) %>% 
-      mutate(temp_exceed = daily_mean > 56) %>% 
-      group_by(redd_id) %>% 
-      summarise(Total = max(counts), `Temperature Threatened` = max(temp_exceed) * max(counts)) %>% 
-      ungroup() %>% 
-      summarise(Total = as.integer(sum(Total)), 
-                `Temperature Threatened` = as.integer(sum(`Temperature Threatened`, na.rm = TRUE))))
-  
-  
-  
   rd_yr <- reactive({
-      rd %>% 
-        filter(year(date) == input$wr_select_year) %>%  
-        group_by(location, seed_day, date) %>% 
-        summarise(total = as.integer(sum(counts))) %>% 
-        ungroup()
+    rd %>% 
+      filter(year(date) == input$wr_select_year) %>%  
+      group_by(location, seed_day, date) %>% 
+      summarise(total = as.integer(sum(counts))) %>% 
+      ungroup()
   })
   
   rd_historic_counts <- reactive({
     if (input$wr_add_year != "None") {
-    rd %>% 
-      filter(year(date) == as.numeric(input$wr_add_year)) %>% 
+      rd %>% 
+        filter(year(date) == as.numeric(input$wr_add_year)) %>% 
         group_by(date) %>% 
         summarise(
           current_active = sum(counts)
@@ -129,7 +112,7 @@ winter_run_server <- function(input, output, session, g_date) {
   })
   
   rd_hatching <- reactive({
-      rd %>% 
+    rd %>% 
       filter(year(date) == input$wr_select_year) %>% 
       group_by(redd_id) %>% 
       mutate(hatching_devel = redd_hatching(daily_mean), 
@@ -173,6 +156,174 @@ winter_run_server <- function(input, output, session, g_date) {
     }
   })
   
+  daterange_from_presence_plot <- reactive({
+    plotly::event_data("plotly_relayout", source="redd_presence_plot")
+  })
+  
+  reaches_to_show_in_map <- reactive({
+    subset(redd_reach, Reach %in% pull(distinct(rd_yr(), location)))
+  })
+  
+  hovered_reach <- reactive({
+    subset(redd_reach, Reach == event_data("plotly_hover", source = "redd_presence_plot")$key)
+  })
+  
+  # year comparison values 
+  year_comparison_results <- reactive({
+    req(input$wr_add_year != "None")
+    
+     year_totals <- redd_data %>% 
+      filter(year(date) %in% c(input$wr_select_year, input$wr_add_year)) %>% 
+      group_by(year = year(date)) %>% 
+      summarise(
+        total = sum(counts, na.rm = TRUE)
+      )
+     
+     first_spawn_last_emergence <- rd %>% 
+       filter(year(date) %in% c(input$wr_select_year, input$wr_add_year)) %>%
+       group_by(year = year(date)) %>% 
+       summarise(
+         first_spawn = format(min(seed_day), "%B %d"), 
+         last_emergence = format(max(date), "%B %d")
+       )
+     
+     # most dense month
+     most_dense_month <- rd %>% 
+       filter(year(date) %in% c(input$wr_select_year, input$wr_add_year)) %>%
+       group_by(date) %>% 
+       summarise(
+         daily_sum = sum(counts)
+       ) %>% 
+       group_by(year = year(date), month = month(date)) %>% 
+       summarise(
+         month_max = max(daily_sum)
+       ) %>% ungroup() %>% 
+       group_by(year) %>% 
+       summarise(
+         max = max(month_max), 
+         month = month[which(month_max == max)][1]
+       )
+     
+     values_1 <- list(
+       year_totals = year_totals %>% filter(year == input$wr_select_year) %>% pull(total), 
+       first_spawn = first_spawn_last_emergence %>% filter(year == input$wr_select_year) %>% pull(first_spawn),
+       last_emergence = first_spawn_last_emergence %>% filter(year == input$wr_select_year) %>% pull(last_emergence), 
+       most_dense_month = c(
+         most_dense_month %>% filter(year == input$wr_select_year) %>% pull(month),
+         most_dense_month %>% filter(year == input$wr_select_year) %>% pull(max) 
+       )
+     )
+     
+     values_2 <- list(
+       year_totals = year_totals %>% filter(year == input$wr_add_year) %>% pull(total), 
+       first_spawn = first_spawn_last_emergence %>% filter(year == input$wr_add_year) %>% pull(first_spawn),
+       last_emergence = first_spawn_last_emergence %>% filter(year == input$wr_add_year) %>% pull(last_emergence),
+       most_dense_month = c(
+         most_dense_month %>% filter(year == input$wr_add_year) %>% pull(month),
+         most_dense_month %>% filter(year == input$wr_add_year) %>% pull(max) 
+       )
+     )
+     
+     list(
+       val1 = values_1, 
+       val2 = values_2
+     )
+  })
+  
+  # Observers ------------------------------------------------------------------
+  
+  observeEvent(input$comparison_button, {
+    showModal(modalDialog(
+      title = paste(input$wr_select_year, "vs", input$wr_add_year), 
+      tags$div(
+        tags$table(
+          class = "table", 
+          tags$thead(
+            tags$tr(
+              tags$th(scope ="col", ""),
+              tags$th(scope ="col", input$wr_select_year), 
+              tags$th(scope ="col", input$wr_add_year)
+            )
+          ), 
+          tags$tbody(
+            tags$tr(
+              tags$th("Total Redds Counted"),
+              tags$th(year_comparison_results()$val1$year_totals), 
+              tags$th(year_comparison_results()$val2$year_totals)
+            )
+          ),
+          tags$tbody(
+            tags$tr(
+              tags$th("First Spawn"),
+              tags$th(year_comparison_results()$val1$first_spawn), 
+              tags$th(year_comparison_results()$val2$first_spawn)
+            )
+          ), 
+          tags$tbody(
+            tags$tr(
+              tags$th("Last Emergence"),
+              tags$th(year_comparison_results()$val1$last_emergence), 
+              tags$th(year_comparison_results()$val2$last_emergence)
+            )
+          ),
+          tags$tbody(
+            tags$tr(
+              tags$th("Most Dense Month (count)"),
+              tags$th(paste0(month.name[year_comparison_results()$val1$most_dense_month[1]], " (", year_comparison_results()$val1$most_dense_month[2],")")), 
+              tags$th(paste0(month.name[year_comparison_results()$val2$most_dense_month[1]], " (", year_comparison_results()$val2$most_dense_month[2],")"))
+            )
+          )
+        ), 
+        tags$p(tags$em("Notes:"))),
+      size = "m"
+    ))
+  })
+  
+  observe({
+    leafletProxy("wr_redd_reaches_map", data=hovered_reach()) %>% 
+      clearGroup("hovered_reach") %>% 
+      addPolylines(
+        # color = "#7a3d69", 
+        group = "hovered_reach", 
+        stroke = TRUE,
+        weight = 12, 
+        fillOpacity = .9, 
+        fillColor = "#7a3d69")
+    
+    
+  })
+  
+  # Output ---------------------------------------------------------------------
+  
+  output$download_wr_data <- downloadHandler(
+    filename = function() {
+      "showr-aerial-redd-survey.csv"
+    },
+    content = function(file){
+      write.csv(redd_data, file, row.names = FALSE)
+      
+    }
+  )
+  
+  # not working correctly
+  output$wr_table <- renderTable(
+    rd %>% 
+      filter(year(date) == input$wr_select_year, counts > 0) %>% 
+      mutate(temp_exceed = daily_mean > 56) %>% 
+      group_by(redd_id) %>% 
+      summarise(Total = max(counts), `Temperature Threatened` = max(temp_exceed) * max(counts)) %>% 
+      ungroup() %>% 
+      summarise(Total = as.integer(sum(Total)), 
+                `Temperature Threatened` = as.integer(sum(`Temperature Threatened`, na.rm = TRUE))))
+  
+  output$comparison_button_ui <- renderUI({
+    if (input$wr_add_year != "None") {
+      actionButton(ns("comparison_button"), "Compare Years", class="btn-sm", 
+                   style="margin-top:25px;")
+    } else 
+      NULL
+  })
+  
   output$winter_run_temp_plot <- renderPlotly({
     p <- plot_ly()  %>% 
       add_lines(data=wr_temp_data(), x=~date, y=~daily_mean, 
@@ -190,15 +341,10 @@ winter_run_server <- function(input, output, session, g_date) {
       
     }
     
-     p %>%  
+    p %>%  
       layout(xaxis=list(title=""), yaxis=list(title="daily mean temperature (F)"), 
              legend=list(orientation='h'))
   })
-  
-  daterange_from_presence_plot <- reactive({
-    plotly::event_data("plotly_relayout", source="redd_presence_plot")
-  })
-  
   
   # this whole thing needs some refactoring
   output$winter_run_plot <- renderPlotly({
@@ -208,94 +354,79 @@ winter_run_server <- function(input, output, session, g_date) {
     
     # giant switch to control what plot to show
     switch (input$wr_show_plot_by,
-      "Reach" = {
-        p <- rd_yr() %>%
-          plot_ly(source="redd_presence_plot") 
-        
-        p <- p %>% add_bars(data=rd_yr(), 
-                            x = ~date, y = ~as.integer(total), color = ~location, 
-                            text = ~paste0(date, "<br>", 
-                                           location, "<br>", 
-                                           total), 
-                            hoverinfo = "text", 
-                            key = ~location) %>%
-          layout(legend = list(orientation = 'h'), showlegend = TRUE, 
-                 xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
-                 barmode='stack')
-        
-        if (input$wr_add_year != "None") {
-          p <- p %>% add_lines(data=rd_historic_counts(), 
-                               x = ~date, y = ~current_active, 
-                               name = paste(input$wr_add_year, "distribution"), 
-                               line = list(color="#2291e0", width=4))
-        }
-        p
-        
-      }, 
-      "Spawn Date" = {
-        p <- rd_yr() %>% 
-          plot_ly(x = ~date, y = ~as.integer(total), 
-                  color = ~format(seed_day, "%b %d"), type='bar', 
-                  text = ~paste0(date, "<br>", 
-                                 location, "<br>", 
-                                 total), 
-                  hoverinfo = "text", colors = "Dark2", 
-                  source="redd_presence_plot", key = ~location)  %>%
-          layout(legend = list(orientation = 'h'), showlegend = TRUE, 
-                 xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
-                 barmode='stack')
-        
-        if (input$wr_add_year != "None") {
-          p <- p %>% add_lines(data=rd_historic_counts(), 
-                               x = ~date, y = ~current_active, 
-                               name = paste(input$wr_add_year, "distribution"), 
-                               line = list(color="#2291e0", width=4), 
-                               inherit = FALSE)
-        }
-        
-        p
-        
-      }, 
-      "Hatch Date" = {
-        p <- rd_hatching() %>% 
-          plot_ly(x=~date, y=~counts, color=~has_hatched, type='bar', 
-                  opacity=~has_hatched,
-                  text = ~paste0(date, "<br>", 
-                                 location, "<br>", 
-                                 counts), 
-                  hoverinfo = "text",
-                  source="redd_presence_plot", key = ~location) %>% 
-          layout(legend = list(orientation = 'h'), showlegend = TRUE, 
-                 xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
-                 barmode='stack')
-        
-        # if (input$wr_select_year == 2018) {
-        #   p <- p %>% add_segments(
-        #     data=filter(rd_hatching(), date == Sys.Date()),
-        #     x=~date, xend = ~date, y = 0, yend = ~sum(counts),
-        #     line=list(color="#7c247f", width=4), name="today", showlegend=FALSE, 
-        #     hoverinfo = "text", text="Today!")  
-        # }
-        
-        p
-      }
+            "Reach" = {
+              p <- rd_yr() %>%
+                plot_ly(source="redd_presence_plot") 
+              
+              p <- p %>% add_bars(data=rd_yr(), 
+                                  x = ~date, y = ~as.integer(total), color = ~location, 
+                                  text = ~paste0(date, "<br>", 
+                                                 location, "<br>", 
+                                                 total), 
+                                  hoverinfo = "text", 
+                                  key = ~location) %>%
+                layout(legend = list(orientation = 'h'), showlegend = TRUE, 
+                       xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
+                       barmode='stack')
+              
+              if (input$wr_add_year != "None") {
+                p <- p %>% add_lines(data=rd_historic_counts(), 
+                                     x = ~date, y = ~current_active, 
+                                     name = paste(input$wr_add_year, "distribution"), 
+                                     line = list(color="#2291e0", width=4))
+              }
+              p
+              
+            }, 
+            "Spawn Date" = {
+              p <- rd_yr() %>% 
+                plot_ly(x = ~date, y = ~as.integer(total), 
+                        color = ~format(seed_day, "%b %d"), type='bar', 
+                        text = ~paste0(date, "<br>", 
+                                       location, "<br>", 
+                                       total), 
+                        hoverinfo = "text", colors = "Dark2", 
+                        source="redd_presence_plot", key = ~location)  %>%
+                layout(legend = list(orientation = 'h'), showlegend = TRUE, 
+                       xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
+                       barmode='stack')
+              
+              if (input$wr_add_year != "None") {
+                p <- p %>% add_lines(data=rd_historic_counts(), 
+                                     x = ~date, y = ~current_active, 
+                                     name = paste(input$wr_add_year, "distribution"), 
+                                     line = list(color="#2291e0", width=4), 
+                                     inherit = FALSE)
+              }
+              
+              p
+              
+            }, 
+            "Hatch Date" = {
+              p <- rd_hatching() %>% 
+                plot_ly(x=~date, y=~counts, color=~has_hatched, type='bar', 
+                        opacity=~has_hatched,
+                        text = ~paste0(date, "<br>", 
+                                       location, "<br>", 
+                                       counts), 
+                        hoverinfo = "text",
+                        source="redd_presence_plot", key = ~location) %>% 
+                layout(legend = list(orientation = 'h'), showlegend = TRUE, 
+                       xaxis = list(title = ""), yaxis = list(title = 'total redds'), 
+                       barmode='stack')
+              
+              # if (input$wr_select_year == 2018) {
+              #   p <- p %>% add_segments(
+              #     data=filter(rd_hatching(), date == Sys.Date()),
+              #     x=~date, xend = ~date, y = 0, yend = ~sum(counts),
+              #     line=list(color="#7c247f", width=4), name="today", showlegend=FALSE, 
+              #     hoverinfo = "text", text="Today!")  
+              # }
+              
+              p
+            }
     )
     
-  })
-  
-  # Bookmarking this page ----------
-  setBookmarkExclude(c("flow_page_bookmark", "temp_page_bookmark", "chinook_bookmark"))
-  
-  observeEvent(input$chinook_bookmark, {
-    session$doBookmark()
-  })
-  
-  onBookmark(function(state) {
-    state$values$wr_year_hash <- digest::digest(input$wr_select_year, "md5")
-  })
-  
-  reaches_to_show_in_map <- reactive({
-    subset(redd_reach, Reach %in% pull(distinct(rd_yr(), location)))
   })
   
   output$wr_redd_reaches_map <- renderLeaflet({
@@ -315,23 +446,15 @@ winter_run_server <- function(input, output, session, g_date) {
                      bringToFront = TRUE) )
   })
   
-  hovered_reach <- reactive({
-    subset(redd_reach, Reach == event_data("plotly_hover", source = "redd_presence_plot")$key)
+  # Bookmarking this page ----------
+  setBookmarkExclude(c("flow_page_bookmark", "temp_page_bookmark", "chinook_bookmark"))
+  
+  observeEvent(input$chinook_bookmark, {
+    session$doBookmark()
   })
   
-  observe({
-    leafletProxy("wr_redd_reaches_map", data=hovered_reach()) %>% 
-      clearGroup("hovered_reach") %>% 
-      addPolylines(
-        # color = "#7a3d69", 
-        group = "hovered_reach", 
-        stroke = TRUE,
-        weight = 12, 
-        fillOpacity = .9, 
-        fillColor = "#7a3d69")
-    
-    
+  onBookmark(function(state) {
+    state$values$wr_year_hash <- digest::digest(input$wr_select_year, "md5")
   })
-  
   
 }
