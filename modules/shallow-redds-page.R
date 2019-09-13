@@ -43,7 +43,8 @@ shallow_redds_ui <- function(id) {
                                                 value = 5000, width = 150)),
                           tags$div(style="display:inline-block;", 
                                    actionButton(ns("run_dewater_calc"), "run"))
-                        )
+                        ), 
+                        uiOutput(ns("dewater_calc_output"))
                       ))
            ))
   )
@@ -52,7 +53,7 @@ shallow_redds_ui <- function(id) {
 shallow_redds_server <- function(input, output, session) {
 
   
-  # Shallow redds map
+  # Shallow redds map -----------------------------------------------------------
   output$shallow_redds_map <- renderLeaflet({
     shallow_color <- leaflet::colorNumeric(
       palette = "OrRd", 
@@ -109,6 +110,23 @@ shallow_redds_server <- function(input, output, session) {
       filter(year(datetime) == 2019, month(datetime) >= 5, 
              location_id == "kwk") %>% 
       arrange(datetime)
+  })
+  
+  shallow_redds_remaining <- eventReactive(input$run_dewater_calc, {
+    shallow_redds_details %>% 
+      filter(emergence_date >= input$dewater_calc_date) %>% 
+      group_by(river_mile) %>% 
+      summarise(
+        total = n() 
+      )
+      
+  })
+  
+  
+  output$dewater_calc_output <- renderUI({
+    tags$div(
+      tags$p(sum(shallow_redds_remaining()$total))
+    )
   })
   
   # calculate the historical flows up to the last emergence data
