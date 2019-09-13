@@ -87,7 +87,8 @@ shallow_redds_server <- function(input, output, session) {
         last_emergence = max(emergence_date),
         total = n() 
       ) %>% 
-      left_join(select(sac_river_miles, river_mile, lat, lon)) 
+      left_join(select(sac_river_miles, river_mile, lat, lon)) %>% 
+      filter(days_to_emergece > 0)
     
   })
   
