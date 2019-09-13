@@ -203,6 +203,31 @@ winter_run_server <- function(input, output, session, g_date) {
          max = max(month_max), 
          month = month[which(month_max == max)][1]
        )
+     
+     values_1 <- list(
+       year_totals = year_totals %>% filter(year == input$wr_select_year) %>% pull(total), 
+       first_spawn = first_spawn_last_emergence %>% filter(year == input$wr_select_year) %>% pull(first_spawn),
+       last_emergence = first_spawn_last_emergence %>% filter(year == input$wr_select_year) %>% pull(last_emergence), 
+       most_dense_month = c(
+         most_dense_month %>% filter(year == input$wr_select_year) %>% pull(month),
+         most_dense_month %>% filter(year == input$wr_select_year) %>% pull(max) 
+       )
+     )
+     
+     values_2 <- list(
+       year_totals = year_totals %>% filter(year == input$wr_add_year) %>% pull(total), 
+       first_spawn = first_spawn_last_emergence %>% filter(year == input$wr_add_year) %>% pull(first_spawn),
+       last_emergence = first_spawn_last_emergence %>% filter(year == input$wr_add_year) %>% pull(last_emergence),
+       most_dense_month = c(
+         most_dense_month %>% filter(year == input$wr_add_year) %>% pull(month),
+         most_dense_month %>% filter(year == input$wr_add_year) %>% pull(max) 
+       )
+     )
+     
+     list(
+       val1 = values_1, 
+       val2 = values_2
+     )
   })
   
   # Observers ------------------------------------------------------------------
@@ -216,36 +241,36 @@ winter_run_server <- function(input, output, session, g_date) {
           tags$thead(
             tags$tr(
               tags$th(scope ="col", ""),
-              tags$th(scope ="col", "2019"), 
-              tags$th(scope ="col", "2017")
+              tags$th(scope ="col", input$wr_select_year), 
+              tags$th(scope ="col", input$wr_add_year)
             )
           ), 
           tags$tbody(
             tags$tr(
               tags$th("Total Redds Counted"),
-              tags$th("251"), 
-              tags$th("44")
+              tags$th(year_comparison_results()$val1$year_totals), 
+              tags$th(year_comparison_results()$val2$year_totals)
             )
           ),
           tags$tbody(
             tags$tr(
               tags$th("First Spawn"),
-              tags$th("August 3"), 
-              tags$th("July 5")
+              tags$th(year_comparison_results()$val1$first_spawn), 
+              tags$th(year_comparison_results()$val2$first_spawn)
             )
           ), 
           tags$tbody(
             tags$tr(
               tags$th("Last Emergence"),
-              tags$th("October 21"), 
-              tags$th("November 1")
+              tags$th(year_comparison_results()$val1$last_emergence), 
+              tags$th(year_comparison_results()$val2$last_emergence)
             )
           ),
           tags$tbody(
             tags$tr(
               tags$th("Most Dense Month (count)"),
-              tags$th("July (460)"), 
-              tags$th("June (34)")
+              tags$th(paste0(month.name[year_comparison_results()$val1$most_dense_month[1]], " (", year_comparison_results()$val1$most_dense_month[2],")")), 
+              tags$th(paste0(month.name[year_comparison_results()$val2$most_dense_month[1]], " (", year_comparison_results()$val2$most_dense_month[2],")"))
             )
           )
         ), 
