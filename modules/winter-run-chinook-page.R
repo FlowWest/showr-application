@@ -168,6 +168,43 @@ winter_run_server <- function(input, output, session, g_date) {
     subset(redd_reach, Reach == event_data("plotly_hover", source = "redd_presence_plot")$key)
   })
   
+  # year comparison values 
+  year_comparison_results <- reactive({
+    req(input$wr_add_year != "None")
+    
+     year_totals <- redd_data %>% 
+      filter(year(date) %in% c(input$wr_select_year, input$wr_add_year)) %>% 
+      group_by(year = year(date)) %>% 
+      summarise(
+        total = sum(counts, na.rm = TRUE)
+      )
+     
+     first_spawn_last_emergence <- rd %>% 
+       filter(year(date) %in% c(input$wr_select_year, input$wr_add_year)) %>%
+       group_by(year = year(date)) %>% 
+       summarise(
+         first_spawn = format(min(seed_day), "%B %d"), 
+         last_emergence = format(max(date), "%B %d")
+       )
+     
+     # most dense month
+     most_dense_month <- rd %>% 
+       filter(year(date) %in% c(input$wr_select_year, input$wr_add_year)) %>%
+       group_by(date) %>% 
+       summarise(
+         daily_sum = sum(counts)
+       ) %>% 
+       group_by(year = year(date), month = month(date)) %>% 
+       summarise(
+         month_max = max(daily_sum)
+       ) %>% ungroup() %>% 
+       group_by(year) %>% 
+       summarise(
+         max = max(month_max), 
+         month = month[which(month_max == max)][1]
+       )
+  })
+  
   # Observers ------------------------------------------------------------------
   
   observeEvent(input$comparison_button, {
@@ -231,7 +268,6 @@ winter_run_server <- function(input, output, session, g_date) {
     
   })
   
-  
   # Output ---------------------------------------------------------------------
   
   output$download_wr_data <- downloadHandler(
@@ -244,8 +280,6 @@ winter_run_server <- function(input, output, session, g_date) {
     }
   )
   
-  
-  
   # not working correctly
   output$wr_table <- renderTable(
     rd %>% 
@@ -257,10 +291,6 @@ winter_run_server <- function(input, output, session, g_date) {
       summarise(Total = as.integer(sum(Total)), 
                 `Temperature Threatened` = as.integer(sum(`Temperature Threatened`, na.rm = TRUE))))
   
-  
-  
-  
-  
   output$comparison_button_ui <- renderUI({
     if (input$wr_add_year != "None") {
       actionButton(ns("comparison_button"), "Compare Years", class="btn-sm", 
@@ -268,10 +298,6 @@ winter_run_server <- function(input, output, session, g_date) {
     } else 
       NULL
   })
-  
-  
-  
-  
   
   output$winter_run_temp_plot <- renderPlotly({
     p <- plot_ly()  %>% 
@@ -294,9 +320,6 @@ winter_run_server <- function(input, output, session, g_date) {
       layout(xaxis=list(title=""), yaxis=list(title="daily mean temperature (F)"), 
              legend=list(orientation='h'))
   })
-  
-  
-  
   
   # this whole thing needs some refactoring
   output$winter_run_plot <- renderPlotly({
@@ -381,9 +404,6 @@ winter_run_server <- function(input, output, session, g_date) {
     
   })
   
-  
-  
-  
   output$wr_redd_reaches_map <- renderLeaflet({
     
     shiny::validate(errorClass = 'no-redds-alert', need(
@@ -401,7 +421,6 @@ winter_run_server <- function(input, output, session, g_date) {
                      bringToFront = TRUE) )
   })
   
-  
   # Bookmarking this page ----------
   setBookmarkExclude(c("flow_page_bookmark", "temp_page_bookmark", "chinook_bookmark"))
   
@@ -412,7 +431,5 @@ winter_run_server <- function(input, output, session, g_date) {
   onBookmark(function(state) {
     state$values$wr_year_hash <- digest::digest(input$wr_select_year, "md5")
   })
-  
-  
   
 }
