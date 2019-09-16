@@ -26,12 +26,9 @@ shallow_redds_ui <- function(id) {
                                   value = today() + 30, width = 150, 
                                   format = "M d, yyyy")),
                tags$div(style="display:inline-block;", 
-                        numericInput(ns("dewater_calc_flow"), "Change flow to", 
-                                     value = 5000, width = 150)),
-               tags$div(style="display:inline-block;", 
-                        actionButton(ns("run_dewater_calc"), "run"))
-             ), 
-             uiOutput(ns("dewater_calc_output"))
+                        actionButton(ns("run_dewater_calc"), "run")), 
+               uiOutput(ns("dewater_calc_output"), inline = TRUE)
+             )
            ))
     
   )
@@ -111,8 +108,8 @@ shallow_redds_server <- function(input, output, session) {
   
   
   output$dewater_calc_output <- renderUI({
-    tags$div(
-      tags$p(sum(shallow_redds_remaining()$total))
+    tags$div(style="display:inline-block;margin-left:20px;",
+      tags$h3(tags$b(sum(shallow_redds_remaining()$total)))
     )
   })
   
