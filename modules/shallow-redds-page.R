@@ -90,7 +90,7 @@ shallow_redds_server <- function(input, output, session) {
   
   output$dewater_calc_output <- renderUI({
     tags$div(style="display:inline-block;margin-left:20px;",
-      tags$h3(tags$b(sum(shallow_redds_remaining()$total)))
+      tags$h3(tags$b(sum(shallow_redds_remaining()$total)), "redds remaining")
     )
   })
   
