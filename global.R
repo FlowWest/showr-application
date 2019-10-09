@@ -1,20 +1,19 @@
 library(shiny)
-library(plotly)
-library(dplyr)
+library(forcats)
+library(readr)
+library(tidyr)
+library(stringr)
 library(lubridate)
+library(dplyr)
+library(purrr)
+library(plotly)
 library(DT)
 library(leaflet)
 library(rgdal)
 library(zoo)
-library(stringr)
-library(readr)
-library(tidyr)
-library(forcats)
-library(readr)
 library(sparkline)
 library(shinyjs)
 library(measurements)
-library(purrr)
 library(shinytoastr)
 library(shinyWidgets)
 library(shinycssloaders)
@@ -35,14 +34,13 @@ source("modules/welcome.R")
 # load general objects, documented in "data/make-general-objects.R"
 load("data/general-objects.RData")
 
-# diversion_data <- read_csv("data/flows/srsc_diversion_data.csv") %>% 
-#   mutate(draft_date = mdy(draft_date))
+# DIVERSION DATA ---------------------------------------------------------------
 diversion_data <- read_rds("data/flows/total-diversions-2019-09-05.rds")
 
 upstream_diversions <- read_rds("data/flows/upstream-diversions-2019-09-05.rds")
 downstream_diversions <- read_rds("data/flows/downstream-diversions-2019-09-05.rds")
 
-# These data are all on a public S3 bucket 
+# TEMP DATA --------------------------------------------------------------------
 temp_data <- 
   read_csv("data/temperatures/showr-hourly-temps-2019-10-09.csv", 
            col_types = cols(
@@ -61,6 +59,10 @@ temp_compliance_points_daily_mean <-
              parameter_value = col_double()
            ))
 
+cdec_temperature_locations <- read_rds("data/temperatures/cdec_temperature_locations.rds")
+model_temps <- read_csv("data/temperatures/cvtemp/sim_run_2019-05-24.csv") 
+
+# FLOW DATA --------------------------------------------------------------------
 flow_data <- 
   read_csv("data/flows/showr-hourly-flow-2019-10-09.csv",
            col_types = cols(
@@ -79,6 +81,7 @@ flow_data_daily_mean <-
              parameter_value = col_double()
            ))
 
+# SHASTA STORAGE ---------------------------------------------------------------
 shasta_storage_data <- 
   read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_ops.csv", 
            col_types = cols(
@@ -88,6 +91,7 @@ shasta_storage_data <-
              parameter_value = col_double()
            ))
 
+# AIR TEMP ---------------------------------------------------------------------
 redd_air_temp <- 
   read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_daily_max_air_temp.csv", 
            col_types = cols(
@@ -97,13 +101,10 @@ redd_air_temp <-
              parameter_value = col_integer()
            )) 
 
+# SALMON DATA -----------------------------------------------------------------
 redd_data <- 
   read_rds("data/chinook/2019-09-06-redd-counts.rds") %>% 
   filter(race == "Winter") 
-# %>% 
-#   mutate(location = factor(location, levels = redd_locations))
-
-carcass_data <- read_rds("data/chinook/carcass_static_data.rds")
 
 # shape files for redd map 
 redd_reach <- readOGR("data/redd_reaches/redd_reach.shp", stringsAsFactors = FALSE)
@@ -112,27 +113,13 @@ redd_reach <- spTransform(redd_reach, CRS("+proj=longlat +datum=WGS84 +no_defs")
 # TCD Configurations
 tcd_configs_data <- read_rds("data/tcd_configurations/tcd_configs_through_2017-08-24.rds")
 
-# temp locations metadata 
-cdec_temperature_locations <- read_rds("data/temperatures/cdec_temperature_locations.rds")
-
-model_temps <- read_csv("data/temperatures/cvtemp/sim_run_2019-05-24.csv") 
-# %>% 
-#   filter(model_type == "usbr_no_w2", 
-#          scenario_name == "may_23_2018_input_90_output_90_50l3mto")
-# model_temps$datetime <- as_date(model_temps$datetime)
-
 # winter run presence 
 wr_presence_data <- read_csv("data/chinook/wr_chinook_presence.csv")
 
-# water year index classifications
-
+# WATER YEAR CLASSIFICATION ------------------------------------------------------
 historic_water_year_types <- 
   readr::read_rds("data/operations/current_water_year_classifications.rds") %>% 
   add_row("water_year" = 2018, "sac_valley_class"="BN", "san_joaquin_class"=NA)
-
-# current_water_year_types <- 
-#   readr::read_rds("data/operations/2018-04-17-water-year-index.rds")
-
 
 pretty_num <- function(num, places = 2) {
   format(round(num, places), big.mark = ',', drop = FALSE)
@@ -189,21 +176,24 @@ daily_temps <- bind_rows(
 historical_daily_min_max_temps <- read_rds("data/temperatures/historical-daily-min-max.rds")
 historical_daily_min_max_flows <- read_rds("data/flows/flow_historical_daily_min_max.rds")
 
-### NO TEMPERATURE DATA BEFORE 2010!!!!
-rd <- redd_data %>%
-  filter(counts > 0, year(date) >= 2010) %>% 
-  mutate(redd_id = row_number(date)) %>% 
-  rowwise() %>% 
-  do(
+redd_data_passed_2010 <- 
+  redd_data %>% filter(year(date) >= 2010, counts > 0) %>% 
+  mutate(redd_id = row_number(date))
+
+rd <- seq_len(nrow(redd_data_passed_2010)) %>%
+  map_df(function(i) {
+    row <- redd_data_passed_2010[i, ]
+    seed_day <- as_date(row$date)
+    estimated_emergence <- as_date(estimate_emergence(seed_day, row$location)) - 1
     tibble(
-      date = seq(.$date, as_date(estimate_emergence(.$date, .$location)) -1, by="day"), # this give a sequence from the seed day to the estiamted emergence value
-      seed_day = .$date,
-      location = .$location, 
-      counts = as.integer(.$counts), # how many redds will exist in the water for this time
-      redd_id = .$redd_id
+      date = seq(seed_day, estimated_emergence, by = "day"),
+      seed_day = seed_day,
+      location = row$location,
+      counts = as.integer(row$counts), 
+      redd_id = row$redd_id
     )
-  ) %>% ungroup() %>% 
-  mutate(cdec_gage = redd_cdec_lookup[location], 
+  }) %>% 
+  mutate(cdec_gage = redd_cdec_lookup[location],
          location = factor(location, levels = unique(redd_data$location))) %>%
   left_join(daily_temps)
 

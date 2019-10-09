@@ -1,7 +1,3 @@
-# Author: Emanuel
-# Details:
-# This file defines both the UI and server for the dashboard page of showr.
-
 dashboardUI <- function(id){
   ns <- NS(id)
   tagList(
@@ -50,18 +46,10 @@ dashboardUI <- function(id){
                                                           label = "plot",
                                                           icon = icon("line-chart"), 
                                                           class = "btn-xs details_button btn-success pull-right"),
-                 # storage_go_to_details_button = actionButton(ns("go_to_storage_details"), 
-                 #                                             label = "plot",
-                 #                                             icon = icon("line-chart"), 
-                 #                                             class = "btn-xs details_button btn-success pull-right"),
                  flow_go_to_details_button = actionButton(ns("go_to_flow_details"), 
                                                           label = "plot",
                                                           icon = icon("line-chart"),
                                                           class = "btn-xs details_button btn-success pull-right"),
-                 # chinook_go_to_details_button = actionButton(ns("go_to_chinook_details"), 
-                 #                                             label = NULL,
-                 #                                             icon = icon("arrow-right"), 
-                 #                                             class = "btn-xs details_button btn-success pull-right"),
                  jump_to_year_button = dropdownButton(
                    actionButton(ns("jump_to_2016"), 
                                 label = "Below Normal (2016)",
@@ -118,18 +106,7 @@ dashboard_server <- function(input, output, session, g_date, x) {
       
     }
   })
-  
-  # observeEvent(input$jump_to_similar_year, {
-  #   similar_year <- get_similar_year("")
-  #   if (input$jump_to_similar_year %% 2 == 0) {
-  #     updateDateInput(session, "global_date", value = starting_date)
-  #     updateActionButton(session, inputId = "jump_to_similar_year", label = "similar year") # when reset it clicked  
-  #   } else {
-  #     updateDateInput(session, "global_date", value = date_last_year())
-  #     updateActionButton(session, inputId = "jump_to_similar_year", label = "reset") # when last year is clicked 
-  #     
-  #   }
-  # })
+
   
   
   # Reservoir Metrics ----------------------------------------------------------
@@ -270,6 +247,7 @@ dashboard_server <- function(input, output, session, g_date, x) {
       textOutput(ns("kwk_temp"))
     }
   })
+  
   output$ccr_temp_span <- renderUI({
     validate(need(length(latest_ccr_temperature()) > 0, "No Data"))
     validate(need(!is.na(latest_ccr_temperature()), "No Data"))
