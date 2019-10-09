@@ -44,7 +44,7 @@ downstream_diversions <- read_rds("data/flows/downstream-diversions-2019-09-05.r
 
 # These data are all on a public S3 bucket 
 temp_data <- 
-  read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_hourly_temps.csv", 
+  read_csv("data/temperatures/showr-hourly-temps-2019-10-09.csv", 
            col_types = cols(
              datetime = col_datetime(format = ""),
              location_id = col_character(),
@@ -53,7 +53,7 @@ temp_data <-
            ))
 
 temp_compliance_points_daily_mean <- 
-  read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_tempatures.csv", 
+  read_csv("data/temperatures/showr-daily-mean-temps-2019-10-09.csv", 
            col_types = cols(
              datetime = col_date(format = ""),
              location_id = col_character(),
@@ -62,7 +62,7 @@ temp_compliance_points_daily_mean <-
            ))
 
 flow_data <- 
-  read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_hourly_flows.csv",
+  read_csv("data/flows/showr-hourly-flow-2019-10-09.csv",
            col_types = cols(
              location_id = col_character(),
              parameter_id = col_integer(),
@@ -71,7 +71,7 @@ flow_data <-
            ))
   
 flow_data_daily_mean <- 
-  read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_flow.csv", 
+  read_csv("data/flows/showr-daily-flow-2019-10-09.csv", 
            col_types = cols(
              datetime = col_date(format = ""),
              location_id = col_character(),
