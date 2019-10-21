@@ -1,7 +1,7 @@
 library(zoo)
 library(CDECRetrieve)
 library(tidyverse)
-
+library(lubridate)
 
 # SHOWR HOURLY TEMPS -----------------------------------------------------------
 
@@ -77,3 +77,20 @@ showr_daily_flows <- showr_hourly_flows %>%
 write_csv(showr_daily_flows, "data/flows/showr-daily-flow-2019-10-09.csv")
 
 
+# SHASTA OPS  -------------------------------------------------------------
+
+showr_ops <- c(15, 94) %>% 
+  map_df(function(sensor_no) {
+      cdec_query(station = "sha", sensor = sensor_no, dur_code = "d", start_date = "2010-01-01")
+  })  %>% 
+  transmute(datetime = as_date(datetime), location_id = tolower(location_id), 
+            parameter_id = parameter_cd, parameter_value) %>% 
+  filter(datetime <= today()) %>% 
+  fill(parameter_value, .direction = "down")
+
+# showr_hourly_flows_fixed <- showr_hourly_flows %>% 
+#   arrange(location_id, datetime) %>% 
+#   fill(parameter_value) %>% 
+#   mutate(parameter_value = round(parameter_value, 1))
+
+write_csv(showr_ops, "data/operations/shasta-daily-operations-2019-10-16.csv")

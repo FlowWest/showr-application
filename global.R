@@ -1,11 +1,6 @@
 library(shiny)
-library(forcats)
-library(readr)
-library(tidyr)
-library(stringr)
+library(tidyverse)
 library(lubridate)
-library(dplyr)
-library(purrr)
 library(plotly)
 library(DT)
 library(leaflet)
@@ -83,7 +78,7 @@ flow_data_daily_mean <-
 
 # SHASTA STORAGE ---------------------------------------------------------------
 shasta_storage_data <- 
-  read_csv("https://s3-us-west-2.amazonaws.com/showr-data-site/showr_ops.csv", 
+  read_csv("data/operations/shasta-daily-operations-2019-10-16.csv", 
            col_types = cols(
              datetime = col_date(format = ""),
              location_id = col_character(),
