@@ -125,7 +125,7 @@ shallow_redds_server <- function(input, output, session) {
   
   output$dewater_calc_output <- renderUI({
     tags$div(
-      tags$p(sum(shallow_redds_remaining()$total))
+      tags$h4(sum(shallow_redds_remaining()$total), style="font-weight:500;")
     )
   })
   
