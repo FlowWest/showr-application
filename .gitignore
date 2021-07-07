@@ -4,3 +4,4 @@ rsconnect/*
 .Rproj.user
 .httr-oauth
 .Rhistory
+*.Rhistory
